@@ -1,9 +1,12 @@
 package com.backSpringBatch.services;
 
 import com.backSpringBatch.Util.Marcaciones;
+import com.backSpringBatch.Util.SaveMantDTO;
 import com.backSpringBatch.postgres.entity.AsistNow;
 import com.backSpringBatch.postgres.mapper.AsistNowMapper;
 import com.backSpringBatch.postgres.models.AsistNowDTO;
+import com.backSpringBatch.postgres.models.ResponseAsistNowPagination;
+import com.backSpringBatch.postgres.models.SearchMarcaDTO;
 import com.backSpringBatch.postgres.repository.PostGresRepository;
 import com.backSpringBatch.sqlserver.entity.AsistNowRegistro;
 import com.backSpringBatch.sqlserver.entity.AsistNowSql;
@@ -13,6 +16,9 @@ import com.backSpringBatch.sqlserver.repository.AsistNowSqlRepository;
 import com.backSpringBatch.sqlserver.repository.SQLRepository;
 import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,6 +69,61 @@ public class DataBaseServices {
     }
 
 
+    //PAGINADO
+    public ResponseAsistNowPagination obtenerMarcaciones (SearchMarcaDTO searchMarcaDTO){
+
+        ResponseAsistNowPagination exit = new ResponseAsistNowPagination();
+        int totalReg = obtenermarcaGeneral(searchMarcaDTO).size();
+        if (totalReg > 0) {
+            int page = searchMarcaDTO.getPage() > 0 ? (searchMarcaDTO.getPage() - 1) : 0;
+            PageRequest pgRq = PageRequest.of(page, searchMarcaDTO.getReg_por_pag());
+            exit.setTotalRegister(totalReg);
+            exit.setAsistNowDTOS(obtenerMarcaPag(pgRq, searchMarcaDTO));
+            exit.setMessage("OK");
+        }else {
+            exit.setAsistNowDTOS(null);
+            exit.setTotalRegister(0);
+            exit.setMessage("No existen datos");
+
+        }
+        return exit;
+    }
+
+    public  List<AsistNowDTO> obtenermarcaGeneral(SearchMarcaDTO search){
+
+        return asistNowMapper.toAsistNowDTOToAsistNow(postGresRepository.getIdAsistfiltro(search.getIdAsistNow()));
+    }
+
+    public List<AsistNowDTO> obtenerMarcaPag( Pageable pag, SearchMarcaDTO search){
+
+        List<AsistNowDTO> exit= new ArrayList<>();
+        Page<Object[]> asistObject =(postGresRepository.getIdAsistSinPag(search.getIdAsistNow(), pag));
+
+        for(Object[] objects : asistObject){
+
+            AsistNowDTO asist=new AsistNowDTO();
+            asist.setAsisId(objects[0].toString());
+            asist.setAsisZona(objects[1].toString());
+            asist.setAsisFecha(objects[2].toString());
+            asist.setAsisHora(objects[3].toString());
+            asist.setAsisTipo(objects[4].toString());
+            asist.setAsisRes(objects[5].toString());
+            exit.add(asist);
+
+        }
+
+        return exit;
+    }
+
+//    public SaveMantDTO justificacion( Boolean justificacion, String idAsistnow){
+//
+//        SaveMantDTO exit = new SaveMantDTO();
+//
+////        AsistNow asistNow = postGresRepository.fin
+//
+//
+//    }
+
 //*/public void simulatorMarcaciones (Boolean inicio) throws InterruptedException {
 //
 //if(inicio){
@@ -109,42 +170,6 @@ public class DataBaseServices {
 //
 //        }
 //}
-    public String getHourNow() {
-        String hora = DateTimeFormatter.ofPattern("HH:mm:ss").format(LocalDateTime.now());
-        return hora;
-    }
-
-    public LocalDateTime obtenergetdateNow(){
-
-        LocalDateTime date = LocalDateTime.now();
-
-        return  date;
-    }
-
-
-
-
-  public List<AsistNowDTO> obtenerMarcaciones(String idAsistNow){
-
-        List<AsistNowDTO> exit= new ArrayList<>();
-           List <Object[]> asistObject =(postGresRepository.getIdAsist(idAsistNow));
-
-           for(Object[] objects : asistObject){
-
-               AsistNowDTO asist=new AsistNowDTO();
-               asist.setAsisId(objects[0].toString());
-               asist.setAsisZona(objects[1].toString());
-               asist.setAsisFecha(objects[2].toString());
-               asist.setAsisHora(objects[3].toString());
-               asist.setAsisTipo(objects[4].toString());
-               asist.setAsisRes(objects[5].toString());
-               exit.add(asist);
-
-           }
-
-        return exit;
-  }
-
 
 
 

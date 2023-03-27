@@ -13,7 +13,6 @@ public class AsistNow {
     @EmbeddedId
     private AsistnowPK id;
 
-
     @Column(name = "asis_fecha")
     private Date asisFecha;
 
@@ -25,6 +24,15 @@ public class AsistNow {
 
     @Column(name = "asis_res")
     private String asisRes;
+
+    @Column (name = "nomina_cod")
+    private String identificacion;
+
+    @Column (name= "atraso")
+    private int atraso;
+
+    @Column(name= "justificacion")
+    private Boolean justificacion;
 
 
     public AsistnowPK getId() {
@@ -65,6 +73,30 @@ public class AsistNow {
 
     public void setAsisRes(String asisRes) {
         this.asisRes = asisRes;
+    }
+
+    public int getAtraso() {
+        return atraso;
+    }
+
+    public String getIdentificacion() {
+        return identificacion;
+    }
+
+    public void setIdentificacion(String identificacion) {
+        this.identificacion = identificacion;
+    }
+
+    public void setAtraso(int atraso) {
+        this.atraso = atraso;
+    }
+
+    public Boolean getJustificacion() {
+        return justificacion;
+    }
+
+    public void setJustificacion(Boolean justificacion) {
+        this.justificacion = justificacion;
     }
 }
 

@@ -10,7 +10,7 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface AsistNowMapper {
 
-//    List<AsistNowDTO> toAsistNowDTOToAsistNow(List<AsistNow> all);
+    List<AsistNowDTO> toAsistNowDTOToAsistNow(List<AsistNow> all);
 
 
 }

@@ -2,14 +2,14 @@ package com.backSpringBatch.controller;
 
 
 import com.backSpringBatch.postgres.models.AsistNowDTO;
+import com.backSpringBatch.postgres.models.ResponseAsistNowPagination;
+import com.backSpringBatch.postgres.models.SearchMarcaDTO;
 import com.backSpringBatch.services.DataBaseServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -30,10 +30,9 @@ public class DataBaseontroller {
 
 	}
 
-	@GetMapping("obtenerMarcaciones/")
-
-	public List<AsistNowDTO> obtenerMarcaciones(@RequestParam String idAsistnow){
-		return dataBaseServices.obtenerMarcaciones(idAsistnow);
+	@PostMapping("obtenerMarcaciones/")
+	public ResponseAsistNowPagination obtenerMarcaciones(@RequestBody @Validated SearchMarcaDTO search){
+		return dataBaseServices.obtenerMarcaciones(search);
 	}
 
 //	@GetMapping("simulatorMarcaciones/")

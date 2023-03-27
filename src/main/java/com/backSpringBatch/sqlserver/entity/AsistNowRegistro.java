@@ -23,6 +23,9 @@ public class AsistNowRegistro {
     @Column(name = "asis_res")
     private String asisRes;
 
+    @Column (name = "nomina_cod")
+    private String identificacion;
+
     public AsistnowRegistroPK getId() {
         return id;
     }
@@ -61,5 +64,13 @@ public class AsistNowRegistro {
 
     public void setAsisRes(String asisRes) {
         this.asisRes = asisRes;
+    }
+
+    public String getIdentificacion() {
+        return identificacion;
+    }
+
+    public void setIdentificacion(String identificacion) {
+        this.identificacion = identificacion;
     }
 }
