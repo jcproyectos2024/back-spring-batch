@@ -1,6 +1,7 @@
 package com.backSpringBatch.controller;
 
 
+import com.backSpringBatch.Util.SaveMantDTO;
 import com.backSpringBatch.postgres.models.AsistNowDTO;
 import com.backSpringBatch.postgres.models.ResponseAsistNowPagination;
 import com.backSpringBatch.postgres.models.SearchMarcaDTO;
@@ -33,6 +34,11 @@ public class DataBaseontroller {
 	@PostMapping("obtenerMarcaciones/")
 	public ResponseAsistNowPagination obtenerMarcaciones(@RequestBody @Validated SearchMarcaDTO search){
 		return dataBaseServices.obtenerMarcaciones(search);
+	}
+
+	@GetMapping("estadoJustificacion/")
+	public SaveMantDTO estadoJustificacion(@RequestParam Boolean justificacion, @RequestParam String identificacion){
+		return  dataBaseServices.justificacion(justificacion, identificacion);
 	}
 
 //	@GetMapping("simulatorMarcaciones/")

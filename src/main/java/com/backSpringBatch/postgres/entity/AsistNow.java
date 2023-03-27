@@ -28,11 +28,6 @@ public class AsistNow {
     @Column (name = "nomina_cod")
     private String identificacion;
 
-    @Column (name= "atraso")
-    private int atraso;
-
-    @Column(name= "justificacion")
-    private Boolean justificacion;
 
 
     public AsistnowPK getId() {
@@ -75,28 +70,12 @@ public class AsistNow {
         this.asisRes = asisRes;
     }
 
-    public int getAtraso() {
-        return atraso;
-    }
-
     public String getIdentificacion() {
         return identificacion;
     }
 
     public void setIdentificacion(String identificacion) {
         this.identificacion = identificacion;
-    }
-
-    public void setAtraso(int atraso) {
-        this.atraso = atraso;
-    }
-
-    public Boolean getJustificacion() {
-        return justificacion;
-    }
-
-    public void setJustificacion(Boolean justificacion) {
-        this.justificacion = justificacion;
     }
 }
 

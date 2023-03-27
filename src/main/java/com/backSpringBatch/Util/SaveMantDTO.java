@@ -5,7 +5,7 @@ public class SaveMantDTO {
 
     private String message;
 
-    private Boolean success;
+//    private Boolean success;
 
     public String getMessage() {
         return message;
@@ -15,11 +15,11 @@ public class SaveMantDTO {
         this.message = message;
     }
 
-    public Boolean getSuccess() {
-        return success;
-    }
-
-    public void setSuccess(Boolean success) {
-        this.success = success;
-    }
+//    public Boolean getSuccess() {
+//        return success;
+//    }
+//
+//    public void setSuccess(Boolean success) {
+//        this.success = success;
+//    }
 }

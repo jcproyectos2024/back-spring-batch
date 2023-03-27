@@ -1,20 +1,17 @@
 package com.backSpringBatch.services;
 
-import com.backSpringBatch.Util.Marcaciones;
 import com.backSpringBatch.Util.SaveMantDTO;
 import com.backSpringBatch.postgres.entity.AsistNow;
+import com.backSpringBatch.postgres.entity.Atrasos;
 import com.backSpringBatch.postgres.mapper.AsistNowMapper;
 import com.backSpringBatch.postgres.models.AsistNowDTO;
 import com.backSpringBatch.postgres.models.ResponseAsistNowPagination;
 import com.backSpringBatch.postgres.models.SearchMarcaDTO;
+import com.backSpringBatch.postgres.repository.AtrasosRepository;
 import com.backSpringBatch.postgres.repository.PostGresRepository;
 import com.backSpringBatch.sqlserver.entity.AsistNowRegistro;
-import com.backSpringBatch.sqlserver.entity.AsistNowSql;
-import com.backSpringBatch.sqlserver.entity.AsistnowRegistroPK;
 import com.backSpringBatch.sqlserver.mapper.AsisRegistroMapper;
-import com.backSpringBatch.sqlserver.repository.AsistNowSqlRepository;
 import com.backSpringBatch.sqlserver.repository.SQLRepository;
-import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,16 +19,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Random;
+
 
 
 @Service
@@ -50,6 +40,9 @@ public class DataBaseServices {
     @Autowired
     private AsistNowMapper asistNowMapper;
 
+    @Autowired
+    private AtrasosRepository atrasosRepository;
+
 
     @Transactional(rollbackFor = { Exception.class })
     public void insertSqlToPostgres(){
@@ -59,6 +52,16 @@ public class DataBaseServices {
             List<AsistNowRegistro> lsRegistros=sqlRepository.findAll();
             lsRegistros.forEach(x->{
                 AsistNow regActual=asisRegistroMapper.asistNowRegistroToAsistNow(x);
+                //Llenar tabla atrasos
+                Atrasos atrasos = new Atrasos();
+                atrasos.setId(x.getId().getAsisId());
+                atrasos.setIdentificacion(x.getIdentificacion());
+                atrasos.setJustificacion(Boolean.FALSE);
+                int hora = Integer.parseInt(x.getAsisHora());
+                int  calHora= hora-83000;
+                String calculo= String.valueOf(calHora);
+                atrasos.setTiempoAtraso(calculo);
+
                 postGresRepository.save(regActual);
                 sqlRepository.delete(x);
             });
@@ -91,13 +94,13 @@ public class DataBaseServices {
 
     public  List<AsistNowDTO> obtenermarcaGeneral(SearchMarcaDTO search){
 
-        return asistNowMapper.toAsistNowDTOToAsistNow(postGresRepository.getIdAsistfiltro(search.getIdAsistNow()));
+        return asistNowMapper.toAsistNowDTOToAsistNow(postGresRepository.getIdAsistfiltro(search.getIdentificacion()));
     }
 
     public List<AsistNowDTO> obtenerMarcaPag( Pageable pag, SearchMarcaDTO search){
 
         List<AsistNowDTO> exit= new ArrayList<>();
-        Page<Object[]> asistObject =(postGresRepository.getIdAsistSinPag(search.getIdAsistNow(), pag));
+        Page<Object[]> asistObject =(postGresRepository.getIdAsistSinPag(search.getIdentificacion(), pag));
 
         for(Object[] objects : asistObject){
 
@@ -108,6 +111,9 @@ public class DataBaseServices {
             asist.setAsisHora(objects[3].toString());
             asist.setAsisTipo(objects[4].toString());
             asist.setAsisRes(objects[5].toString());
+            asist.setAtraso(objects[6].toString());
+//            asist.setJustificacion(Boolean.valueOf(objects[7].toString()));
+
             exit.add(asist);
 
         }
@@ -115,14 +121,17 @@ public class DataBaseServices {
         return exit;
     }
 
-//    public SaveMantDTO justificacion( Boolean justificacion, String idAsistnow){
-//
-//        SaveMantDTO exit = new SaveMantDTO();
-//
-////        AsistNow asistNow = postGresRepository.fin
-//
-//
-//    }
+    public SaveMantDTO justificacion( Boolean justificacion, String identificacion){
+
+        SaveMantDTO exit = new SaveMantDTO();
+
+        Atrasos atrasos = atrasosRepository.findIdentificacion(identificacion);
+        atrasos.setJustificacion(justificacion);
+        atrasosRepository.save(atrasos);
+        exit.setMessage("Atraso Justificado");
+        return exit;
+
+    }
 
 //*/public void simulatorMarcaciones (Boolean inicio) throws InterruptedException {
 //

@@ -19,6 +19,10 @@ public class AsistNowDTO {
 
     private String asisRes;
 
+    private  Boolean justificacion;
+
+    private String atraso;
+
 
     public String getAsisId() {
         return asisId;
@@ -78,5 +82,19 @@ public class AsistNowDTO {
     }
 
 
+    public Boolean getJustificacion() {
+        return justificacion;
+    }
 
+    public void setJustificacion(Boolean justificacion) {
+        this.justificacion = justificacion;
+    }
+
+    public String getAtraso() {
+        return atraso;
+    }
+
+    public void setAtraso(String atraso) {
+        this.atraso = atraso;
+    }
 }

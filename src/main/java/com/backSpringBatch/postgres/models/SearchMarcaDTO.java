@@ -5,7 +5,7 @@ public class SearchMarcaDTO {
     private int page;
     private int reg_por_pag;
 
-    private String  idAsistNow;
+    private String  identificacion;
 
 
 
@@ -26,11 +26,11 @@ public class SearchMarcaDTO {
         this.reg_por_pag = reg_por_pag;
     }
 
-    public String getIdAsistNow() {
-        return idAsistNow;
+    public String getIdentificacion() {
+        return identificacion;
     }
 
-    public void setIdAsistNow(String idAsistNow) {
-        this.idAsistNow = idAsistNow;
+    public void setIdentificacion(String identificacion) {
+        this.identificacion = identificacion;
     }
 }
