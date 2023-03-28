@@ -55,12 +55,12 @@ public class DataBaseServices {
                 //Llenar tabla atrasos
                 Atrasos atrasos = new Atrasos();
                 atrasos.setId(x.getId().getAsisId());
-                atrasos.setIdentificacion(x.getIdentificacion());
+                atrasos.setIdentificacion(x.getIdentificacion()!=null?x.getIdentificacion():"");
                 atrasos.setJustificacion(Boolean.FALSE);
-                int hora = Integer.parseInt(x.getAsisHora());
-                int  calHora= hora-83000;
-                String calculo= String.valueOf(calHora);
-                atrasos.setTiempoAtraso(calculo);
+//                int hora = Integer.parseInt(x.getAsisHora());
+//                int  calHora= hora-83000;
+//                String calculo= String.valueOf(calHora);
+                atrasos.setTiempoAtraso("00:02:00");
 
                 postGresRepository.save(regActual);
                 sqlRepository.delete(x);
