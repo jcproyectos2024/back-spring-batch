@@ -111,7 +111,7 @@ public class DataBaseServices {
             asist.setAsisHora(objects[3].toString());
             asist.setAsisTipo(objects[4].toString());
             asist.setAsisRes(objects[5].toString());
-            asist.setAtraso(objects[6].toString());
+//            asist.setAtraso(objects[6].toString());
 //            asist.setJustificacion(Boolean.valueOf(objects[7].toString()));
 
             exit.add(asist);
@@ -125,7 +125,7 @@ public class DataBaseServices {
 
         SaveMantDTO exit = new SaveMantDTO();
 
-        Atrasos atrasos = atrasosRepository.findIdentificacion(identificacion);
+        Atrasos atrasos = atrasosRepository.getIdentificacion(identificacion);
         atrasos.setJustificacion(justificacion);
         atrasosRepository.save(atrasos);
         exit.setMessage("Atraso Justificado");

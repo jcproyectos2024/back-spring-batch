@@ -2,7 +2,6 @@ package com.backSpringBatch.controller;
 
 
 import com.backSpringBatch.Util.SaveMantDTO;
-import com.backSpringBatch.postgres.models.AsistNowDTO;
 import com.backSpringBatch.postgres.models.ResponseAsistNowPagination;
 import com.backSpringBatch.postgres.models.SearchMarcaDTO;
 import com.backSpringBatch.services.DataBaseServices;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 
 @Controller

@@ -22,7 +22,7 @@ public interface PostGresRepository extends JpaRepository<AsistNow, String> {
             " order by  an.id.asisIng desc")
     List<AsistNow> getIdAsistfiltro(@Param("identificacion") String identificacion);
 
-    @Query(nativeQuery = false, value = "SELECT an.id.asisId, an.id.asisZona, an.asisFecha, an.asisHora, an.asisTipo, an.asisRes, at.tiempoAtraso  " +
+    @Query(nativeQuery = false, value = "SELECT an.id.asisId, an.id.asisZona, an.asisFecha, an.asisHora, an.asisTipo, an.asisRes  " +
             " from AsistNow an" +
             " left join Atrasos at " +
             " where  (an.identificacion =:identificacion or :identificacion is null)" +

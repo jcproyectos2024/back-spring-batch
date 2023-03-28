@@ -15,10 +15,10 @@ public interface AtrasosRepository extends JpaRepository<Atrasos, Long> {
     @Query(nativeQuery = false, value = "SELECT  at  " +
             " from Atrasos at" +
             " join AsistNow an" +
-            " where  an.identificacion =:identificacion" +
+            " where ( at.identificacion =:identificacion" +
             " and an.asisTipo ='INGRESO' " +
-            " and an.asisRes = 'OK' " +
+            " and an.asisRes = 'OK' )" +
             " order by  an.id.asisIng desc")
-    Atrasos findIdentificacion  (String identificacion);
+    Atrasos getIdentificacion  (String identificacion);
 
 }
