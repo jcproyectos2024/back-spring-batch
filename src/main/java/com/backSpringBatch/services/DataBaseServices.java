@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -64,21 +65,23 @@ public class DataBaseServices {
             List<AsistNowRegistro> lsRegistros=sqlRepository.findAll();
             lsRegistros.forEach(x->{
                 AsistNow regActual=asisRegistroMapper.asistNowRegistroToAsistNow(x);
-                //Llenar tabla atrasos
-//                Atrasos atrasos = new Atrasos();
-//                atrasos.setId(x.getId().getAsisId());
-//                atrasos.setFecha(x.getId().getAsisIng());
-//                atrasos.setIdentificacion(x.getIdentificacion()!=null?x.getIdentificacion():"");
-//                atrasos.setJustificacion(Boolean.FALSE);
-//                int hora = Integer.parseInt(x.getAsisHora());
-//                int  calHora= hora-83000;
-//               String calculo= String.valueOf(calHora);
-//                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd h:mm");
-//                Date difference = utily.getDifferenceBetwenDates(sdf.parse(x.getId().getAsisIng(), sdf.parse());;
-//                String hora= calcularHora();
-//                atrasos.setTiempoAtraso("00:20:00");
+
+
+                if(regActual.getAsisTipo().equals("INGRESO")&&regActual.getIdentificacion()!=null ){
+                    Atrasos atrasos = new Atrasos();
+                    atrasos.setId(regActual.getId());
+                    atrasos.setIdentificacion(regActual.getIdentificacion()!=null?regActual.getIdentificacion():"");
+                    atrasos.setJustificacion(Boolean.FALSE);
+                    // Validar primer ingreso
+                        SimpleDateFormat sdfResult = new SimpleDateFormat("HH:mm:ss");
+                        Date horaGrupo = (calcularHora(regActual.getIdentificacion()));
+                        Date difference = utily.getDifferenceBetwenDates(horaGrupo, regActual.getId().getAsisIng());
+                        String hora = sdfResult.format(difference);
+                        atrasos.setTiempoAtraso(hora);
+                    atrasosRepository.save(atrasos);
+                }
                 postGresRepository.save(regActual);
-//                atrasosRepository.save(atrasos);
+
 
                 sqlRepository.delete(x);
             });
@@ -140,11 +143,12 @@ public class DataBaseServices {
     public SaveMantDTO justificacion( Boolean justificacion, String identificacion){
 
         SaveMantDTO exit = new SaveMantDTO();
-        if(justificacion){
+
+        Atrasos atrasos = atrasosRepository.findByIdentificacion(identificacion);
+        if(atrasos.getJustificacion()){
             exit.setMessage("Ya exite una justificacion");
             return exit;
         }
-        Atrasos atrasos = atrasosRepository.findByIdentificacion(identificacion);
         atrasos.setJustificacion(justificacion);
         atrasosRepository.save(atrasos);
         exit.setMessage("Atraso Justificado");
@@ -198,14 +202,11 @@ public class DataBaseServices {
 //
 //        }
 //}
- public String calcularHora(String identificacion, String hora){
+ public Date calcularHora(String identificacion){
         ScheduleDTO horaGupo= restServices.getSchedulePerson(identificacion);
-        int horaAsis= Integer.valueOf(hora);
-        int horaDefault=Integer.parseInt(horaGupo.getDesde());
-        int horaCalculada =  horaDefault - horaAsis;
-        String horaAtraso= String.valueOf(horaCalculada);
+        Date horaGrupo= horaGupo.getDesde();
 
-        return  horaAtraso;
+        return  horaGrupo;
  }
 
 

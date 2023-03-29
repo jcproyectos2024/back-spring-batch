@@ -26,7 +26,6 @@ public class DataBaseontroller {
 	public void insertSqlToPostgres() {
 		dataBaseServices.insertSqlToPostgres();
 		System.out.println("Mensaje de cron:"+System.currentTimeMillis());
-
 	}
 
 	@PostMapping("obtenerMarcaciones/")
@@ -44,10 +43,10 @@ public class DataBaseontroller {
 //		dataBaseServices.simulatorMarcaciones(inicio);
 //	}
 
-	@GetMapping("calcularHora")
-	public String calcularHora(@RequestParam String identificaicion, @RequestParam String hora){
-		return dataBaseServices.calcularHora(identificaicion, hora);
-	}
+//	@GetMapping("calcularHora")
+//	public String calcularHora(@RequestParam String identificaicion, @RequestParam String hora){
+//		return dataBaseServices.calcularHora(identificaicion, hora);
+//	}
 
 }
 	

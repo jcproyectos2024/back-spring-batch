@@ -1,12 +1,14 @@
 package com.backSpringBatch.Util;
 
+import java.util.Date;
+
 public class ScheduleDTO {
 
     private Long id;
 
-    private  String desde;
+    private Date desde;
 
-    private String hasta;
+    private Date hasta;
 
     private String nameSchedule;
 
@@ -56,20 +58,19 @@ public class ScheduleDTO {
         this.idTurns = idTurns;
     }
 
-
-    public String getDesde() {
+    public Date getDesde() {
         return desde;
     }
 
-    public void setDesde(String desde) {
+    public void setDesde(Date desde) {
         this.desde = desde;
     }
 
-    public String getHasta() {
+    public Date getHasta() {
         return hasta;
     }
 
-    public void setHasta(String hasta) {
+    public void setHasta(Date hasta) {
         this.hasta = hasta;
     }
 }

@@ -12,17 +12,11 @@ import java.util.Date;
 public class Atrasos {
 
 
-    @Id
-    @Column(name = "id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Nullable
-    private String id;
+    @EmbeddedId
+    private AsistnowPK id;
 
     @Column (name = "tiempo_atraso")
     private  String tiempoAtraso;
-
-    @Column (name= "fecha")
-    private Date fecha;
 
 
     @Column(name= "identificacion")
@@ -31,11 +25,12 @@ public class Atrasos {
     @Column(name= "justificacion")
     private  Boolean justificacion;
 
-    public String getId() {
+
+    public AsistnowPK getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(AsistnowPK id) {
         this.id = id;
     }
 
@@ -46,7 +41,6 @@ public class Atrasos {
     public void setTiempoAtraso(String tiempoAtraso) {
         this.tiempoAtraso = tiempoAtraso;
     }
-
 
     public String getIdentificacion() {
         return identificacion;
@@ -64,11 +58,4 @@ public class Atrasos {
         this.justificacion = justificacion;
     }
 
-    public Date getFecha() {
-        return fecha;
-    }
-
-    public void setFecha(Date fecha) {
-        this.fecha = fecha;
-    }
 }

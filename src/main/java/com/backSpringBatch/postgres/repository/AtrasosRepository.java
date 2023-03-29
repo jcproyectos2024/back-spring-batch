@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 
 
 @Repository
-public interface AtrasosRepository extends JpaRepository<Atrasos, Long> {
+public interface AtrasosRepository extends JpaRepository<Atrasos, String> {
 
 //    @Query(nativeQuery = false, value = "SELECT  at  " +
 //            " from Atrasos at" +

@@ -5,6 +5,7 @@ import javax.persistence.Embeddable;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Embeddable
 public class AsistnowPK implements Serializable {
@@ -15,7 +16,7 @@ public class AsistnowPK implements Serializable {
     private String asisId;
 
     @Column(name = "asis_ing")
-    private LocalDateTime asisIng;
+    private Date asisIng;
 
     @Column(name = "asis_zona")
     private String asisZona;
@@ -28,11 +29,11 @@ public class AsistnowPK implements Serializable {
         this.asisId = asisId;
     }
 
-    public LocalDateTime getAsisIng() {
+    public Date getAsisIng() {
         return asisIng;
     }
 
-    public void setAsisIng(LocalDateTime asisIng) {
+    public void setAsisIng(Date asisIng) {
         this.asisIng = asisIng;
     }
 
