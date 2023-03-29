@@ -65,8 +65,6 @@ public class DataBaseServices {
             List<AsistNowRegistro> lsRegistros=sqlRepository.findAll();
             lsRegistros.forEach(x->{
                 AsistNow regActual=asisRegistroMapper.asistNowRegistroToAsistNow(x);
-
-
                 if(regActual.getAsisTipo().equals("INGRESO")&&regActual.getIdentificacion()!=null ){
                     Atrasos atrasos = new Atrasos();
                     atrasos.setId(regActual.getId());
@@ -193,7 +191,7 @@ public class DataBaseServices {
 //                sql.setAsisRes("OK");
 //
 //                asistNowSqlRepository.save(sql);
-////                System.out.println("Resultado"+" "+sql);
+//                System.out.println("Resultado"+" "+sql);
 //
 //                Thread.sleep(3000);
 //                ;

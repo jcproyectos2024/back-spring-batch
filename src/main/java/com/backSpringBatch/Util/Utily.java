@@ -14,20 +14,20 @@ public class Utily {
 
 
 
-    public static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd h:mm");
-    public static SimpleDateFormat sdfResult = new SimpleDateFormat("HH:mm:ss");
-    public static SimpleDateFormat sdfResultMinutos = new SimpleDateFormat("m");
+//    public static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd h:mm");
+//    public static SimpleDateFormat sdfResult = new SimpleDateFormat("HH:mm:ss");
+//    public static SimpleDateFormat sdfResultMinutos = new SimpleDateFormat("m");
 
-    public  void main(String[] args) throws ParseException {
-        Date difference = getDifferenceBetwenDates(sdf.parse("2018-11-01 9:31"), sdf.parse("2018-11-01 9:33"));
-        System.out.println(sdfResult.format(difference)); //00:02:00
-        System.out.println(sdfResultMinutos.format(difference) + " Minutos"); //2 Minutos
-
-        Date difference2 = getDifferenceBetwenDates(sdf.parse("2018-11-01 9:31"), sdf.parse("2018-11-01 11:28"));
-
-        System.out.println(sdfResult.format(difference2)); //01:57:00
-        System.out.println(sdfResultMinutos.format(difference2) + " Minutos"); //57 Minutos
-    }
+//    public  void main(String[] args) throws ParseException {
+//        Date difference = getDifferenceBetwenDates(sdf.parse("2018-11-01 9:31"), sdf.parse("2018-11-01 9:33"));
+//        System.out.println(sdfResult.format(difference)); //00:02:00
+//        System.out.println(sdfResultMinutos.format(difference) + " Minutos"); //2 Minutos
+//
+//        Date difference2 = getDifferenceBetwenDates(sdf.parse("2018-11-01 9:31"), sdf.parse("2018-11-01 11:28"));
+//
+//        System.out.println(sdfResult.format(difference2)); //01:57:00
+//        System.out.println(sdfResultMinutos.format(difference2) + " Minutos"); //57 Minutos
+//    }
     public Date getDifferenceBetwenDates (Date dateInicio, Date dateFinal) {
 
         long milliseconds = dateFinal.getTime() - dateInicio.getTime();
