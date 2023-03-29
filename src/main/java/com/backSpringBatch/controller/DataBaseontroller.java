@@ -44,5 +44,10 @@ public class DataBaseontroller {
 //		dataBaseServices.simulatorMarcaciones(inicio);
 //	}
 
+	@GetMapping("calcularHora")
+	public String calcularHora(@RequestParam String identificaicion, @RequestParam String hora){
+		return dataBaseServices.calcularHora(identificaicion, hora);
+	}
+
 }
 	

@@ -17,7 +17,7 @@ public class AsistNowDTO {
 
     private String asisTipo;
 
-    private String asisRes;
+//    private String asisRes;
 
     private  Boolean justificacion;
 
@@ -72,15 +72,15 @@ public class AsistNowDTO {
     public void setAsisTipo(String asisTipo) {
         this.asisTipo = asisTipo;
     }
-
-    public String getAsisRes() {
-        return asisRes;
-    }
-
-    public void setAsisRes(String asisRes) {
-        this.asisRes = asisRes;
-    }
-
+//
+//    public String getAsisRes() {
+//        return asisRes;
+//    }
+//
+//    public void setAsisRes(String asisRes) {
+//        this.asisRes = asisRes;
+//    }
+//
 
     public Boolean getJustificacion() {
         return justificacion;

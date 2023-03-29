@@ -1,6 +1,8 @@
 package com.backSpringBatch.services;
 
 import com.backSpringBatch.Util.SaveMantDTO;
+import com.backSpringBatch.Util.ScheduleDTO;
+import com.backSpringBatch.Util.Utily;
 import com.backSpringBatch.postgres.entity.AsistNow;
 import com.backSpringBatch.postgres.entity.Atrasos;
 import com.backSpringBatch.postgres.mapper.AsistNowMapper;
@@ -19,9 +21,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import static java.util.logging.Level.parse;
 
 
 @Service
@@ -43,6 +49,12 @@ public class DataBaseServices {
     @Autowired
     private AtrasosRepository atrasosRepository;
 
+    @Autowired
+    private RESTServices restServices;
+
+    @Autowired
+    private Utily utily;
+
 
     @Transactional(rollbackFor = { Exception.class })
     public void insertSqlToPostgres(){
@@ -53,16 +65,21 @@ public class DataBaseServices {
             lsRegistros.forEach(x->{
                 AsistNow regActual=asisRegistroMapper.asistNowRegistroToAsistNow(x);
                 //Llenar tabla atrasos
-                Atrasos atrasos = new Atrasos();
-                atrasos.setId(x.getId().getAsisId());
-                atrasos.setIdentificacion(x.getIdentificacion()!=null?x.getIdentificacion():"");
-                atrasos.setJustificacion(Boolean.FALSE);
+//                Atrasos atrasos = new Atrasos();
+//                atrasos.setId(x.getId().getAsisId());
+//                atrasos.setFecha(x.getId().getAsisIng());
+//                atrasos.setIdentificacion(x.getIdentificacion()!=null?x.getIdentificacion():"");
+//                atrasos.setJustificacion(Boolean.FALSE);
 //                int hora = Integer.parseInt(x.getAsisHora());
 //                int  calHora= hora-83000;
-//                String calculo= String.valueOf(calHora);
-                atrasos.setTiempoAtraso("00:02:00");
-
+//               String calculo= String.valueOf(calHora);
+//                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd h:mm");
+//                Date difference = utily.getDifferenceBetwenDates(sdf.parse(x.getId().getAsisIng(), sdf.parse());;
+//                String hora= calcularHora();
+//                atrasos.setTiempoAtraso("00:20:00");
                 postGresRepository.save(regActual);
+//                atrasosRepository.save(atrasos);
+
                 sqlRepository.delete(x);
             });
 
@@ -110,9 +127,8 @@ public class DataBaseServices {
             asist.setAsisFecha(objects[2].toString());
             asist.setAsisHora(objects[3].toString());
             asist.setAsisTipo(objects[4].toString());
-            asist.setAsisRes(objects[5].toString());
-//            asist.setAtraso(objects[6].toString());
-//            asist.setJustificacion(Boolean.valueOf(objects[7].toString()));
+            asist.setAtraso(objects[5].toString());
+            asist.setJustificacion(Boolean.valueOf(objects[6].toString()));
 
             exit.add(asist);
 
@@ -124,8 +140,11 @@ public class DataBaseServices {
     public SaveMantDTO justificacion( Boolean justificacion, String identificacion){
 
         SaveMantDTO exit = new SaveMantDTO();
-
-        Atrasos atrasos = atrasosRepository.getIdentificacion(identificacion);
+        if(justificacion){
+            exit.setMessage("Ya exite una justificacion");
+            return exit;
+        }
+        Atrasos atrasos = atrasosRepository.findByIdentificacion(identificacion);
         atrasos.setJustificacion(justificacion);
         atrasosRepository.save(atrasos);
         exit.setMessage("Atraso Justificado");
@@ -179,6 +198,15 @@ public class DataBaseServices {
 //
 //        }
 //}
+ public String calcularHora(String identificacion, String hora){
+        ScheduleDTO horaGupo= restServices.getSchedulePerson(identificacion);
+        int horaAsis= Integer.valueOf(hora);
+        int horaDefault=Integer.parseInt(horaGupo.getDesde());
+        int horaCalculada =  horaDefault - horaAsis;
+        String horaAtraso= String.valueOf(horaCalculada);
+
+        return  horaAtraso;
+ }
 
 
 

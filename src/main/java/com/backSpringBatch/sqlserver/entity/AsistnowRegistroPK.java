@@ -16,7 +16,7 @@ public class AsistnowRegistroPK implements Serializable {
     private String asisId;
 
     @Column(name = "asis_ing")
-    private LocalDateTime asisIng;
+    private Date asisIng;
 
     @Column(name = "asis_zona")
     private String asisZona;
@@ -29,11 +29,11 @@ public class AsistnowRegistroPK implements Serializable {
         this.asisId = asisId;
     }
 
-    public LocalDateTime getAsisIng() {
+    public Date getAsisIng() {
         return asisIng;
     }
 
-    public void setAsisIng(LocalDateTime asisIng) {
+    public void setAsisIng(Date asisIng) {
         this.asisIng = asisIng;
     }
 

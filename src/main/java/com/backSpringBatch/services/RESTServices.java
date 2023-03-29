@@ -22,7 +22,7 @@ public class RESTServices {
         String ruta = env.getProperty("url_get_schedule");
         ScheduleDTO rootc = null;
         String rutahistory=ruta;
-        rutahistory=identificacion;
+        rutahistory+="?identificacion="+identificacion;
         try {
             Response response =
                     RestAssured.given().contentType("application/json")

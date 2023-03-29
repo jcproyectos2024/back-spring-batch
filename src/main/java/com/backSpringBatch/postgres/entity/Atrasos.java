@@ -4,6 +4,8 @@ package com.backSpringBatch.postgres.entity;
 import groovyjarjarantlr4.v4.runtime.misc.Nullable;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @Table(name ="atrasos", schema = "public")
@@ -18,6 +20,10 @@ public class Atrasos {
 
     @Column (name = "tiempo_atraso")
     private  String tiempoAtraso;
+
+    @Column (name= "fecha")
+    private Date fecha;
+
 
     @Column(name= "identificacion")
     private String identificacion;
@@ -56,5 +62,13 @@ public class Atrasos {
 
     public void setJustificacion(Boolean justificacion) {
         this.justificacion = justificacion;
+    }
+
+    public Date getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(Date fecha) {
+        this.fecha = fecha;
     }
 }
