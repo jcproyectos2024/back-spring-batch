@@ -5,6 +5,7 @@ import com.backSpringBatch.Util.SaveMantDTO;
 import com.backSpringBatch.Util.Utily;
 import com.backSpringBatch.postgres.models.JustificacionDTO;
 import com.backSpringBatch.postgres.models.ResponseAsistNowPagination;
+import com.backSpringBatch.postgres.models.ResponseHorasProduccionPagination;
 import com.backSpringBatch.postgres.models.SearchMarcaDTO;
 import com.backSpringBatch.services.DataBaseServices;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,16 +46,21 @@ public class DataBaseontroller {
 		return dataBaseServices.obtenerAtrasos(search);
 	}
 
+	@PostMapping("obtenerHorasProd/")
+	public ResponseHorasProduccionPagination obtenerHorasProd(@RequestBody @Validated SearchMarcaDTO search) throws ParseException {
+		return dataBaseServices.obtenerHorasProd(search);
+	}
+
 	@PostMapping("estadoJustificacion/")
 	public SaveMantDTO estadoJustificacion(@RequestBody @Validated JustificacionDTO justDTO){
 		return  dataBaseServices.justificacion(justDTO);
 	}
 
-	@GetMapping("sumarHoras")
-	public Date sumaHoras (@RequestParam Date dateInicio, Date dateFinal){
-		return utily.getSumBetwenDates(dateInicio, dateFinal);
-
-	}
+//	@GetMapping("sumarHoras")
+//	public Date sumaHoras (@RequestParam Date dateInicio, Date dateFinal){
+//		return utily.getSumBetwenDates(dateInicio, dateFinal);
+//
+//	}
 
 //	@GetMapping("simulatorMarcaciones/")
 //	public void simulatorMarcaciones (Boolean inicio ) throws InterruptedException {

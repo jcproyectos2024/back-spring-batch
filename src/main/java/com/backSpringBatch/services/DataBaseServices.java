@@ -6,10 +6,8 @@ import com.backSpringBatch.Util.Utily;
 import com.backSpringBatch.postgres.entity.*;
 import com.backSpringBatch.postgres.mapper.AsistNowMapper;
 import com.backSpringBatch.postgres.mapper.AtrasosMapper;
-import com.backSpringBatch.postgres.models.AsistNowDTO;
-import com.backSpringBatch.postgres.models.JustificacionDTO;
-import com.backSpringBatch.postgres.models.ResponseAsistNowPagination;
-import com.backSpringBatch.postgres.models.SearchMarcaDTO;
+import com.backSpringBatch.postgres.mapper.HorasProduccionMapper;
+import com.backSpringBatch.postgres.models.*;
 import com.backSpringBatch.postgres.repository.*;
 import com.backSpringBatch.sqlserver.entity.AsistNowRegistro;
 import com.backSpringBatch.sqlserver.mapper.AsisRegistroMapper;
@@ -60,10 +58,15 @@ public class DataBaseServices {
     private HorasProduccionRepository horasProduccionRepository;
 
     @Autowired
+    private HorasProduccionMapper produccionMapper;
+
+    @Autowired
     private BiometricoRepository biometricoRepository;
 
     @Autowired
     private Utily utily;
+
+
 
 
     @Transactional(rollbackFor = { Exception.class })
@@ -159,7 +162,6 @@ public class DataBaseServices {
         }
     }
 
-
     //PAGINADO
     public ResponseAsistNowPagination obtenerMarcaciones (SearchMarcaDTO searchMarcaDTO) throws ParseException {
 
@@ -175,12 +177,12 @@ public class DataBaseServices {
             exit.setAsistNowDTOS(null);
             exit.setTotalRegister(0);
             exit.setMessage("No existen datos");
-
         }
         return exit;
     }
 
     public  List<AsistNowDTO> obtenermarcaGeneral(SearchMarcaDTO search){
+
 
         return asistNowMapper.toAsistNowDTOToAsistNow(postGresRepository.getIdAsistfiltro(search.getIdentificacion()));
     }
@@ -195,7 +197,8 @@ public class DataBaseServices {
 
             AsistNowDTO asist=new AsistNowDTO();
             asist.setAsisId(objects[0].toString());
-            asist.setAsisZona(objects[1].toString());
+            Biometrico bio = biometricoRepository.findByIpBiometrico(objects[1].toString());
+            asist.setAsisZona(bio.getNombreBiometrico());
             asist.setAsisFecha(objects[2].toString());
             asist.setAsisHora(objects[3].toString());
             asist.setAsisTipo(objects[4].toString());
@@ -236,20 +239,60 @@ public class DataBaseServices {
         List<AsistNowDTO> exit= new ArrayList<>();
         Page<Object[]> asistObject =(atrasosRepository.getIdAtrasosPag(search.getIdentificacion(), pag));
         SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//        DateTimeFormatter formato = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         for(Object[] objects : asistObject){
 
             AsistNowDTO asist=new AsistNowDTO();
             asist.setAsisId(objects[0].toString());
-            asist.setAsisZona(objects[1].toString());
+            Biometrico bio = biometricoRepository.findByIpBiometrico(objects[1].toString());
+            asist.setAsisZona(bio.getNombreBiometrico());
             asist.setAsisFecha(objects[2].toString());
             asist.setAtraso(objects[3].toString()!=null?objects[3].toString():"");
             asist.setJustificacion(Boolean.valueOf(objects[4].toString()));
-//            LocalDate date= LocalDate.parse(objects[7].toString(), formato);
             Date date= format.parse(objects[5].toString());
             asist.setAsisIng(date);
             exit.add(asist);
+        }
+        return exit;
+    }
+
+    //PAGINADO
+    public ResponseHorasProduccionPagination obtenerHorasProd(SearchMarcaDTO searchMarcaDTO) throws ParseException {
+        ResponseHorasProduccionPagination exit = new ResponseHorasProduccionPagination();
+        int totalReg = obtenerhorasProdGeneral(searchMarcaDTO).size();
+        if (totalReg > 0) {
+            int page = searchMarcaDTO.getPage() > 0 ? (searchMarcaDTO.getPage() - 1) : 0;
+            PageRequest pgRq = PageRequest.of(page, searchMarcaDTO.getReg_por_pag());
+            exit.setTotalRegister(totalReg);
+            exit.setHorasProduccionDTO(obtenerhorasProdPag(pgRq, searchMarcaDTO));
+            exit.setMessage("OK");
+        }else {
+            exit.setHorasProduccionDTO(null);
+            exit.setTotalRegister(0);
+            exit.setMessage("No existen datos");
+
+        }
+        return exit;
+    }
+
+
+    public  List<HorasProduccionDTO> obtenerhorasProdGeneral(SearchMarcaDTO search){
+
+        return produccionMapper.toAsistNowDTOToHorasProduccion(horasProduccionRepository.getHorasProdfiltro(search.getIdentificacion()));
+    }
+
+    public List<HorasProduccionDTO> obtenerhorasProdPag( Pageable pag, SearchMarcaDTO search) throws ParseException {
+
+        List<HorasProduccionDTO> exit= new ArrayList<>();
+        Page<Object[]> asistObject =(horasProduccionRepository.getIdHorasProdPag(search.getIdentificacion(), pag));
+
+        for(Object[] objects : asistObject){
+
+            HorasProduccionDTO horas=new HorasProduccionDTO();
+            horas.setAsisId(objects[0].toString());
+            horas.setAsisFecha(objects[1].toString());
+            horas.setHorasProd(objects[2].toString());
+            exit.add(horas);
         }
         return exit;
     }
@@ -277,6 +320,23 @@ public class DataBaseServices {
 
         return  horaGrupo;
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
