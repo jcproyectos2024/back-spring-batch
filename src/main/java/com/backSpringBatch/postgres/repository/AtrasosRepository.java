@@ -34,6 +34,8 @@ public interface AtrasosRepository extends JpaRepository<Atrasos, String> {
 
     Atrasos findByIdentificacionAndAndId_AsisIng  (String identificacion, Date asisIng);
 
+    Atrasos findByIdentificacionAndAndFecha (String identificacion, Date fecha );
+
 
 
 

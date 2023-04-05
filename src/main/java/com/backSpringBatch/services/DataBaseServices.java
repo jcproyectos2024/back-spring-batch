@@ -3,20 +3,14 @@ package com.backSpringBatch.services;
 import com.backSpringBatch.Util.SaveMantDTO;
 import com.backSpringBatch.Util.ScheduleDTO;
 import com.backSpringBatch.Util.Utily;
-import com.backSpringBatch.postgres.entity.AsistNow;
-import com.backSpringBatch.postgres.entity.Atrasos;
-import com.backSpringBatch.postgres.entity.HorasProduccion;
-import com.backSpringBatch.postgres.entity.HorasProduccionTemp;
+import com.backSpringBatch.postgres.entity.*;
 import com.backSpringBatch.postgres.mapper.AsistNowMapper;
 import com.backSpringBatch.postgres.mapper.AtrasosMapper;
 import com.backSpringBatch.postgres.models.AsistNowDTO;
 import com.backSpringBatch.postgres.models.JustificacionDTO;
 import com.backSpringBatch.postgres.models.ResponseAsistNowPagination;
 import com.backSpringBatch.postgres.models.SearchMarcaDTO;
-import com.backSpringBatch.postgres.repository.AtrasosRepository;
-import com.backSpringBatch.postgres.repository.HorasProduccionRepository;
-import com.backSpringBatch.postgres.repository.HorasProduccionTempRepository;
-import com.backSpringBatch.postgres.repository.PostGresRepository;
+import com.backSpringBatch.postgres.repository.*;
 import com.backSpringBatch.sqlserver.entity.AsistNowRegistro;
 import com.backSpringBatch.sqlserver.mapper.AsisRegistroMapper;
 import com.backSpringBatch.sqlserver.repository.SQLRepository;
@@ -66,6 +60,9 @@ public class DataBaseServices {
     private HorasProduccionRepository horasProduccionRepository;
 
     @Autowired
+    private BiometricoRepository biometricoRepository;
+
+    @Autowired
     private Utily utily;
 
 
@@ -79,22 +76,25 @@ public class DataBaseServices {
             lsRegistros.forEach(x->{
                 AsistNow regActual=asisRegistroMapper.asistNowRegistroToAsistNow(x);
                 postGresRepository.save(regActual);
-
-                if(x.getAsisTipo().equals("INGRESO")&& x.getId().getAsisZona().equals("192.168.9.102") && x.getIdentificacion()!=null ){
-                    Atrasos atrasos = new Atrasos();
-                    atrasos.setId(regActual.getId());
-                    atrasos.setIdentificacion(regActual.getIdentificacion()!=null?regActual.getIdentificacion():"");
-                    atrasos.setFecha(regActual.getAsisFecha());
-                    atrasos.setJustificacion(Boolean.FALSE);
-                    // Validar primer ingreso
+                Biometrico bio = biometricoRepository.findByIpBiometrico(regActual.getId().getAsisZona());
+                Atrasos atra= atrasosRepository.findByIdentificacionAndAndFecha(regActual.getIdentificacion(), regActual.getAsisFecha());
+                if(atra==null) {
+                    if (bio.getTipoBiometrinco().equals("INGRESO") && bio.getNombreBiometrico().equals("GARITA") && x.getIdentificacion() != null) {
+                        Atrasos atrasos = new Atrasos();
+                        atrasos.setId(regActual.getId());
+                        atrasos.setIdentificacion(regActual.getIdentificacion() != null ? regActual.getIdentificacion() : "");
+                        atrasos.setFecha(regActual.getAsisFecha());
+                        atrasos.setJustificacion(Boolean.FALSE);
+                        // Validar primer ingreso
                         Date horaGrupo = (obtenerhoraGrupo(regActual.getIdentificacion()));
                         Date difference = utily.getDifferenceBetwenDates(horaGrupo, regActual.getId().getAsisIng());
                         String hora = sdfResult.format(difference);
                         atrasos.setTiempoAtraso(hora);
-                    atrasosRepository.save(atrasos);
-                    postGresRepository.save(regActual);
+                        atrasosRepository.save(atrasos);
+                        postGresRepository.save(regActual);
+                    }
                 }
-                if(x.getId().getAsisZona().equals("192.168.9.105") || x.getId().getAsisZona().equals("192.168.9.106")){
+                if( bio.getNombreBiometrico().equals("PLANTA")){
                     HorasProduccionTemp horasTemp= new HorasProduccionTemp();
                     horasTemp.setId(regActual.getId());
                     horasTemp.setIdentificacion(regActual.getIdentificacion());
@@ -105,7 +105,6 @@ public class DataBaseServices {
                     List<HorasProduccionTemp> horas= horaTempRepository.findByIdentificacion(regActual.getIdentificacion());
                     HorasProduccion horasProd = horasProduccionRepository.findByIdentificacionAndFecha(regActual.getIdentificacion(), regActual.getAsisFecha());
                     if(horas.size()>1) {
-//                        HorasProduccionTemp horasProdTemp = new HorasProduccionTemp();
                         HorasProduccion horasProduccion = new HorasProduccion();
                         HorasProduccionTemp ingreso = horas.get(0);
                         HorasProduccionTemp salida = horas.get(1);
@@ -191,7 +190,6 @@ public class DataBaseServices {
         List<AsistNowDTO> exit= new ArrayList<>();
         Page<Object[]> asistObject =(postGresRepository.getIdAsistSinPag(search.getIdentificacion(), pag));
         SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//        DateTimeFormatter formato = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         for(Object[] objects : asistObject){
 
@@ -201,7 +199,6 @@ public class DataBaseServices {
             asist.setAsisFecha(objects[2].toString());
             asist.setAsisHora(objects[3].toString());
             asist.setAsisTipo(objects[4].toString());
-//            LocalDate date= LocalDate.parse(objects[7].toString(), formato);
             Date date= format.parse(objects[5].toString());
             asist.setAsisIng(date);
             exit.add(asist);
