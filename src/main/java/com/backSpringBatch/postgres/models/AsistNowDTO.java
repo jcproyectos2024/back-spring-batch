@@ -1,5 +1,6 @@
 package com.backSpringBatch.postgres.models;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 public class AsistNowDTO {
@@ -7,7 +8,7 @@ public class AsistNowDTO {
 
     private String asisId;
 
-//    private String asisIng;
+    private Date asisIng;
 
     private String asisZona;
 
@@ -41,13 +42,13 @@ public class AsistNowDTO {
         this.asisZona = asisZona;
     }
 
-//    public String getAsisIng() {
-//        return asisIng;
-//    }
-//
-//    public void setAsisIng(String asisIng) {
-//        this.asisIng = asisIng;
-//    }
+    public Date getAsisIng() {
+        return asisIng;
+    }
+
+    public void setAsisIng(Date asisIng) {
+        this.asisIng = asisIng;
+    }
 
     public String getAsisFecha() {
         return asisFecha;

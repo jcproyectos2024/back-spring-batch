@@ -41,6 +41,45 @@ public class Utily {
         return c.getTime();
     }
 
+//    public Date getSumBetwenDates (Date dateInicio, Date dateFinal) {
+//
+//        int milliseconds = dateFinal.getMinutes() + dateInicio.getMinutes();
+//        int seconds = (int) (milliseconds / 1000) % 60;
+//        int minutes = (int) ((milliseconds / (1000 * 60)) % 60);
+//        int hours = (int) ((milliseconds / ((1000 * 60 * 60)) % 24) -10);
+//        Calendar c = Calendar.getInstance();
+//        c.set(Calendar.SECOND, seconds);
+//        c.set(Calendar.MINUTE, minutes);
+//        c.set(Calendar.HOUR_OF_DAY, hours);
+//        return c.getTime();
+//    }
+
+
+
+
+
+
+    public Date getSumBetwenDates (Date dateInicio, Date dateFinal) {
+
+        int seconds1 = dateInicio.getSeconds();
+        int minutes1 = dateInicio.getMinutes();
+        int hours1 = dateInicio.getHours();
+
+        int seconds2 = dateFinal.getSeconds();
+        int minutes2 = dateFinal.getMinutes();
+        int hours2 = dateFinal.getHours();
+
+        int resultsec = seconds1 +seconds2;
+        int resultmin = minutes1 + minutes2;
+        int resulthour = hours1 + hours2;
+
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.SECOND, resultsec);
+        c.set(Calendar.MINUTE, resultmin);
+        c.set(Calendar.HOUR_OF_DAY, resulthour);
+        return c.getTime();
+    }
+
 
     public String getHourNow() {
         String hora = DateTimeFormatter.ofPattern("HH:mm:ss").format(LocalDateTime.now());

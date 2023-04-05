@@ -5,11 +5,17 @@ import com.backSpringBatch.Util.ScheduleDTO;
 import com.backSpringBatch.Util.Utily;
 import com.backSpringBatch.postgres.entity.AsistNow;
 import com.backSpringBatch.postgres.entity.Atrasos;
+import com.backSpringBatch.postgres.entity.HorasProduccion;
+import com.backSpringBatch.postgres.entity.HorasProduccionTemp;
 import com.backSpringBatch.postgres.mapper.AsistNowMapper;
+import com.backSpringBatch.postgres.mapper.AtrasosMapper;
 import com.backSpringBatch.postgres.models.AsistNowDTO;
+import com.backSpringBatch.postgres.models.JustificacionDTO;
 import com.backSpringBatch.postgres.models.ResponseAsistNowPagination;
 import com.backSpringBatch.postgres.models.SearchMarcaDTO;
 import com.backSpringBatch.postgres.repository.AtrasosRepository;
+import com.backSpringBatch.postgres.repository.HorasProduccionRepository;
+import com.backSpringBatch.postgres.repository.HorasProduccionTempRepository;
 import com.backSpringBatch.postgres.repository.PostGresRepository;
 import com.backSpringBatch.sqlserver.entity.AsistNowRegistro;
 import com.backSpringBatch.sqlserver.mapper.AsisRegistroMapper;
@@ -20,15 +26,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.security.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static java.util.logging.Level.parse;
 
 
 @Service
@@ -54,6 +57,15 @@ public class DataBaseServices {
     private RESTServices restServices;
 
     @Autowired
+    private HorasProduccionTempRepository horaTempRepository;
+
+    @Autowired
+    private AtrasosMapper atrasosMapper;
+
+    @Autowired
+    private HorasProduccionRepository horasProduccionRepository;
+
+    @Autowired
     private Utily utily;
 
 
@@ -61,26 +73,85 @@ public class DataBaseServices {
     public void insertSqlToPostgres(){
 
         try{
-
+            SimpleDateFormat sdfResult = new SimpleDateFormat("HH:mm:ss");
+            SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             List<AsistNowRegistro> lsRegistros=sqlRepository.findAll();
             lsRegistros.forEach(x->{
                 AsistNow regActual=asisRegistroMapper.asistNowRegistroToAsistNow(x);
-                if(regActual.getAsisTipo().equals("INGRESO")&&regActual.getIdentificacion()!=null ){
+                postGresRepository.save(regActual);
+
+                if(x.getAsisTipo().equals("INGRESO")&& x.getId().getAsisZona().equals("192.168.9.102") && x.getIdentificacion()!=null ){
                     Atrasos atrasos = new Atrasos();
                     atrasos.setId(regActual.getId());
                     atrasos.setIdentificacion(regActual.getIdentificacion()!=null?regActual.getIdentificacion():"");
+                    atrasos.setFecha(regActual.getAsisFecha());
                     atrasos.setJustificacion(Boolean.FALSE);
                     // Validar primer ingreso
-                        SimpleDateFormat sdfResult = new SimpleDateFormat("HH:mm:ss");
-                        Date horaGrupo = (calcularHora(regActual.getIdentificacion()));
+                        Date horaGrupo = (obtenerhoraGrupo(regActual.getIdentificacion()));
                         Date difference = utily.getDifferenceBetwenDates(horaGrupo, regActual.getId().getAsisIng());
                         String hora = sdfResult.format(difference);
                         atrasos.setTiempoAtraso(hora);
                     atrasosRepository.save(atrasos);
+                    postGresRepository.save(regActual);
                 }
-                postGresRepository.save(regActual);
+                if(x.getId().getAsisZona().equals("192.168.9.105") || x.getId().getAsisZona().equals("192.168.9.106")){
+                    HorasProduccionTemp horasTemp= new HorasProduccionTemp();
+                    horasTemp.setId(regActual.getId());
+                    horasTemp.setIdentificacion(regActual.getIdentificacion());
+                    horasTemp.setTipo(regActual.getAsisTipo());
+                    horasTemp.setStatus(Boolean.FALSE);
+                    horaTempRepository.save(horasTemp);
+
+                    List<HorasProduccionTemp> horas= horaTempRepository.findByIdentificacion(regActual.getIdentificacion());
+                    HorasProduccion horasProd = horasProduccionRepository.findByIdentificacionAndFecha(regActual.getIdentificacion(), regActual.getAsisFecha());
+                    if(horas.size()>1) {
+//                        HorasProduccionTemp horasProdTemp = new HorasProduccionTemp();
+                        HorasProduccion horasProduccion = new HorasProduccion();
+                        HorasProduccionTemp ingreso = horas.get(0);
+                        HorasProduccionTemp salida = horas.get(1);
+                        //horas producidas
+                        Date calHora = utily.getDifferenceBetwenDates(ingreso.getId().getAsisIng(), salida.getId().getAsisIng());
+                        ingreso.setStatus(Boolean.TRUE);
+                        salida.setStatus(Boolean.TRUE);
+                        horaTempRepository.save(ingreso);
+                        horaTempRepository.save(salida);
+                        if(horasProd ==null){
+                            horasProduccion.setId(regActual.getId());
+                            horasProduccion.setIdentificacion(regActual.getIdentificacion());
+                            horasProduccion.setFecha(regActual.getAsisFecha());
 
 
+                            try {
+                                Date date = format.parse(String.valueOf(calHora));
+                                horasProduccion.setCalHorasProd(date);
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+
+                            horasProduccion.setCalHorasProd(calHora);
+                            String hora = sdfResult.format(calHora);
+                            horasProduccion.setHorasProduccion(hora);
+                            horasProduccionRepository.save(horasProduccion);
+                        }
+                        else {
+
+                             Date calPro= utily.getSumBetwenDates(horasProd.getCalHorasProd(),calHora);
+                                horasProd.setCalHorasProd(calPro);
+                                String hora= sdfResult.format(calPro);
+                                horasProd.setHorasProduccion(hora);
+                            horasProduccionRepository.save(horasProd);
+                        }
+
+                    }
+
+                    List<HorasProduccionTemp> temp= horaTempRepository.findAll();
+                    temp.forEach(t->{
+                       if( t.getStatus()){
+                           horaTempRepository.delete(t);
+                       }
+
+                    });
+                }
                 sqlRepository.delete(x);
             });
 
@@ -91,7 +162,7 @@ public class DataBaseServices {
 
 
     //PAGINADO
-    public ResponseAsistNowPagination obtenerMarcaciones (SearchMarcaDTO searchMarcaDTO){
+    public ResponseAsistNowPagination obtenerMarcaciones (SearchMarcaDTO searchMarcaDTO) throws ParseException {
 
         ResponseAsistNowPagination exit = new ResponseAsistNowPagination();
         int totalReg = obtenermarcaGeneral(searchMarcaDTO).size();
@@ -115,10 +186,12 @@ public class DataBaseServices {
         return asistNowMapper.toAsistNowDTOToAsistNow(postGresRepository.getIdAsistfiltro(search.getIdentificacion()));
     }
 
-    public List<AsistNowDTO> obtenerMarcaPag( Pageable pag, SearchMarcaDTO search){
+    public List<AsistNowDTO> obtenerMarcaPag( Pageable pag, SearchMarcaDTO search) throws ParseException {
 
         List<AsistNowDTO> exit= new ArrayList<>();
         Page<Object[]> asistObject =(postGresRepository.getIdAsistSinPag(search.getIdentificacion(), pag));
+        SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//        DateTimeFormatter formato = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         for(Object[] objects : asistObject){
 
@@ -128,31 +201,87 @@ public class DataBaseServices {
             asist.setAsisFecha(objects[2].toString());
             asist.setAsisHora(objects[3].toString());
             asist.setAsisTipo(objects[4].toString());
-            asist.setAtraso(objects[5].toString());
-            asist.setJustificacion(Boolean.valueOf(objects[6].toString()));
-
+//            LocalDate date= LocalDate.parse(objects[7].toString(), formato);
+            Date date= format.parse(objects[5].toString());
+            asist.setAsisIng(date);
             exit.add(asist);
-
         }
-
         return exit;
     }
 
-    public SaveMantDTO justificacion( Boolean justificacion, String identificacion){
+    //PAGINADO
+    public ResponseAsistNowPagination obtenerAtrasos (SearchMarcaDTO searchMarcaDTO) throws ParseException {
+
+        ResponseAsistNowPagination exit = new ResponseAsistNowPagination();
+        int totalReg = obtenerAtrasosGeneral(searchMarcaDTO).size();
+        if (totalReg > 0) {
+            int page = searchMarcaDTO.getPage() > 0 ? (searchMarcaDTO.getPage() - 1) : 0;
+            PageRequest pgRq = PageRequest.of(page, searchMarcaDTO.getReg_por_pag());
+            exit.setTotalRegister(totalReg);
+            exit.setAsistNowDTOS(obtenerAtrasosPag(pgRq, searchMarcaDTO));
+            exit.setMessage("OK");
+        }else {
+            exit.setAsistNowDTOS(null);
+            exit.setTotalRegister(0);
+            exit.setMessage("No existen datos");
+
+        }
+        return exit;
+    }
+
+    public  List<AsistNowDTO> obtenerAtrasosGeneral(SearchMarcaDTO search){
+
+        return atrasosMapper.toAsistNowDTOToAtrasos(atrasosRepository.getIdAtrasosfiltro(search.getIdentificacion()));
+    }
+
+    public List<AsistNowDTO> obtenerAtrasosPag( Pageable pag, SearchMarcaDTO search) throws ParseException {
+
+        List<AsistNowDTO> exit= new ArrayList<>();
+        Page<Object[]> asistObject =(atrasosRepository.getIdAtrasosPag(search.getIdentificacion(), pag));
+        SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//        DateTimeFormatter formato = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        for(Object[] objects : asistObject){
+
+            AsistNowDTO asist=new AsistNowDTO();
+            asist.setAsisId(objects[0].toString());
+            asist.setAsisZona(objects[1].toString());
+            asist.setAsisFecha(objects[2].toString());
+            asist.setAtraso(objects[3].toString()!=null?objects[3].toString():"");
+            asist.setJustificacion(Boolean.valueOf(objects[4].toString()));
+//            LocalDate date= LocalDate.parse(objects[7].toString(), formato);
+            Date date= format.parse(objects[5].toString());
+            asist.setAsisIng(date);
+            exit.add(asist);
+        }
+        return exit;
+    }
+
+    public SaveMantDTO justificacion(JustificacionDTO justDTO){
 
         SaveMantDTO exit = new SaveMantDTO();
 
-        Atrasos atrasos = atrasosRepository.findByIdentificacion(identificacion);
+        Atrasos atrasos = atrasosRepository.findByIdentificacionAndAndId_AsisIng(justDTO.getIdentificacion(),justDTO.getFechaIng());
+
         if(atrasos.getJustificacion()){
             exit.setMessage("Ya exite una justificacion");
             return exit;
         }
-        atrasos.setJustificacion(justificacion);
+        atrasos.setJustificacion(justDTO.getJustificacion());
         atrasosRepository.save(atrasos);
         exit.setMessage("Atraso Justificado");
         return exit;
 
     }
+
+    public Date obtenerhoraGrupo(String identificacion){
+        ScheduleDTO horaGupo= restServices.getSchedulePerson(identificacion);
+        Date horaGrupo= horaGupo.getDesde();
+
+        return  horaGrupo;
+    }
+
+
 
 //*/public void simulatorMarcaciones (Boolean inicio) throws InterruptedException {
 //
@@ -200,12 +329,7 @@ public class DataBaseServices {
 //
 //        }
 //}
- public Date calcularHora(String identificacion){
-        ScheduleDTO horaGupo= restServices.getSchedulePerson(identificacion);
-        Date horaGrupo= horaGupo.getDesde();
 
-        return  horaGrupo;
- }
 
 
 

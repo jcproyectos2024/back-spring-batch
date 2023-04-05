@@ -2,6 +2,8 @@ package com.backSpringBatch.controller;
 
 
 import com.backSpringBatch.Util.SaveMantDTO;
+import com.backSpringBatch.Util.Utily;
+import com.backSpringBatch.postgres.models.JustificacionDTO;
 import com.backSpringBatch.postgres.models.ResponseAsistNowPagination;
 import com.backSpringBatch.postgres.models.SearchMarcaDTO;
 import com.backSpringBatch.services.DataBaseServices;
@@ -11,6 +13,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
+import java.util.Date;
 
 
 @Controller
@@ -19,6 +23,9 @@ import org.springframework.web.bind.annotation.*;
 public class DataBaseontroller {
 	@Autowired
 	private DataBaseServices dataBaseServices;
+
+	@Autowired
+	private Utily utily;
 
 	
 	
@@ -29,13 +36,24 @@ public class DataBaseontroller {
 	}
 
 	@PostMapping("obtenerMarcaciones/")
-	public ResponseAsistNowPagination obtenerMarcaciones(@RequestBody @Validated SearchMarcaDTO search){
+	public ResponseAsistNowPagination obtenerMarcaciones(@RequestBody @Validated SearchMarcaDTO search) throws ParseException {
 		return dataBaseServices.obtenerMarcaciones(search);
 	}
 
-	@GetMapping("estadoJustificacion/")
-	public SaveMantDTO estadoJustificacion(@RequestParam Boolean justificacion, @RequestParam String identificacion){
-		return  dataBaseServices.justificacion(justificacion, identificacion);
+	@PostMapping("obtenerAtrasos/")
+	public ResponseAsistNowPagination obtenerAtrasos(@RequestBody @Validated SearchMarcaDTO search) throws ParseException {
+		return dataBaseServices.obtenerAtrasos(search);
+	}
+
+	@PostMapping("estadoJustificacion/")
+	public SaveMantDTO estadoJustificacion(@RequestBody @Validated JustificacionDTO justDTO){
+		return  dataBaseServices.justificacion(justDTO);
+	}
+
+	@GetMapping("sumarHoras")
+	public Date sumaHoras (@RequestParam Date dateInicio, Date dateFinal){
+		return utily.getSumBetwenDates(dateInicio, dateFinal);
+
 	}
 
 //	@GetMapping("simulatorMarcaciones/")

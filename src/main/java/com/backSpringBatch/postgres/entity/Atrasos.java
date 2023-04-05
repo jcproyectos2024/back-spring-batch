@@ -25,6 +25,10 @@ public class Atrasos {
     @Column(name= "justificacion")
     private  Boolean justificacion;
 
+    @Column(name = "atraso_fecha")
+    private Date fecha;
+
+
 
     public AsistnowPK getId() {
         return id;
@@ -58,4 +62,11 @@ public class Atrasos {
         this.justificacion = justificacion;
     }
 
+    public Date getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(Date fecha) {
+        this.fecha = fecha;
+    }
 }

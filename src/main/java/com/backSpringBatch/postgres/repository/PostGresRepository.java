@@ -23,10 +23,9 @@ public interface PostGresRepository extends JpaRepository<AsistNow, String> {
             " order by  an.id.asisIng desc")
     List<AsistNow> getIdAsistfiltro(@Param("identificacion") String identificacion);
 
-    @Query(nativeQuery = true, value = "select asi.asis_id, asi.asis_zona, asi.asis_fecha,asi.asis_hora,asi.asis_tipo, a.tiempo_atraso, a.justificacion  " +
+    @Query(nativeQuery = true, value = "select asi.asis_id, asi.asis_zona, asi.asis_fecha,asi.asis_hora,asi.asis_tipo, asi.asis_ing  " +
             "from asistnow asi" +
-            " join atrasos a on asi.asis_id=a.asis_id" +
-            " where (asi.nomina_cod =:identificacion or :identificacion is null)" +
+            " where (asi.nomina_cod =:identificacion)" +
             " and asi.asis_res = 'OK' " +
             " order by  asi.asis_ing desc")
     Page<Object[]> getIdAsistSinPag(@Param("identificacion") String identificacion, Pageable pageable);
