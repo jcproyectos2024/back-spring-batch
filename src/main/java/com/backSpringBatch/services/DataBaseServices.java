@@ -121,8 +121,6 @@ public class DataBaseServices {
                             horasProduccion.setId(regActual.getId());
                             horasProduccion.setIdentificacion(regActual.getIdentificacion());
                             horasProduccion.setFecha(regActual.getAsisFecha());
-
-
                             try {
                                 Date date = format.parse(String.valueOf(calHora));
                                 horasProduccion.setCalHorasProd(date);
@@ -136,16 +134,13 @@ public class DataBaseServices {
                             horasProduccionRepository.save(horasProduccion);
                         }
                         else {
-
                              Date calPro= utily.getSumBetwenDates(horasProd.getCalHorasProd(),calHora);
                                 horasProd.setCalHorasProd(calPro);
                                 String hora= sdfResult.format(calPro);
                                 horasProd.setHorasProduccion(hora);
                             horasProduccionRepository.save(horasProd);
                         }
-
                     }
-
                     List<HorasProduccionTemp> temp= horaTempRepository.findAll();
                     temp.forEach(t->{
                        if( t.getStatus()){
@@ -182,7 +177,6 @@ public class DataBaseServices {
     }
 
     public  List<AsistNowDTO> obtenermarcaGeneral(SearchMarcaDTO search){
-
 
         return asistNowMapper.toAsistNowDTOToAsistNow(postGresRepository.getIdAsistfiltro(search.getIdentificacion()));
     }
@@ -275,7 +269,6 @@ public class DataBaseServices {
         return exit;
     }
 
-
     public  List<HorasProduccionDTO> obtenerhorasProdGeneral(SearchMarcaDTO search){
 
         return produccionMapper.toAsistNowDTOToHorasProduccion(horasProduccionRepository.getHorasProdfiltro(search.getIdentificacion()));
@@ -311,13 +304,11 @@ public class DataBaseServices {
         atrasosRepository.save(atrasos);
         exit.setMessage("Atraso Justificado");
         return exit;
-
     }
 
     public Date obtenerhoraGrupo(String identificacion){
         ScheduleDTO horaGupo= restServices.getSchedulePerson(identificacion);
         Date horaGrupo= horaGupo.getDesde();
-
         return  horaGrupo;
     }
 
