@@ -25,7 +25,6 @@ import java.util.Date;
 import java.util.List;
 
 
-
 @Service
 public class DataBaseServices {
 
@@ -67,8 +66,6 @@ public class DataBaseServices {
     private Utily utily;
 
 
-
-
     @Transactional(rollbackFor = { Exception.class })
     public void insertSqlToPostgres(){
 
@@ -80,21 +77,24 @@ public class DataBaseServices {
                 AsistNow regActual=asisRegistroMapper.asistNowRegistroToAsistNow(x);
                 postGresRepository.save(regActual);
                 Biometrico bio = biometricoRepository.findByIpBiometrico(regActual.getId().getAsisZona());
+                //Validar si existe un atraso
                 Atrasos atra= atrasosRepository.findByIdentificacionAndAndFecha(regActual.getIdentificacion(), regActual.getAsisFecha());
                 if(atra==null) {
                     if (bio.getTipoBiometrinco().equals("INGRESO") && bio.getNombreBiometrico().equals("GARITA") && x.getIdentificacion() != null) {
-                        Atrasos atrasos = new Atrasos();
-                        atrasos.setId(regActual.getId());
-                        atrasos.setIdentificacion(regActual.getIdentificacion() != null ? regActual.getIdentificacion() : "");
-                        atrasos.setFecha(regActual.getAsisFecha());
-                        atrasos.setJustificacion(Boolean.FALSE);
-                        // Validar primer ingreso
                         Date horaGrupo = (obtenerhoraGrupo(regActual.getIdentificacion()));
+                        //Validar hora ingreso
                         Date difference = utily.getDifferenceBetwenDates(horaGrupo, regActual.getId().getAsisIng());
-                        String hora = sdfResult.format(difference);
-                        atrasos.setTiempoAtraso(hora);
-                        atrasosRepository.save(atrasos);
-                        postGresRepository.save(regActual);
+                        String horaVerificacion = sdfResult.format(difference);
+                        if(!horaVerificacion.equals("00:00:00") ) {
+                            Atrasos atrasos = new Atrasos();
+                            atrasos.setId(regActual.getId());
+                            atrasos.setIdentificacion(regActual.getIdentificacion() != null ? regActual.getIdentificacion() : "");
+                            atrasos.setFecha(regActual.getAsisFecha());
+                            atrasos.setJustificacion(Boolean.FALSE);
+                            atrasos.setTiempoAtraso(horaVerificacion);
+                            atrasosRepository.save(atrasos);
+                            postGresRepository.save(regActual);
+                        }
                     }
                 }
                 if( bio.getNombreBiometrico().equals("PLANTA")){
@@ -146,7 +146,6 @@ public class DataBaseServices {
                        if( t.getStatus()){
                            horaTempRepository.delete(t);
                        }
-
                     });
                 }
                 sqlRepository.delete(x);
@@ -291,7 +290,7 @@ public class DataBaseServices {
     }
 
     public SaveMantDTO justificacion(JustificacionDTO justDTO){
-
+        
         SaveMantDTO exit = new SaveMantDTO();
 
         Atrasos atrasos = atrasosRepository.findByIdentificacionAndAndId_AsisIng(justDTO.getIdentificacion(),justDTO.getFechaIng());
