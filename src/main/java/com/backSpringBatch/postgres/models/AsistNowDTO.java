@@ -1,6 +1,5 @@
 package com.backSpringBatch.postgres.models;
 
-import java.time.LocalDate;
 import java.util.Date;
 
 public class AsistNowDTO {
@@ -15,6 +14,12 @@ public class AsistNowDTO {
     private String asisFecha;
 
     private String asisHora;
+    
+    private String horaIngreso;
+    
+    private String horaAlmuerzo;
+    
+    private String horaSalida;
 
     private String asisTipo;
 
@@ -98,4 +103,31 @@ public class AsistNowDTO {
     public void setAtraso(String atraso) {
         this.atraso = atraso;
     }
+
+	public String getHoraIngreso() {
+		return horaIngreso;
+	}
+
+	public void setHoraIngreso(String horaIngreso) {
+		this.horaIngreso = horaIngreso;
+	}
+
+	public String getHoraAlmuerzo() {
+		return horaAlmuerzo;
+	}
+
+	public void setHoraAlmuerzo(String horaAlmuerzo) {
+		this.horaAlmuerzo = horaAlmuerzo;
+	}
+
+	public String getHoraSalida() {
+		return horaSalida;
+	}
+
+	public void setHoraSalida(String horaSalida) {
+		this.horaSalida = horaSalida;
+	}
+
+	
+    
 }

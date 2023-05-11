@@ -18,9 +18,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -61,10 +64,16 @@ public class DataBaseServices {
 
     @Autowired
     private BiometricoRepository biometricoRepository;
+    
+    @Autowired
+    private AsistNowRefactorRepository asistNowRefactorRepository;
 
     @Autowired
     private Utily utily;
 
+    
+    @Autowired
+    private ListUtils listUtils;
 
     @Transactional(rollbackFor = { Exception.class })
     public void insertSqlToPostgres(){
@@ -76,6 +85,47 @@ public class DataBaseServices {
             lsRegistros.forEach(x->{
                 AsistNow regActual=asisRegistroMapper.asistNowRegistroToAsistNow(x);
                 postGresRepository.save(regActual);
+                
+                //aqui se inserta el refactorizado 
+                //ini will 10/05/23
+                AsistNowRefactor busquedaRef=asistNowRefactorRepository.findByAsisFechaAndIdentificacion(x.getAsisFecha(), x.getIdentificacion());
+                if(busquedaRef!=null) {
+                	if(x.getAsisTipo().equals("SALIDA")) {
+                		busquedaRef.setHoraSalida((busquedaRef.getHoraSalida()!=null?busquedaRef.getHoraSalida()+"\n"+x.getAsisHora():x.getAsisHora()));
+                	}else if(x.getAsisTipo().equals("BREAK-OUT")) {
+                		busquedaRef.setHoraAlmuerzo((busquedaRef.getHoraAlmuerzo()!=null?busquedaRef.getHoraAlmuerzo()+"\n"+x.getAsisHora():x.getAsisHora()));
+                	}else if(x.getAsisTipo().equals("INGRESO")) {
+                		busquedaRef.setHoraIngreso((busquedaRef.getHoraIngreso()!=null?busquedaRef.getHoraIngreso()+"\n"+x.getAsisHora():x.getAsisHora()));
+                	}
+                	asistNowRefactorRepository.save(busquedaRef);
+                }else {
+                	
+                	AsistnowPK pkAsist=new AsistnowPK();
+                	pkAsist.setAsisId(x.getId().getAsisId());
+                	pkAsist.setAsisIng(x.getId().getAsisIng());
+                	pkAsist.setAsisZona(x.getId().getAsisZona());                	
+                	busquedaRef=new AsistNowRefactor(pkAsist, 
+                			x.getAsisFecha(), 
+                			x.getAsisHora(),
+                			x.getAsisTipo(), 
+                			x.getAsisRes(), 
+                			x.getIdentificacion(), 
+                			null, 
+                			null, 
+                			null);
+                	if(x.getAsisTipo().equals("SALIDA")) {
+                		busquedaRef.setHoraSalida(x.getAsisHora());
+                	}else if(x.getAsisTipo().equals("BREAK-OUT")) {
+                		busquedaRef.setHoraAlmuerzo(x.getAsisHora());
+                	}else if(x.getAsisTipo().equals("INGRESO")) {
+                		busquedaRef.setHoraIngreso(x.getAsisHora());
+                	}
+                	asistNowRefactorRepository.save(busquedaRef);
+                }
+                //fin will 10/05/23
+                
+                
+                
                 Biometrico bio = biometricoRepository.findByIpBiometrico(regActual.getId().getAsisZona());
                 //Validar si existe un atraso
                 Atrasos atra= atrasosRepository.findByIdentificacionAndAndFecha(regActual.getIdentificacion(), regActual.getAsisFecha());
@@ -155,6 +205,17 @@ public class DataBaseServices {
             ex.printStackTrace();
         }
     }
+    
+    public List<AsistNow> pruebaPaginado(int numberPage, int pageSize, String fechaRegistro) {
+    	
+    
+    	List<AsistNow> lsAsistencia=postGresRepository.getAsistenciasxFechaRegistro(fechaRegistro);
+        List<AsistNow> results = new ArrayList<>();
+        results=listUtils.getPage(lsAsistencia, numberPage,pageSize);
+        return results;
+    	
+    }
+    
 
     //PAGINADO
     public ResponseAsistNowPagination obtenerMarcaciones (SearchMarcaDTO searchMarcaDTO) throws ParseException {
@@ -166,6 +227,43 @@ public class DataBaseServices {
             PageRequest pgRq = PageRequest.of(page, searchMarcaDTO.getReg_por_pag());
             exit.setTotalRegister(totalReg);
             exit.setAsistNowDTOS(obtenerMarcaPag(pgRq, searchMarcaDTO));
+            exit.setMessage("OK");
+        }else {
+            exit.setAsistNowDTOS(null);
+            exit.setTotalRegister(0);
+            exit.setMessage("No existen datos");
+        }
+        return exit;
+    }
+    
+    
+    public ResponseAsistNowPagination obtenerMarcacionesRefactorizado (SearchMarcaDTO searchMarcaDTO) throws ParseException {
+
+        ResponseAsistNowPagination exit = new ResponseAsistNowPagination();
+        int totalReg = asistNowRefactorRepository.getIdAsistfiltro(searchMarcaDTO.getIdentificacion()).size();
+        SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        List<AsistNowDTO> lsAsistencia= new ArrayList<>();
+        if (totalReg > 0) {
+            int page = searchMarcaDTO.getPage() > 0 ? (searchMarcaDTO.getPage() - 1) : 0;
+            PageRequest pgRq = PageRequest.of(page, searchMarcaDTO.getReg_por_pag());
+            exit.setTotalRegister(totalReg);
+            
+            Page<AsistNowRefactor> lsRefactor=asistNowRefactorRepository.getIdAsistfiltroPagin(searchMarcaDTO.getIdentificacion(), pgRq);
+            for(AsistNowRefactor ref:lsRefactor) {
+            	AsistNowDTO asist=new AsistNowDTO();
+                asist.setAsisId(ref.getId().getAsisId());
+                Biometrico bio = biometricoRepository.findByIpBiometrico(ref.getId().getAsisZona());
+                asist.setAsisZona(bio.getNombreBiometrico());
+                asist.setAsisFecha(format.format(ref.getAsisFecha()));
+                asist.setAsisHora(ref.getAsisHora());
+                asist.setAsisTipo("");
+                asist.setAsisIng(ref.getId().getAsisIng());
+                asist.setHoraIngreso((ref.getHoraIngreso()!=null? ref.getHoraIngreso().replace("-", "\n"):""));
+                asist.setHoraAlmuerzo((ref.getHoraAlmuerzo()!=null?ref.getHoraAlmuerzo().replace("-", "\n"):""));
+                asist.setHoraSalida((ref.getHoraSalida()!=null?ref.getHoraSalida().replace("-", "\n"):""));
+                lsAsistencia.add(asist);
+            }
+            exit.setAsistNowDTOS(lsAsistencia);
             exit.setMessage("OK");
         }else {
             exit.setAsistNowDTOS(null);
@@ -312,6 +410,57 @@ public class DataBaseServices {
     }
 
 
+	public String procesarDataGuardada() {
+    	String exito="OK";
+    	try {
+    		//aqui se inserta el refactorizado 
+            //ini will 10/05/23
+    		List<AsistNow> lsAsistencias=postGresRepository.findAll();
+    		lsAsistencias.stream().forEach(x->{
+                AsistNowRefactor busquedaRef=asistNowRefactorRepository.findByAsisFechaAndIdentificacion(x.getAsisFecha(), x.getIdentificacion());
+                if(busquedaRef!=null) {
+                	if(x.getAsisTipo().equals("SALIDA")) {
+                		busquedaRef.setHoraSalida((busquedaRef.getHoraSalida()!=null?busquedaRef.getHoraSalida()+"-"+x.getAsisHora():x.getAsisHora()));
+                	}else if(x.getAsisTipo().equals("BREAK-OUT")) {
+                		busquedaRef.setHoraAlmuerzo((busquedaRef.getHoraAlmuerzo()!=null?busquedaRef.getHoraAlmuerzo()+"-"+x.getAsisHora():x.getAsisHora()));
+                	}else if(x.getAsisTipo().equals("INGRESO")) {
+                		busquedaRef.setHoraIngreso((busquedaRef.getHoraIngreso()!=null?busquedaRef.getHoraIngreso()+"-"+x.getAsisHora():x.getAsisHora()));
+                	}
+                	asistNowRefactorRepository.save(busquedaRef);
+                }else {
+                	
+                	AsistnowPK pkAsist=new AsistnowPK();
+                	pkAsist.setAsisId(x.getId().getAsisId());
+                	pkAsist.setAsisIng(x.getId().getAsisIng());
+                	pkAsist.setAsisZona(x.getId().getAsisZona());                	
+                	busquedaRef=new AsistNowRefactor(pkAsist, 
+                			x.getAsisFecha(), 
+                			x.getAsisHora(),
+                			"", 
+                			x.getAsisRes(), 
+                			x.getIdentificacion(), 
+                			null, 
+                			null, 
+                			null);
+                	if(x.getAsisTipo().equals("SALIDA")) {
+                		busquedaRef.setHoraSalida(x.getAsisHora());
+                	}else if(x.getAsisTipo().equals("BREAK-OUT")) {
+                		busquedaRef.setHoraAlmuerzo(x.getAsisHora());
+                	}else if(x.getAsisTipo().equals("INGRESO")) {
+                		busquedaRef.setHoraIngreso(x.getAsisHora());
+                	}
+                	asistNowRefactorRepository.save(busquedaRef);
+                }
+    		});
+    		
+
+            //fin will 10/05/23
+		} catch (Exception e) {
+			exito=e.getMessage();
+			// TODO: handle exception
+		}
+		return exito;
+	}
 
 
 

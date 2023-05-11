@@ -3,6 +3,7 @@ package com.backSpringBatch.controller;
 
 import com.backSpringBatch.Util.SaveMantDTO;
 import com.backSpringBatch.Util.Utily;
+import com.backSpringBatch.postgres.entity.AsistNow;
 import com.backSpringBatch.postgres.models.JustificacionDTO;
 import com.backSpringBatch.postgres.models.ResponseAsistNowPagination;
 import com.backSpringBatch.postgres.models.ResponseHorasProduccionPagination;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.util.Date;
+import java.util.List;
 
 
 @Controller
@@ -36,9 +38,15 @@ public class DataBaseontroller {
 		System.out.println("Mensaje de cron:"+System.currentTimeMillis());
 	}
 
+	/*metodo anterior, ahora estara el refactorizado
 	@PostMapping("obtenerMarcaciones/")
 	public ResponseAsistNowPagination obtenerMarcaciones(@RequestBody @Validated SearchMarcaDTO search) throws ParseException {
 		return dataBaseServices.obtenerMarcaciones(search);
+	}
+	*/
+	@PostMapping("obtenerMarcaciones/")
+	public ResponseAsistNowPagination obtenerMarcaciones(@RequestBody @Validated SearchMarcaDTO search) throws ParseException {
+		return dataBaseServices.obtenerMarcacionesRefactorizado(search);
 	}
 
 	@PostMapping("obtenerAtrasos/")
@@ -56,6 +64,22 @@ public class DataBaseontroller {
 		return  dataBaseServices.justificacion(justDTO);
 	}
 
+	
+	
+	@GetMapping("obtenerRegistrosPaginadoLista/")
+	public List<AsistNow> obtenerRegistrosPaginadoLista(@RequestParam int numberPage, 
+			@RequestParam int pageSize,
+			@RequestParam String fechaRegistro) {
+		return dataBaseServices.pruebaPaginado(numberPage,pageSize,fechaRegistro);
+	}
+	
+	
+	@GetMapping("procesarDataGuardada/")
+	public String procesarDataGuardada() {
+		return dataBaseServices.procesarDataGuardada();
+	}
+	
+	
 //	@GetMapping("sumarHoras")
 //	public Date sumaHoras (@RequestParam Date dateInicio, Date dateFinal){
 //		return utily.getSumBetwenDates(dateInicio, dateFinal);
