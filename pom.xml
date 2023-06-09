@@ -141,7 +141,7 @@
     </dependencies>
 
     <build>
-        <finalName>Back-RRHH</finalName>
+        <finalName>Back-Marcaciones</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

@@ -258,9 +258,9 @@ public class DataBaseServices {
                 asist.setAsisHora(ref.getAsisHora());
                 asist.setAsisTipo("");
                 asist.setAsisIng(ref.getId().getAsisIng());
-                asist.setHoraIngreso((ref.getHoraIngreso()!=null? ref.getHoraIngreso().replace("-", "\n"):""));
-                asist.setHoraAlmuerzo((ref.getHoraAlmuerzo()!=null?ref.getHoraAlmuerzo().replace("-", "\n"):""));
-                asist.setHoraSalida((ref.getHoraSalida()!=null?ref.getHoraSalida().replace("-", "\n"):""));
+                asist.setHoraIngreso((ref.getHoraIngreso()!=null? ref.getHoraIngreso():""));
+                asist.setHoraAlmuerzo((ref.getHoraAlmuerzo()!=null?ref.getHoraAlmuerzo():""));
+                asist.setHoraSalida((ref.getHoraSalida()!=null?ref.getHoraSalida():""));
                 lsAsistencia.add(asist);
             }
             exit.setAsistNowDTOS(lsAsistencia);
