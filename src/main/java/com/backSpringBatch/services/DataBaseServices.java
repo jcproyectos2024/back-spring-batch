@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -196,8 +198,55 @@ public class DataBaseServices {
                        if( t.getStatus()){
                            horaTempRepository.delete(t);
                        }
-                    });
+                    });  
+                    
                 }
+                
+                //logica para el calculo de las horas suplementarias de producción
+                if(bio.getNombreBiometrico().equals("GARITA") && bio.getTipoBiometrinco().equals("SALIDA")) {
+
+                	try {
+                    	String fechaActual=utily.obtenerFechaActual(x.getId().getAsisIng());
+						String fechaActualMenosDias=utily.obtenerFechaMenosDias(1, x.getId().getAsisIng());
+						Biometrico bioObtenido=biometricoRepository.findBytTipoBiometrincoAndNombreBiometrico("INGRESO","GARITA");
+						List<AsistNow> lsMarcacionesEntradaGarita=postGresRepository.findByElementByFechas(fechaActualMenosDias, fechaActual,x.getIdentificacion(),bioObtenido.getIpBiometrico(), Sort.by(Sort.Direction.DESC,"asisFecha"));						
+						/*
+						 * Filtrado por las fechas ahora se debe de obtener la fecha y hora de la marcacion de entrada
+						 * y la fecha y hora de la marcacion de salida 
+						 * */
+						
+				        //List<AsistNow> lsMarcacionesPlanta=lsAsistencias.stream().filter(dat->((biometricoRepository.findByIpBiometrico(dat.getId().getAsisZona())).getNombreBiometrico().equals("GARITA"))).collect(Collectors.toList());
+				        //List<AsistNow> lsMarcacionesEntrada=lsMarcacionesPlanta.stream().filter(dat->((biometricoRepository.findByIpBiometrico(dat.getId().getAsisZona())).getTipoBiometrinco().equals("INGRESO"))).collect(Collectors.toList());
+
+						if(lsMarcacionesEntradaGarita.size()>0) {
+							
+							//se obtiene la marcacion de entrada y salida de garita actual 
+							
+							AsistNow marcacionSalidaG=regActual;							
+							AsistNow marcacionEntradaG=lsMarcacionesEntradaGarita.get(lsMarcacionesEntradaGarita.size()-1);
+							//se obtiene todas las marcaciones de entrada y salida de planta
+							Biometrico bioIngresoPlanta=biometricoRepository.findBytTipoBiometrincoAndNombreBiometrico("INGRESO","PLANTA");
+							Biometrico biosSalidaPlanta=biometricoRepository.findBytTipoBiometrincoAndNombreBiometrico("SALIDA","PLANTA");
+
+							List<AsistNow> lsIngresoPlanta=postGresRepository.findByElementByFechas(utily.obtenerFechaActual(marcacionEntradaG.getAsisFecha()),  utily.obtenerFechaActual(marcacionSalidaG.getAsisFecha()),x.getIdentificacion(),bioIngresoPlanta.getIpBiometrico(), Sort.by(Sort.Direction.ASC,"asisFecha"));						
+							List<AsistNow> lsSalidaPlanta=postGresRepository.findByElementByFechas(utily.obtenerFechaActual(marcacionEntradaG.getAsisFecha()),  utily.obtenerFechaActual(marcacionSalidaG.getAsisFecha()),x.getIdentificacion(),biosSalidaPlanta.getIpBiometrico(), Sort.by(Sort.Direction.DESC,"asisFecha"));						
+
+							AsistNow igPlantaHora=lsIngresoPlanta.get(0);
+							AsistNow salPlantaHora=lsSalidaPlanta.get(0);
+							
+							
+						}
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+                	
+                	
+                	
+                	
+                }
+                
+                
                 sqlRepository.delete(x);
             });
 

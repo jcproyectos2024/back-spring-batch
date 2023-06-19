@@ -4,6 +4,7 @@ package com.backSpringBatch.postgres.repository;
 import com.backSpringBatch.postgres.entity.AsistNow;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -41,6 +42,14 @@ public interface PostGresRepository extends JpaRepository<AsistNow, String> {
 
 
 
+    @Query(nativeQuery=false, value="select an from AsistNow an "
+    		+ " where to_char(an.asisFecha,'yyyy-MM-dd') between :fechaIni  and :fechaFin "
+    		+ " and an.identificacion=:nominaCod "
+    		+ " and an.id.asisZona=:ipZona "
+    		+ " order by an.id.asisIng desc  ")
+    List<AsistNow> findByElementByFechas(String fechaIni, String fechaFin, String nominaCod, String ipZona, Sort sort);
+    
+    
 
 
 

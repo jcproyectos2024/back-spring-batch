@@ -1,6 +1,10 @@
 package com.backSpringBatch.Util;
 
 import org.springframework.stereotype.Component;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 @Component
@@ -64,6 +68,22 @@ public class Utily {
 //    public static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd h:mm");
 //    public static SimpleDateFormat sdfResult = new SimpleDateFormat("HH:mm:ss");
 //    public static SimpleDateFormat sdfResultMinutos = new SimpleDateFormat("m");
+    
+    public String obtenerFechaActual(Date fechaReg) {
+    	return DateFormat.getDateInstance().format(fechaReg);
+
+    }
+    
+    public String obtenerFechaMenosDias(int dias, Date fechaReg) throws ParseException {
+    	String exit="";
+    	String fechaActual = DateFormat.getDateInstance().format(fechaReg);
+    	Date fecha = new SimpleDateFormat("yyyy-MM-dd").parse(fechaActual);
+    	Calendar calendario = Calendar.getInstance();
+    	calendario.setTime(fecha);
+    	calendario.add(Calendar.DAY_OF_MONTH, -dias);
+    	exit = new SimpleDateFormat("yyyy-MM-dd").format(calendario.getTime());
+    	return exit;
+    }
 
 
 

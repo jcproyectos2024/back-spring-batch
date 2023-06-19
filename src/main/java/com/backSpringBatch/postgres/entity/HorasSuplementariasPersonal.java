@@ -24,7 +24,7 @@ public class HorasSuplementariasPersonal {
     @Column(name = "identificacion")
     private  String identificacion;
     
-    @Column(name = "tipo")
+    @Column(name = "tipo")//anticipo o mensual
     private  String tipo;
     
     @Column(name = "estado")
