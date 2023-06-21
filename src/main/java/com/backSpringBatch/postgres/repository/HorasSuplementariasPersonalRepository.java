@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface HorasSuplementariasPersonalRepository extends JpaRepository <HorasSuplementariasPersonal, String> {
 
+	HorasSuplementariasPersonal findByIdentificacionAndEstadoTrue(String identificacion);
     
 
 }

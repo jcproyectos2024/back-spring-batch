@@ -30,14 +30,12 @@ public class HorasSuplementariasPersonal {
     @Column(name = "estado")
     private  Boolean estado;
 
-    @Column(name = "horas_25")
-    private  Long horas25;
+    @Column(name = "horas")
+    private  Long horas;
     
-    @Column(name = "horas_50")
-    private  Long horas50;
-    
-    @Column(name = "horas_100")
-    private  Long horas_100;
+    @Column(name = "porcentaje")
+    private  Double porcentaje;
+
 
 	public Long getId() {
 		return id;
@@ -71,29 +69,31 @@ public class HorasSuplementariasPersonal {
 		this.estado = estado;
 	}
 
-	public Long getHoras25() {
-		return horas25;
+	public Long getHoras() {
+		return horas;
 	}
 
-	public void setHoras25(Long horas25) {
-		this.horas25 = horas25;
+	public void setHoras(Long horas) {
+		this.horas = horas;
 	}
 
-	public Long getHoras50() {
-		return horas50;
+	public Double getPorcentaje() {
+		return porcentaje;
 	}
 
-	public void setHoras50(Long horas50) {
-		this.horas50 = horas50;
+	public void setPorcentaje(Double porcentaje) {
+		this.porcentaje = porcentaje;
 	}
 
-	public Long getHoras_100() {
-		return horas_100;
+	public HorasSuplementariasPersonal() {
+		this.horas=0L;
+		this.estado=true;
+		
+		//super();
 	}
 
-	public void setHoras_100(Long horas_100) {
-		this.horas_100 = horas_100;
-	}
+	
+	
 
    
 

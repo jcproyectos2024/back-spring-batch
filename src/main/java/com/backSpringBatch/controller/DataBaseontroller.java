@@ -2,8 +2,6 @@ package com.backSpringBatch.controller;
 
 
 import com.backSpringBatch.Util.SaveMantDTO;
-import com.backSpringBatch.Util.Utily;
-import com.backSpringBatch.postgres.entity.AsistNow;
 import com.backSpringBatch.postgres.models.JustificacionDTO;
 import com.backSpringBatch.postgres.models.ResponseAsistNowPagination;
 import com.backSpringBatch.postgres.models.ResponseHorasProduccionPagination;
@@ -16,8 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
-import java.util.Date;
-import java.util.List;
+
 
 
 @Controller
@@ -27,11 +24,7 @@ public class DataBaseontroller {
 	@Autowired
 	private DataBaseServices dataBaseServices;
 
-	@Autowired
-	private Utily utily;
 
-	
-	
 	@Scheduled (cron = "0/3 * * ? * *")
 	public void insertSqlToPostgres() {
 		dataBaseServices.insertSqlToPostgres();
@@ -65,13 +58,7 @@ public class DataBaseontroller {
 	}
 
 	
-	
-	@GetMapping("obtenerRegistrosPaginadoLista/")
-	public List<AsistNow> obtenerRegistrosPaginadoLista(@RequestParam int numberPage, 
-			@RequestParam int pageSize,
-			@RequestParam String fechaRegistro) {
-		return dataBaseServices.pruebaPaginado(numberPage,pageSize,fechaRegistro);
-	}
+
 	
 	
 	@GetMapping("procesarDataGuardada/")

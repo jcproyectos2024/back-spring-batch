@@ -19,15 +19,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -73,9 +70,11 @@ public class DataBaseServices {
     @Autowired
     private Utily utily;
 
+    @Autowired
+    private HorasSuplementariasPersonalRepository horasSuplementariasPersonalRepository;
     
     @Autowired
-    private ListUtils listUtils;
+    private PoliticasHorasSupleRepository politicasHorasSupleRepository;
 
     @Transactional(rollbackFor = { Exception.class })
     public void insertSqlToPostgres(){
@@ -214,16 +213,12 @@ public class DataBaseServices {
 						 * Filtrado por las fechas ahora se debe de obtener la fecha y hora de la marcacion de entrada
 						 * y la fecha y hora de la marcacion de salida 
 						 * */
-						
-				        //List<AsistNow> lsMarcacionesPlanta=lsAsistencias.stream().filter(dat->((biometricoRepository.findByIpBiometrico(dat.getId().getAsisZona())).getNombreBiometrico().equals("GARITA"))).collect(Collectors.toList());
-				        //List<AsistNow> lsMarcacionesEntrada=lsMarcacionesPlanta.stream().filter(dat->((biometricoRepository.findByIpBiometrico(dat.getId().getAsisZona())).getTipoBiometrinco().equals("INGRESO"))).collect(Collectors.toList());
-
 						if(lsMarcacionesEntradaGarita.size()>0) {
 							
 							//se obtiene la marcacion de entrada y salida de garita actual 
 							
 							AsistNow marcacionSalidaG=regActual;							
-							AsistNow marcacionEntradaG=lsMarcacionesEntradaGarita.get(lsMarcacionesEntradaGarita.size()-1);
+							AsistNow marcacionEntradaG=lsMarcacionesEntradaGarita.get(0);
 							//se obtiene todas las marcaciones de entrada y salida de planta
 							Biometrico bioIngresoPlanta=biometricoRepository.findBytTipoBiometrincoAndNombreBiometrico("INGRESO","PLANTA");
 							Biometrico biosSalidaPlanta=biometricoRepository.findBytTipoBiometrincoAndNombreBiometrico("SALIDA","PLANTA");
@@ -233,7 +228,41 @@ public class DataBaseServices {
 
 							AsistNow igPlantaHora=lsIngresoPlanta.get(0);
 							AsistNow salPlantaHora=lsSalidaPlanta.get(0);
+							String horaIni=igPlantaHora.getAsisHora().replaceAll(":", "");
+							String horaFin=salPlantaHora.getAsisHora().replaceAll(":", "");
 							
+							if(igPlantaHora!=null && salPlantaHora!=null) {
+		                       // Date difference = utily.getDifferenceBetwenDates(horaGrupo, regActual.getId().getAsisIng());
+								List<PoliticasHorasSuple> lsPoliticas=politicasHorasSupleRepository.findByEstadoTrue();
+								if(lsPoliticas.size()>0) {
+									HorasSuplementariasPersonal horaPersonal=horasSuplementariasPersonalRepository.findByIdentificacionAndEstadoTrue(x.getIdentificacion());
+									if(horaPersonal==null) {
+										horaPersonal=new HorasSuplementariasPersonal();
+										horaPersonal.setIdentificacion(x.getIdentificacion());
+									}
+									for(int i=0;i<lsPoliticas.size();i++) {
+										PoliticasHorasSuple polHoras=lsPoliticas.get(i);
+										if(i==0 && Integer.parseInt(horaIni)>=Integer.parseInt(polHoras.getRangoHoraInicial().replaceAll(":", ""))
+												&& Integer.parseInt(horaFin)>=Integer.parseInt(polHoras.getRangoHoraFinal().replaceAll(":", ""))) {
+											horaPersonal.setHoras(horaPersonal.getHoras()+8L);
+										}else if(i>0 && Integer.parseInt(horaIni)>=Integer.parseInt(polHoras.getRangoHoraInicial().replaceAll(":", ""))) {
+											if(Integer.parseInt(horaFin)>=Integer.parseInt(polHoras.getRangoHoraFinal().replaceAll(":", ""))) {
+												horaPersonal.setHoras(null);
+											}else if(Integer.parseInt(horaFin)<=Integer.parseInt(polHoras.getRangoHoraFinal().replaceAll(":", ""))) {
+												
+											}
+											
+										}
+										horaPersonal.setPorcentaje(polHoras.getPorcentaje());
+
+										
+										horasSuplementariasPersonalRepository.save(horaPersonal);
+									}
+									
+
+								}
+								
+							}
 							
 						}
 					} catch (ParseException e) {
@@ -255,15 +284,7 @@ public class DataBaseServices {
         }
     }
     
-    public List<AsistNow> pruebaPaginado(int numberPage, int pageSize, String fechaRegistro) {
-    	
-    
-    	List<AsistNow> lsAsistencia=postGresRepository.getAsistenciasxFechaRegistro(fechaRegistro);
-        List<AsistNow> results = new ArrayList<>();
-        results=listUtils.getPage(lsAsistencia, numberPage,pageSize);
-        return results;
-    	
-    }
+
     
 
     //PAGINADO
