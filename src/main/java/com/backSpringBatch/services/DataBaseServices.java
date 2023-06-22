@@ -246,17 +246,20 @@ public class DataBaseServices {
 												&& Integer.parseInt(horaFin)>=Integer.parseInt(polHoras.getRangoHoraFinal().replaceAll(":", ""))) {
 											horaPersonal.setHoras(horaPersonal.getHoras()+8L);
 										}else if(i>0 && Integer.parseInt(horaIni)>=Integer.parseInt(polHoras.getRangoHoraInicial().replaceAll(":", ""))) {
+											String horaActual ="";
 											if(Integer.parseInt(horaFin)>=Integer.parseInt(polHoras.getRangoHoraFinal().replaceAll(":", ""))) {
-												horaPersonal.setHoras(null);
+												Date difference = utily.getDifferenceBetwenDates(utily.concatenaHoraFechaActual(polHoras.getRangoHoraFinal()), utily.concatenaHoraFechaActual(polHoras.getRangoHoraInicial()));
+							                    horaActual = sdfResult.format(difference);
 											}else if(Integer.parseInt(horaFin)<=Integer.parseInt(polHoras.getRangoHoraFinal().replaceAll(":", ""))) {
-												
-											}
-											
-										}
-										horaPersonal.setPorcentaje(polHoras.getPorcentaje());
+												Date difference = utily.getDifferenceBetwenDates(utily.concatenaHoraFechaActual(salPlantaHora.getAsisHora()), utily.concatenaHoraFechaActual(polHoras.getRangoHoraInicial()));
+							                    horaActual = sdfResult.format(difference);
 
+											}
+											horaPersonal.setHoras(horaPersonal.getHoras()+utily.horasMilisegundos(horaActual));
+											horaPersonal.setPorcentaje(polHoras.getPorcentaje());
+											horasSuplementariasPersonalRepository.save(horaPersonal);
+										}
 										
-										horasSuplementariasPersonalRepository.save(horaPersonal);
 									}
 									
 
@@ -269,13 +272,8 @@ public class DataBaseServices {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-                	
-                	
-                	
-                	
                 }
-                
-                
+
                 sqlRepository.delete(x);
             });
 

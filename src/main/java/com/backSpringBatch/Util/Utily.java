@@ -85,15 +85,39 @@ public class Utily {
     	return exit;
     }
 
-    public String horaMilisegundo() {
-    	int inOffset = Calendar.getInstance().getTimeZone().getOffset((new java.util.Date()).getTime());
-    	SimpleDateFormat sdf = new SimpleDateFormat ("hh:mm:ss");
-    	long tiempoRestante = 6000000; // Este valor se saca de BBDD
-    	Date tiempoRestanteDate = new Date(tiempoRestante-inOffset);
-    	String tiempoRestanteString = sdf.format(tiempoRestanteDate);
-    	System.out.println(tiempoRestanteString);
-    	return tiempoRestanteString;
-    }
 
+    public Integer segundosMilisegundos(String segundos) {
+    	return Integer.parseInt(segundos)*1000;
+    }
+    
+    public Integer minutosMilisengundos(String minutos) {
+    	return Integer.parseInt(minutos)*60000;
+    }
+    
+    public Integer horasMilisegundos(String horas) {
+    	return Integer.parseInt(horas)*3600000;
+    }
+    
+    public Integer horasMilisegundosGeneral(String hora) {
+    	String[] horaSep=hora.split(":");
+    	return segundosMilisegundos(horaSep[2])+minutosMilisengundos(horaSep[1])+horasMilisegundos(horaSep[0]);
+    }
+    
+    
+    public Date concatenaHoraFechaActual(String horaPendienteFormat) throws ParseException {
+    	 SimpleDateFormat dtf = new SimpleDateFormat("yyyy-MM-dd");
+         Calendar calendar = Calendar.getInstance();
+
+         Date dateObj = calendar.getTime();
+         String formattedDate = dtf.format(dateObj);
+
+
+
+         SimpleDateFormat fechaHora= new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+         Date fh= fechaHora.parse(formattedDate+" "+horaPendienteFormat);
+         return fh;
+
+    }
+    
 
 }
