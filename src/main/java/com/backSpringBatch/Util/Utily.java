@@ -119,5 +119,22 @@ public class Utily {
 
     }
     
+    public Date concatenaHoraFechaActual(String horaPendienteFormat, int dia) throws ParseException {
+   	 SimpleDateFormat dtf = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar calendar = Calendar.getInstance();
+        
+            	calendar.add(Calendar.DAY_OF_MONTH, +dia);
+
+        Date dateObj = calendar.getTime();
+        String formattedDate = dtf.format(dateObj);
+
+
+
+        SimpleDateFormat fechaHora= new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        Date fh= fechaHora.parse(formattedDate+" "+horaPendienteFormat);
+        return fh;
+
+   }
+    
 
 }

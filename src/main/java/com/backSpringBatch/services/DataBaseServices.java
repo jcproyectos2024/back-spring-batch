@@ -231,9 +231,94 @@ public class DataBaseServices {
 							String horaIni=igPlantaHora.getAsisHora().replaceAll(":", "");
 							String horaFin=salPlantaHora.getAsisHora().replaceAll(":", "");
 							
+							String rangoMarcadoFin=salPlantaHora.getAsisHora();
+							
 							if(igPlantaHora!=null && salPlantaHora!=null) {
 		                       // Date difference = utily.getDifferenceBetwenDates(horaGrupo, regActual.getId().getAsisIng());
 								List<PoliticasHorasSuple> lsPoliticas=politicasHorasSupleRepository.findByEstadoTrue();
+								
+								
+							    
+							        if(lsPoliticas.size()>0) {
+							        	
+										HorasSuplementariasPersonal horaPersonal=horasSuplementariasPersonalRepository.findByIdentificacionAndEstadoTrue(x.getIdentificacion());
+										if(horaPersonal==null) {
+											horaPersonal=new HorasSuplementariasPersonal();
+											horaPersonal.setIdentificacion(x.getIdentificacion());
+										}
+							        	
+							 
+							            
+							            if(lsPoliticas.size()>0 && utily.horasMilisegundosGeneral(rangoMarcadoFin)>=utily.horasMilisegundosGeneral(lsPoliticas.get(0).getRangoHoraFinal())
+							                    && 
+							                    utily.horasMilisegundosGeneral(rangoMarcadoFin)<=utily.horasMilisegundosGeneral(lsPoliticas.get(lsPoliticas.size()-1).getRangoHoraFinal())
+							                    ){
+							                
+							                Integer horaArrastrada=0;
+							                horaArrastrada=utily.horasMilisegundosGeneral(rangoMarcadoFin)-utily.horasMilisegundosGeneral(lsPoliticas.get(0).getRangoHoraFinal());
+							                                              System.out.println("horas arrastradas i:"+  horaArrastrada);
+
+							                for(int i=0;i<lsPoliticas.size();i++) {
+							                    PoliticasHorasSuple polHoras=lsPoliticas.get(i);
+							                    if(i==0){
+							                        if(utily.horasMilisegundosGeneral(rangoMarcadoFin)>=utily.horasMilisegundosGeneral(polHoras.getRangoHoraFinal())){
+							                            horaArrastrada=horaArrastrada;//-utily.horasMilisegundosGeneral(polHoras.getRangoHoraFinal());
+							                            /*Date difference = utily.getDifferenceBetwenDates(utily.concatenaHoraFechaActual(polHoras.getRangoHoraFinal(),1), utily.concatenaHoraFechaActual(polHoras.getRangoHoraInicial(),0));
+							                            String horaActual = sdfResult.format(difference);*/
+							                            Integer horasPaso=utily.horasMilisegundosGeneral("8:00:00");
+							                            
+							                            horaPersonal.setHoras(horaPersonal.getHoras()+horasPaso);
+							                            horaPersonal.setPorcentaje(polHoras.getPorcentaje());
+							                            
+							                              System.out.println("horas arrastradas i:"+i+"   "+  horasPaso+"_____________Porcentaje:"+polHoras.getPorcentaje());
+							                        }else{ 
+							                            horaArrastrada=utily.horasMilisegundosGeneral(polHoras.getRangoHoraInicial())-horaArrastrada;
+							                            
+							                            horaPersonal.setHoras(horaPersonal.getHoras()+horaArrastrada);
+							                            horaPersonal.setPorcentaje(polHoras.getPorcentaje());
+							                            
+							                            System.out.println("horas arrastradas i:"+i+"   "+  horaArrastrada+"_____________Porcentaje:"+polHoras.getPorcentaje());
+							                            break;
+							                        }
+							                      
+							                    }else if (i>0){
+							                        Integer dif=utily.horasMilisegundosGeneral(polHoras.getRangoHoraFinal())-utily.horasMilisegundosGeneral(polHoras.getRangoHoraInicial());
+							                       System.out.println("diferencia:"+dif);
+							                        if(horaArrastrada>0 && horaArrastrada>=dif){
+							                            horaArrastrada=horaArrastrada-dif;
+							                            
+							                            horaPersonal.setHoras(horaPersonal.getHoras()+horaArrastrada);
+							                            horaPersonal.setPorcentaje(polHoras.getPorcentaje());
+							                              System.out.println("horas arrastradas i:"+i+"   "+  horaArrastrada+"_____________Porcentaje:"+polHoras.getPorcentaje());
+							                        }else if(horaArrastrada>60000 && horaArrastrada<dif){
+							                            horaArrastrada= (utily.horasMilisegundosGeneral(polHoras.getRangoHoraFinal())-horaArrastrada)-utily.horasMilisegundosGeneral(polHoras.getRangoHoraInicial());
+							                            
+							                            horaPersonal.setHoras(horaPersonal.getHoras()+horaArrastrada);
+							                            horaPersonal.setPorcentaje(polHoras.getPorcentaje());
+							                            System.out.println("horas arrastradas i:"+i+"   "+  horaArrastrada+"_____________Porcentaje:"+polHoras.getPorcentaje());
+							                              break;
+							                        }
+							                        
+							                       // System.out.println("horas arrastradas:"+horaArrastrada);
+							                    }
+							                    
+							                
+							                }
+							        
+							            }
+							        }
+								
+								
+								
+								
+								
+								
+								
+								
+								
+								
+								
+								/*
 								if(lsPoliticas.size()>0) {
 									HorasSuplementariasPersonal horaPersonal=horasSuplementariasPersonalRepository.findByIdentificacionAndEstadoTrue(x.getIdentificacion());
 									if(horaPersonal==null) {
@@ -263,7 +348,7 @@ public class DataBaseServices {
 									}
 									
 
-								}
+								}*/
 								
 							}
 							
