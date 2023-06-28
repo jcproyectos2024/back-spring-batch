@@ -207,7 +207,7 @@ public class DataBaseServices {
                 	try {
                     	String fechaActual=utily.obtenerFechaActual(x.getId().getAsisIng());
 						String fechaActualMenosDias=utily.obtenerFechaMenosDias(1, x.getId().getAsisIng());
-						Biometrico bioObtenido=biometricoRepository.findBytTipoBiometrincoAndNombreBiometrico("INGRESO","GARITA");
+						Biometrico bioObtenido=biometricoRepository.findByTipoBiometrincoAndNombreBiometrico("INGRESO","GARITA");
 						List<AsistNow> lsMarcacionesEntradaGarita=postGresRepository.findByElementByFechas(fechaActualMenosDias, fechaActual,x.getIdentificacion(),bioObtenido.getIpBiometrico(), Sort.by(Sort.Direction.DESC,"asisFecha"));						
 						/*
 						 * Filtrado por las fechas ahora se debe de obtener la fecha y hora de la marcacion de entrada
@@ -220,8 +220,8 @@ public class DataBaseServices {
 							AsistNow marcacionSalidaG=regActual;							
 							AsistNow marcacionEntradaG=lsMarcacionesEntradaGarita.get(0);
 							//se obtiene todas las marcaciones de entrada y salida de planta
-							Biometrico bioIngresoPlanta=biometricoRepository.findBytTipoBiometrincoAndNombreBiometrico("INGRESO","PLANTA");
-							Biometrico biosSalidaPlanta=biometricoRepository.findBytTipoBiometrincoAndNombreBiometrico("SALIDA","PLANTA");
+							Biometrico bioIngresoPlanta=biometricoRepository.findByTipoBiometrincoAndNombreBiometrico("INGRESO","PLANTA");
+							Biometrico biosSalidaPlanta=biometricoRepository.findByTipoBiometrincoAndNombreBiometrico("SALIDA","PLANTA");
 
 							List<AsistNow> lsIngresoPlanta=postGresRepository.findByElementByFechas(utily.obtenerFechaActual(marcacionEntradaG.getAsisFecha()),  utily.obtenerFechaActual(marcacionSalidaG.getAsisFecha()),x.getIdentificacion(),bioIngresoPlanta.getIpBiometrico(), Sort.by(Sort.Direction.ASC,"asisFecha"));						
 							List<AsistNow> lsSalidaPlanta=postGresRepository.findByElementByFechas(utily.obtenerFechaActual(marcacionEntradaG.getAsisFecha()),  utily.obtenerFechaActual(marcacionSalidaG.getAsisFecha()),x.getIdentificacion(),biosSalidaPlanta.getIpBiometrico(), Sort.by(Sort.Direction.DESC,"asisFecha"));						
