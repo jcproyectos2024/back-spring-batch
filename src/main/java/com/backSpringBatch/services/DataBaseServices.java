@@ -3,10 +3,12 @@ package com.backSpringBatch.services;
 import com.backSpringBatch.Util.SaveMantDTO;
 import com.backSpringBatch.Util.ScheduleDTO;
 import com.backSpringBatch.Util.Utily;
+import com.backSpringBatch.dto.HorasSuplementariasPersonalDto;
 import com.backSpringBatch.postgres.entity.*;
 import com.backSpringBatch.postgres.mapper.AsistNowMapper;
 import com.backSpringBatch.postgres.mapper.AtrasosMapper;
 import com.backSpringBatch.postgres.mapper.HorasProduccionMapper;
+import com.backSpringBatch.postgres.mapper.HorasSuplementariasPersonalMapper;
 import com.backSpringBatch.postgres.models.*;
 import com.backSpringBatch.postgres.repository.*;
 import com.backSpringBatch.sqlserver.entity.AsistNowRegistro;
@@ -75,6 +77,9 @@ public class DataBaseServices {
     
     @Autowired
     private PoliticasHorasSupleRepository politicasHorasSupleRepository;
+
+    @Autowired
+    private HorasSuplementariasPersonalMapper  horasSuplementariasPersonalMapper;
 
     @Transactional(rollbackFor = { Exception.class })
     public void insertSqlToPostgres(){
@@ -681,6 +686,27 @@ public class DataBaseServices {
 
 
 
+    public HorasSuplementariasPersonalResponses findAllByHorasSuplementariasPersonal()
+    {
+        HorasSuplementariasPersonalResponses response = new HorasSuplementariasPersonalResponses();
+        try {
+
+            List<HorasSuplementariasPersonal> horasSuplementariasPersonalList = horasSuplementariasPersonalRepository.findAllByEstadoTrue();
+            List<HorasSuplementariasPersonalDto>  horasSuplementariasPersonalDtoList = horasSuplementariasPersonalMapper.toHorasSuplementariasPersonalDtoList(horasSuplementariasPersonalList);
+            response.setHorasSuplementariasPersonalDtoList(horasSuplementariasPersonalDtoList);
+            response.setMensaje("ok");
+            response.setTotalRegistros(horasSuplementariasPersonalDtoList.size());
+            response.setSuccess(true);
+            return response;
+
+        }catch (Exception e) {
+            // TODO: handle exception
+            response.setMensaje(e.getMessage());
+            response.setSuccess(false);
+            return response;
+        }
+
+    }
 
 
 }

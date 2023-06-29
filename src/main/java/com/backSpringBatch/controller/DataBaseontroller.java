@@ -2,10 +2,7 @@ package com.backSpringBatch.controller;
 
 
 import com.backSpringBatch.Util.SaveMantDTO;
-import com.backSpringBatch.postgres.models.JustificacionDTO;
-import com.backSpringBatch.postgres.models.ResponseAsistNowPagination;
-import com.backSpringBatch.postgres.models.ResponseHorasProduccionPagination;
-import com.backSpringBatch.postgres.models.SearchMarcaDTO;
+import com.backSpringBatch.postgres.models.*;
 import com.backSpringBatch.services.DataBaseServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -83,5 +80,12 @@ public class DataBaseontroller {
 //		return dataBaseServices.calcularHora(identificaicion, hora);
 //	}
 
+
+	@GetMapping("findAllByHorasSuplementariasPersonal/")
+	public HorasSuplementariasPersonalResponses findAllByHorasSuplementariasPersonal()
+	{
+
+		return dataBaseServices.findAllByHorasSuplementariasPersonal();
+	}
 }
 	
