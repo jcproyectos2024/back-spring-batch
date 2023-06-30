@@ -130,14 +130,18 @@ public class DataBaseServices {
                 }
                 //fin will 10/05/23
                 
-                
-                
+
+
                 Biometrico bio = biometricoRepository.findByIpBiometrico(regActual.getId().getAsisZona());
                 //Validar si existe un atraso
                 Atrasos atra= atrasosRepository.findByIdentificacionAndAndFecha(regActual.getIdentificacion(), regActual.getAsisFecha());
                 if(atra==null) {
-                    if (bio.getTipoBiometrinco().equals("INGRESO") && bio.getNombreBiometrico().equals("GARITA") && x.getIdentificacion() != null) {
-                        Date horaGrupo = (obtenerhoraGrupo(regActual.getIdentificacion()));
+                    if (bio.getTipoBiometrinco().equals("INGRESO") && bio.getNombreBiometrico().equals("GARITA") && x.getIdentificacion() != null)
+                    {
+
+                       Date horaGrupo = (obtenerhoraGrupo(regActual.getIdentificacion()));
+                       if (horaGrupo!=null)
+                       {
                         //Validar hora ingreso
                         Date difference = utily.getDifferenceBetwenDates(horaGrupo, regActual.getId().getAsisIng());
                         String horaVerificacion = sdfResult.format(difference);
@@ -151,6 +155,7 @@ public class DataBaseServices {
                             atrasosRepository.save(atrasos);
                             postGresRepository.save(regActual);
                         }
+                       }
                     }
                 }
                 if( bio.getNombreBiometrico().equals("PLANTA")){
@@ -563,7 +568,8 @@ public class DataBaseServices {
 
     public Date obtenerhoraGrupo(String identificacion){
         ScheduleDTO horaGupo= restServices.getSchedulePerson(identificacion);
-        Date horaGrupo= horaGupo.getDesde();
+        Date horaGrupo = horaGupo == null ? null : horaGupo.getDesde();
+        //Date horaGrupo= horaGupo.getDesde();
         return  horaGrupo;
     }
 
