@@ -45,8 +45,7 @@ public interface PostGresRepository extends JpaRepository<AsistNow, String> {
     @Query(nativeQuery=false, value="select an from AsistNow an "
     		+ " where to_char(an.asisFecha,'yyyy-MM-dd') between :fechaIni  and :fechaFin "
     		+ " and an.identificacion=:nominaCod "
-    		+ " and an.id.asisZona=:ipZona "
-    		+ " order by an.id.asisIng desc  ")
+    		+ " and an.id.asisZona=:ipZona ")
     List<AsistNow> findByElementByFechas(String fechaIni, String fechaFin, String nominaCod, String ipZona, Sort sort);
     
     

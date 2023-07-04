@@ -70,13 +70,15 @@ public class Utily {
 //    public static SimpleDateFormat sdfResultMinutos = new SimpleDateFormat("m");
     
     public String obtenerFechaActual(Date fechaReg) {
-    	return DateFormat.getDateInstance().format(fechaReg);
+        SimpleDateFormat formateo=new SimpleDateFormat("yyyy-MM-dd");
+    	return formateo.format(fechaReg);
 
     }
     
     public String obtenerFechaMenosDias(int dias, Date fechaReg) throws ParseException {
     	String exit="";
-    	String fechaActual = DateFormat.getDateInstance().format(fechaReg);
+        SimpleDateFormat formateo=new SimpleDateFormat("yyyy-MM-dd");
+    	String fechaActual = formateo.format(fechaReg);
     	Date fecha = new SimpleDateFormat("yyyy-MM-dd").parse(fechaActual);
     	Calendar calendario = Calendar.getInstance();
     	calendario.setTime(fecha);
