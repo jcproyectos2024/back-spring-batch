@@ -28,6 +28,8 @@ public class AsistNowRegistro {
 
     @Column (name = "empresa")
     private String empresa;
+
+
     public AsistnowRegistroPK getId() {
         return id;
     }

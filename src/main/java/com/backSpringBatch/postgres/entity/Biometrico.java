@@ -3,12 +3,12 @@ package com.backSpringBatch.postgres.entity;
 
 import groovyjarjarantlr4.v4.runtime.misc.Nullable;
 import javax.persistence.*;
-
+import java.io.Serializable;
 
 
 @Entity
 @Table(name ="biometricos", schema = "public")
-public class Biometrico {
+public class Biometrico implements Serializable {
 
 
     @Id

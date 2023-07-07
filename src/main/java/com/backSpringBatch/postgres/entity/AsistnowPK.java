@@ -21,6 +21,8 @@ public class AsistnowPK implements Serializable {
     @Column(name = "asis_zona")
     private String asisZona;
 
+
+
     public String getAsisId() {
         return asisId;
     }

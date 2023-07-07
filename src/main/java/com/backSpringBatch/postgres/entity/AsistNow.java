@@ -2,12 +2,13 @@ package com.backSpringBatch.postgres.entity;
 
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
 
 @Entity
 @Table(name ="asistnow", schema = "public")
-public class AsistNow {
+public class AsistNow implements Serializable  {
 
 
     @EmbeddedId
@@ -32,9 +33,9 @@ public class AsistNow {
     @Column (name = "empresa")
     private String empresa;
 
-  /*  @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "asis_zona", referencedColumnName = "ip_biometrico", insertable = false, updatable = false)
-    private  Biometrico  biometrico;*/
+   @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "asis_zona", referencedColumnName="ip_biometrico",  insertable = false, updatable = false)
+    private  Biometrico  biometrico;
 
     public AsistnowPK getId() {
         return id;
@@ -92,13 +93,13 @@ public class AsistNow {
         this.empresa = empresa;
     }
 
-  /*  public Biometrico getBiometrico() {
+    public Biometrico getBiometrico() {
         return biometrico;
     }
 
     public void setBiometrico(Biometrico biometrico) {
         this.biometrico = biometrico;
-    }*/
+    }
 }
 
 

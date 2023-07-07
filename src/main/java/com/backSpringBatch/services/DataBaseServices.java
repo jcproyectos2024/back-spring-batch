@@ -91,8 +91,8 @@ public class DataBaseServices {
             List<AsistNowRegistro> lsRegistros=sqlRepository.findAll();
             lsRegistros.forEach(x->{
                 AsistNow regActual=asisRegistroMapper.asistNowRegistroToAsistNow(x);
-              //  Biometrico biometricoGuarado  = biometricoRepository.findByIpBiometrico(regActual.getId().getAsisZona());
-               // regActual.setBiometrico(biometricoGuarado);
+              Biometrico biometricoGuarado  = biometricoRepository.findByIpBiometrico(regActual.getId().getAsisZona());
+              regActual.setBiometrico(biometricoGuarado);
                 postGresRepository.save(regActual);
                 
                 //aqui se inserta el refactorizado 
@@ -188,6 +188,7 @@ public class DataBaseServices {
                             horasProduccion.setIdentificacion(regActual.getIdentificacion());
                             horasProduccion.setFecha(regActual.getAsisFecha());
                             try {
+                                System.out.println("-----calHora----"+calHora);
                                 Date date = format.parse(String.valueOf(calHora));
                                 horasProduccion.setCalHorasProd(date);
                             } catch (ParseException e) {
@@ -659,6 +660,7 @@ public class DataBaseServices {
 
 
 
+    @Transactional
     public HorasSuplementariasPersonalResponses findAllByHorasSuplementariasPersonal(HorasSuplementariasPersonalBody  HorasSuplementariasPersonalBody )
     {
         HorasSuplementariasPersonalResponses response = new HorasSuplementariasPersonalResponses();
@@ -694,18 +696,18 @@ public class DataBaseServices {
 
     }
 
+    @Transactional
     public HorasSuplementariasPersonalResponses calculoHorasSuplementariasProduccion(String fechaIni, String fechaFin ,String identificacion, String empresa )
     {
 
         HorasSuplementariasPersonalResponses response = new HorasSuplementariasPersonalResponses();
 
 
-        List<AsistNow>  asistNowList =null;
-        // postGresRepository.findByElementByFechasEmpresa(fechaIni,fechaFin,identificacion,empresa,Sort.by(Sort.Direction.ASC,"id.asisIng"));
+       List<AsistNow>  asistNowList =postGresRepository.findByElementByFechasEmpresa(fechaIni,fechaFin,identificacion,empresa,Sort.by(Sort.Direction.ASC,"id.asisIng"));
 
 
 
-        //System.out.println("  asistNowList.size()"+  asistNowList.size());
+        System.out.println("  asistNowList.size()"+  asistNowList.size());
 
         asistNowList.stream().forEach(regActual ->
         {
@@ -714,10 +716,10 @@ public class DataBaseServices {
 
 
 
-        Biometrico bio = biometricoRepository.findByIpBiometrico(regActual.getId().getAsisZona());
+       // Biometrico bio = biometricoRepository.findByIpBiometrico(regActual.getId().getAsisZona());
         //logica para el calculo de las horas suplementarias de producción
-        if(bio.getNombreBiometrico().equals("GARITA") && bio.getTipoBiometrinco().equals("SALIDA"))
-        {
+    //   if(bio.getNombreBiometrico().equals("GARITA") && bio.getTipoBiometrinco().equals("SALIDA"))
+     //   {
 
             try {
                 String fechaActual=utily.obtenerFechaActual(regActual.getId().getAsisIng());
@@ -834,7 +836,7 @@ public class DataBaseServices {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-        }
+       // }
 
         });
 
