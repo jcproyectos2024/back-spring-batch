@@ -27,6 +27,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -90,6 +91,8 @@ public class DataBaseServices {
             List<AsistNowRegistro> lsRegistros=sqlRepository.findAll();
             lsRegistros.forEach(x->{
                 AsistNow regActual=asisRegistroMapper.asistNowRegistroToAsistNow(x);
+              //  Biometrico biometricoGuarado  = biometricoRepository.findByIpBiometrico(regActual.getId().getAsisZona());
+               // regActual.setBiometrico(biometricoGuarado);
                 postGresRepository.save(regActual);
                 
                 //aqui se inserta el refactorizado 
@@ -213,7 +216,7 @@ public class DataBaseServices {
                     
                 }
                 
-                //logica para el calculo de las horas suplementarias de producción
+//                //logica para el calculo de las horas suplementarias de producción
 //                if(bio.getNombreBiometrico().equals("GARITA") && bio.getTipoBiometrinco().equals("SALIDA"))
 //                {
 //
@@ -656,9 +659,10 @@ public class DataBaseServices {
 
 
 
-    public HorasSuplementariasPersonalResponses findAllByHorasSuplementariasPersonal()
+    public HorasSuplementariasPersonalResponses findAllByHorasSuplementariasPersonal(HorasSuplementariasPersonalBody  HorasSuplementariasPersonalBody )
     {
         HorasSuplementariasPersonalResponses response = new HorasSuplementariasPersonalResponses();
+        calculoHorasSuplementariasProduccion(HorasSuplementariasPersonalBody.getFechaIni(),HorasSuplementariasPersonalBody.getFechaFin(),HorasSuplementariasPersonalBody.getIdentificacion(),HorasSuplementariasPersonalBody.getEmpresa());
         try {
 
             List<HorasSuplementariasPersonal> horasSuplementariasPersonalList = horasSuplementariasPersonalRepository.findAllByEstadoTrue();
@@ -690,12 +694,27 @@ public class DataBaseServices {
 
     }
 
-    public HorasSuplementariasPersonalResponses calculoHorasSuplementariasProduccion(String inditif)
+    public HorasSuplementariasPersonalResponses calculoHorasSuplementariasProduccion(String fechaIni, String fechaFin ,String identificacion, String empresa )
     {
 
         HorasSuplementariasPersonalResponses response = new HorasSuplementariasPersonalResponses();
 
 
+        List<AsistNow>  asistNowList =null;
+        // postGresRepository.findByElementByFechasEmpresa(fechaIni,fechaFin,identificacion,empresa,Sort.by(Sort.Direction.ASC,"id.asisIng"));
+
+
+
+        //System.out.println("  asistNowList.size()"+  asistNowList.size());
+
+        asistNowList.stream().forEach(regActual ->
+        {
+
+
+
+
+
+        Biometrico bio = biometricoRepository.findByIpBiometrico(regActual.getId().getAsisZona());
         //logica para el calculo de las horas suplementarias de producción
         if(bio.getNombreBiometrico().equals("GARITA") && bio.getTipoBiometrinco().equals("SALIDA"))
         {
@@ -719,8 +738,8 @@ public class DataBaseServices {
                     Biometrico bioIngresoPlanta=biometricoRepository.findByTipoBiometrincoAndNombreBiometrico("INGRESO","PLANTA");
                     Biometrico biosSalidaPlanta=biometricoRepository.findByTipoBiometrincoAndNombreBiometrico("SALIDA","PLANTA");
 
-                    List<AsistNow> lsIngresoPlanta=postGresRepository.findByElementByFechas(utily.obtenerFechaActual(marcacionEntradaG.getAsisFecha()),  utily.obtenerFechaActual(marcacionSalidaG.getAsisFecha()),x.getIdentificacion(),bioIngresoPlanta.getIpBiometrico(), Sort.by(Sort.Direction.ASC,"asisFecha"));
-                    List<AsistNow> lsSalidaPlanta=postGresRepository.findByElementByFechas(utily.obtenerFechaActual(marcacionEntradaG.getAsisFecha()),  utily.obtenerFechaActual(marcacionSalidaG.getAsisFecha()),x.getIdentificacion(),biosSalidaPlanta.getIpBiometrico(), Sort.by(Sort.Direction.DESC,"asisFecha"));
+                    List<AsistNow> lsIngresoPlanta=postGresRepository.findByElementByFechas(utily.obtenerFechaActual(marcacionEntradaG.getAsisFecha()),  utily.obtenerFechaActual(marcacionSalidaG.getAsisFecha()),regActual.getIdentificacion(),bioIngresoPlanta.getIpBiometrico(), Sort.by(Sort.Direction.ASC,"asisFecha"));
+                    List<AsistNow> lsSalidaPlanta=postGresRepository.findByElementByFechas(utily.obtenerFechaActual(marcacionEntradaG.getAsisFecha()),  utily.obtenerFechaActual(marcacionSalidaG.getAsisFecha()),regActual.getIdentificacion(),biosSalidaPlanta.getIpBiometrico(), Sort.by(Sort.Direction.DESC,"asisFecha"));
 
                     if(lsIngresoPlanta.size()>0 && lsSalidaPlanta.size()>0) {
 
@@ -738,10 +757,10 @@ public class DataBaseServices {
 
                         if(lsPoliticas.size()>0) {
 
-                            HorasSuplementariasPersonal horaPersonal=horasSuplementariasPersonalRepository.findByIdentificacionAndEstadoTrue(x.getIdentificacion());
+                            HorasSuplementariasPersonal horaPersonal=horasSuplementariasPersonalRepository.findByIdentificacionAndEstadoTrue(regActual.getIdentificacion());
                             if(horaPersonal==null) {
                                 horaPersonal=new HorasSuplementariasPersonal();
-                                horaPersonal.setIdentificacion(x.getIdentificacion());
+                                horaPersonal.setIdentificacion(regActual.getIdentificacion());
                             }
 
 
@@ -810,11 +829,14 @@ public class DataBaseServices {
                     }
 
                 }
+
             } catch (ParseException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
+
+        });
 
             return response;
 

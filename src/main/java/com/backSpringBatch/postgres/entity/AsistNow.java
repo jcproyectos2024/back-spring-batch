@@ -29,6 +29,12 @@ public class AsistNow {
     private String identificacion;
 
 
+    @Column (name = "empresa")
+    private String empresa;
+
+  /*  @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "asis_zona", referencedColumnName = "ip_biometrico", insertable = false, updatable = false)
+    private  Biometrico  biometrico;*/
 
     public AsistnowPK getId() {
         return id;
@@ -77,6 +83,22 @@ public class AsistNow {
     public void setIdentificacion(String identificacion) {
         this.identificacion = identificacion;
     }
+
+    public String getEmpresa() {
+        return empresa;
+    }
+
+    public void setEmpresa(String empresa) {
+        this.empresa = empresa;
+    }
+
+  /*  public Biometrico getBiometrico() {
+        return biometrico;
+    }
+
+    public void setBiometrico(Biometrico biometrico) {
+        this.biometrico = biometrico;
+    }*/
 }
 
 

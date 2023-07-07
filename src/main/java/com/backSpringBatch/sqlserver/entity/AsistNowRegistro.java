@@ -26,6 +26,8 @@ public class AsistNowRegistro {
     @Column (name = "nomina_cod")
     private String identificacion;
 
+    @Column (name = "empresa")
+    private String empresa;
     public AsistnowRegistroPK getId() {
         return id;
     }
@@ -72,5 +74,13 @@ public class AsistNowRegistro {
 
     public void setIdentificacion(String identificacion) {
         this.identificacion = identificacion;
+    }
+
+    public String getEmpresa() {
+        return empresa;
+    }
+
+    public void setEmpresa(String empresa) {
+        this.empresa = empresa;
     }
 }

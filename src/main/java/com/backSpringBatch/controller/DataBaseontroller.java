@@ -81,11 +81,11 @@ public class DataBaseontroller {
 //	}
 
 
-	@GetMapping("findAllByHorasSuplementariasPersonal/")
-	public HorasSuplementariasPersonalResponses findAllByHorasSuplementariasPersonal()
+	@PostMapping("findAllByHorasSuplementariasPersonal/")
+	public HorasSuplementariasPersonalResponses findAllByHorasSuplementariasPersonal(@RequestBody @Validated HorasSuplementariasPersonalBody  HorasSuplementariasPersonalBody)
 	{
 
-		return dataBaseServices.findAllByHorasSuplementariasPersonal();
+		return dataBaseServices.findAllByHorasSuplementariasPersonal(HorasSuplementariasPersonalBody);
 	}
 }
 	
