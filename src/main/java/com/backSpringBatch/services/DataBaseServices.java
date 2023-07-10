@@ -145,6 +145,7 @@ public class DataBaseServices {
                     {
 
                        Date horaGrupo = (obtenerhoraGrupo(regActual.getIdentificacion()));
+                       System.out.println("horaGrupo"+horaGrupo);
                        if (horaGrupo!=null)
                        {
                         //Validar hora ingreso
@@ -163,7 +164,8 @@ public class DataBaseServices {
                        }
                     }
                 }
-                if( bio.getNombreBiometrico().equals("PLANTA")){
+                if( bio.getNombreBiometrico().equals("PLANTA"))
+                {
                     HorasProduccionTemp horasTemp= new HorasProduccionTemp();
                     horasTemp.setId(regActual.getId());
                     horasTemp.setIdentificacion(regActual.getIdentificacion());
@@ -173,10 +175,16 @@ public class DataBaseServices {
 
                     List<HorasProduccionTemp> horas= horaTempRepository.findByIdentificacion(regActual.getIdentificacion());
                     HorasProduccion horasProd = horasProduccionRepository.findByIdentificacionAndFecha(regActual.getIdentificacion(), regActual.getAsisFecha());
-                    if(horas.size()>1) {
+
+                    if(horas.size()>1)
+                    {
+
+
                         HorasProduccion horasProduccion = new HorasProduccion();
                         HorasProduccionTemp ingreso = horas.get(0);
+                        System.out.println("HorasProduccionTemp++ingreso"+ingreso.getId().getAsisIng());
                         HorasProduccionTemp salida = horas.get(1);
+                        System.out.println("HorasProduccionTemp++salida"+salida.getId().getAsisIng());
                         //horas producidas
                         Date calHora = utily.getDifferenceBetwenDates(ingreso.getId().getAsisIng(), salida.getId().getAsisIng());
                         ingreso.setStatus(Boolean.TRUE);
@@ -184,16 +192,19 @@ public class DataBaseServices {
                         horaTempRepository.save(ingreso);
                         horaTempRepository.save(salida);
                         if(horasProd ==null){
+
                             horasProduccion.setId(regActual.getId());
                             horasProduccion.setIdentificacion(regActual.getIdentificacion());
                             horasProduccion.setFecha(regActual.getAsisFecha());
-                            try {
+                           // try {
                                 System.out.println("-----calHora----"+calHora);
-                                Date date = format.parse(String.valueOf(calHora));
+                                //Date date = format.parse(String.valueOf(calHora));
+                                Date date = calHora;
                                 horasProduccion.setCalHorasProd(date);
-                            } catch (ParseException e) {
+                         /*   } catch (ParseException e)
+                            {
                                 e.printStackTrace();
-                            }
+                            }*/
 
                             horasProduccion.setCalHorasProd(calHora);
                             String hora = sdfResult.format(calHora);
@@ -201,6 +212,8 @@ public class DataBaseServices {
                             horasProduccionRepository.save(horasProduccion);
                         }
                         else {
+                            System.out.println("getCalHorasProd"+horasProd.getCalHorasProd());
+                            System.out.println("getHorasProduccion"+horasProd.getHorasProduccion());
                              Date calPro= utily.getSumBetwenDates(horasProd.getCalHorasProd(),calHora);
                                 horasProd.setCalHorasProd(calPro);
                                 String hora= sdfResult.format(calPro);
@@ -739,9 +752,9 @@ public class DataBaseServices {
                     //se obtiene todas las marcaciones de entrada y salida de planta
                     Biometrico bioIngresoPlanta=biometricoRepository.findByTipoBiometrincoAndNombreBiometrico("INGRESO","PLANTA");
                     Biometrico biosSalidaPlanta=biometricoRepository.findByTipoBiometrincoAndNombreBiometrico("SALIDA","PLANTA");
-
+                    Biometrico biosSalidaGarita=biometricoRepository.findByTipoBiometrincoAndNombreBiometrico("SALIDA","GARITA");
                     List<AsistNow> lsIngresoPlanta=postGresRepository.findByElementByFechas(utily.obtenerFechaActual(marcacionEntradaG.getAsisFecha()),  utily.obtenerFechaActual(marcacionSalidaG.getAsisFecha()),regActual.getIdentificacion(),bioIngresoPlanta.getIpBiometrico(), Sort.by(Sort.Direction.ASC,"asisFecha"));
-                    List<AsistNow> lsSalidaPlanta=postGresRepository.findByElementByFechas(utily.obtenerFechaActual(marcacionEntradaG.getAsisFecha()),  utily.obtenerFechaActual(marcacionSalidaG.getAsisFecha()),regActual.getIdentificacion(),biosSalidaPlanta.getIpBiometrico(), Sort.by(Sort.Direction.DESC,"asisFecha"));
+                    List<AsistNow> lsSalidaPlanta=postGresRepository.findByElementByFechasSalidaGaritaPlanta(utily.obtenerFechaActual(marcacionEntradaG.getAsisFecha()),  utily.obtenerFechaActual(marcacionSalidaG.getAsisFecha()),regActual.getIdentificacion(),biosSalidaGarita.getIpBiometrico(),biosSalidaPlanta.getIpBiometrico() , Sort.by(Sort.Direction.DESC,"asisFecha"));
 
                     if(lsIngresoPlanta.size()>0 && lsSalidaPlanta.size()>0) {
 
