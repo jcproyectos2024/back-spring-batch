@@ -674,13 +674,13 @@ public class DataBaseServices {
 
 
     @Transactional
-    public HorasSuplementariasPersonalResponses findAllByHorasSuplementariasPersonal(HorasSuplementariasPersonalBody  HorasSuplementariasPersonalBody )
+    public HorasSuplementariasPersonalResponses findAllByHorasSuplementariasPersonal(HorasSuplementariasPersonalBody  horasSuplementariasPersonalBody )
     {
         HorasSuplementariasPersonalResponses response = new HorasSuplementariasPersonalResponses();
-        calculoHorasSuplementariasProduccion(HorasSuplementariasPersonalBody.getFechaIni(),HorasSuplementariasPersonalBody.getFechaFin(),HorasSuplementariasPersonalBody.getIdentificacion(),HorasSuplementariasPersonalBody.getEmpresa());
+        calculoHorasSuplementariasProduccion(horasSuplementariasPersonalBody.getFechaIni(),horasSuplementariasPersonalBody.getFechaFin(),horasSuplementariasPersonalBody.getIdentificacion(),horasSuplementariasPersonalBody.getEmpresa());
         try {
 
-            List<HorasSuplementariasPersonal> horasSuplementariasPersonalList = horasSuplementariasPersonalRepository.findAllByEstadoTrue();
+            List<HorasSuplementariasPersonal> horasSuplementariasPersonalList = horasSuplementariasPersonalRepository.findAllByEstadoTrueAndIdentificacion(horasSuplementariasPersonalBody.getIdentificacion());
             List<HorasSuplementariasPersonalDto>  horasSuplementariasPersonalDtoList = horasSuplementariasPersonalMapper.toHorasSuplementariasPersonalDtoList(horasSuplementariasPersonalList);
             if (horasSuplementariasPersonalDtoList.isEmpty())
             {
@@ -772,15 +772,11 @@ public class DataBaseServices {
 
                         if(lsPoliticas.size()>0) {
 
-                            HorasSuplementariasPersonal horaPersonal=horasSuplementariasPersonalRepository.findByIdentificacionAndEstadoTrue(regActual.getIdentificacion());
-                            if(horaPersonal==null) {
-                                horaPersonal=new HorasSuplementariasPersonal();
-                                horaPersonal.setIdentificacion(regActual.getIdentificacion());
-                            }
 
 
 
-                            if(lsPoliticas.size()>0 && utily.horasMilisegundosGeneral(rangoMarcadoFin)>=utily.horasMilisegundosGeneral(lsPoliticas.get(0).getRangoHoraFinal())
+
+                            if(utily.horasMilisegundosGeneral(rangoMarcadoFin)>=utily.horasMilisegundosGeneral(lsPoliticas.get(0).getRangoHoraFinal())
                                     &&
                                     utily.horasMilisegundosGeneral(rangoMarcadoFin)<=utily.horasMilisegundosGeneral(lsPoliticas.get(lsPoliticas.size()-1).getRangoHoraFinal())
                             ){
@@ -791,6 +787,12 @@ public class DataBaseServices {
 
                                 for(int i=0;i<lsPoliticas.size();i++) {
                                     PoliticasHorasSuple polHoras=lsPoliticas.get(i);
+
+                                    HorasSuplementariasPersonal horaPersonal=horasSuplementariasPersonalRepository.findByIdentificacionAndEstadoTrueAndPorcentaje(regActual.getIdentificacion(),polHoras.getPorcentaje());
+                                    if(horaPersonal==null) {
+                                        horaPersonal=new HorasSuplementariasPersonal();
+                                        horaPersonal.setIdentificacion(regActual.getIdentificacion());
+                                    }
                                     if(i==0){
                                         if(utily.horasMilisegundosGeneral(rangoMarcadoFin)>=utily.horasMilisegundosGeneral(polHoras.getRangoHoraFinal())){
                                             horaArrastrada=horaArrastrada;//-utily.horasMilisegundosGeneral(polHoras.getRangoHoraFinal());
