@@ -720,7 +720,6 @@ public class DataBaseServices {
 
 
 
-        System.out.println("  asistNowList.size()"+  asistNowList.size());
 
         asistNowList.stream().forEach(regActual ->
         {
