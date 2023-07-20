@@ -859,4 +859,39 @@ public class DataBaseServices {
 
     }
 
+
+
+
+    public HorasSuplementariasPersonalResponses calculoHorasSuplementariasPersonalProduccionFija(AsistNow asistNow )
+    {
+        HorasSuplementariasPersonalResponses response = new HorasSuplementariasPersonalResponses();
+        try {
+
+
+            PersonResponseS  personResponseS=   restServices.consultarPersonaTipoBiometricoCalculo(asistNow.getIdentificacion());
+
+            if (personResponseS!=null)
+            {
+                List<AsistNow> lsAsistNow=postGresRepository.findByElementByFechasEmpresaEntrada(utily.obtenerFechaActual(asistNow.getAsisFecha()),  utily.obtenerFechaActual(asistNow.getAsisFecha()),asistNow.getIdentificacion(),personResponseS.getPersonCabeceraDTOC().getTipoBiometricoCalculo().getNombreBiometrico(), "INGRESO", asistNow.getEmpresa(),Sort.by(Sort.Direction.ASC,"asisFecha"));
+
+
+
+            }
+
+
+
+                return response;
+
+
+
+        }catch (Exception e)
+        {
+            // TODO: handle exception
+            response.setMensaje(e.getMessage());
+            response.setSuccess(false);
+            return response;
+        }
+
+    }
+
 }

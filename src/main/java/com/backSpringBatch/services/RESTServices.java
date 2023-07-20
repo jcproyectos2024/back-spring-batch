@@ -1,6 +1,7 @@
 package com.backSpringBatch.services;
 
 import com.backSpringBatch.Util.ScheduleDTO;
+import com.backSpringBatch.postgres.models.PersonResponseS;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import io.restassured.RestAssured;
@@ -38,4 +39,27 @@ public class RESTServices {
         }
         return rootc;
     }
+
+    public PersonResponseS consultarPersonaTipoBiometricoCalculo(String identificacion) {
+        String ruta = env.getProperty("consultarPersonaTipoBiometricoCalculo");
+        PersonResponseS rootc = null;
+        String rutahistory=ruta;
+        rutahistory+="?identificacion="+identificacion;
+        try {
+            Response response =
+                    RestAssured.given().contentType("application/json")
+                            .when().get(rutahistory).then().extract().response();
+
+            String json = response.getBody().asString();
+            Gson gson = new Gson();
+            rootc = gson.fromJson(json, new TypeToken<PersonResponseS>() {
+            }.getType());
+        } catch (Exception e) {
+            // TODO: handle exception
+            e.printStackTrace();
+        }
+        return rootc;
+    }
+
+
 }
