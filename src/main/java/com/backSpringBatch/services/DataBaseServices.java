@@ -872,8 +872,21 @@ public class DataBaseServices {
 
             if (personResponseS!=null)
             {
-                List<AsistNow> lsAsistNow=postGresRepository.findByElementByFechasEmpresaEntrada(utily.obtenerFechaActual(asistNow.getAsisFecha()),  utily.obtenerFechaActual(asistNow.getAsisFecha()),asistNow.getIdentificacion(),personResponseS.getPersonCabeceraDTOC().getTipoBiometricoCalculo().getNombreBiometrico(), "INGRESO", asistNow.getEmpresa(),Sort.by(Sort.Direction.ASC,"asisFecha"));
+                if (personResponseS.getPersonalCorpDTOS().getSchedule().getTurns().getNameTurns().equalsIgnoreCase("Nocturno"))
+                {
+                    //consulto la marcacion de entrada con la configurtacion de biometrico asignado a cada empleado
+                    //la fecha consultada se le resta -1 dia por que la jornada Nocturno
+                    String fechaActual=utily.obtenerFechaActual(asistNow.getId().getAsisIng());
+                    String fechaActualMenosDias=utily.obtenerFechaMenosDias(1, asistNow.getId().getAsisIng());
+                    List<AsistNow> lsMarcacionesEntrada=postGresRepository.findByElementByFechasEmpresaEntrada(fechaActualMenosDias,fechaActual,asistNow.getIdentificacion(),personResponseS.getPersonCabeceraDTOC().getTipoBiometricoCalculo().getNombreBiometrico(), "INGRESO", asistNow.getEmpresa(),Sort.by(Sort.Direction.ASC,"asisFecha"));
+                    List<AsistNow> lsMarcacionesSalida=postGresRepository.findByElementByFechasEmpresaEntrada(fechaActual,fechaActual,asistNow.getIdentificacion(),personResponseS.getPersonCabeceraDTOC().getTipoBiometricoCalculo().getNombreBiometrico(), "SALIDA", asistNow.getEmpresa(),Sort.by(Sort.Direction.ASC,"asisFecha"));
 
+
+                    List<PoliticasHorasSuple> lsPoliticas=politicasHorasSupleRepository.findByEstadoTrue();
+
+
+
+                }
 
 
             }
