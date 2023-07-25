@@ -2,6 +2,8 @@ package com.backSpringBatch.controller;
 
 
 import com.backSpringBatch.Util.SaveMantDTO;
+import com.backSpringBatch.dto.ConsultarEntradaSalida;
+import com.backSpringBatch.dto.ConsultarEntradaSalidaMarcacionResponses;
 import com.backSpringBatch.postgres.models.*;
 import com.backSpringBatch.services.DataBaseServices;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,6 +88,14 @@ public class DataBaseontroller {
 	{
 
 		return dataBaseServices.findAllByHorasSuplementariasPersonal(HorasSuplementariasPersonalBody);
+	}
+
+
+	@PostMapping("consultarEntradaSalidaMarcacion/")
+	public ConsultarEntradaSalidaMarcacionResponses consultarEntradaSalidaMarcacion(@RequestBody @Validated ConsultarEntradaSalida consultarEntradaSalida)
+	{
+
+		return dataBaseServices.consultarEntradaSalidaMarcacion(consultarEntradaSalida);
 	}
 }
 	

@@ -139,21 +139,16 @@ public class Utily {
    }
     
 
-   public void calculaDiferencia(){
+   public void calculaDiferencia(String inicio, String fin){
 
 
        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
        try
        {
-   /* Date d1 = df.parse("2023-07-20 19:30:00");
-    Date d2 = df.parse("2023-07-21 05:30:00");
-    long diff = d1.getTime() - d2.getTime();
-    long days = diff / (1000 * 60 * 60 * 24);*/
 
-           //SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-           java.util.Date now = df.parse("2023-07-21 05:00:00");
-           java.util.Date date=df.parse("2023-07-20 19:30:00");
+           java.util.Date now = df.parse(inicio);
+           java.util.Date date=df.parse(fin);
            long l=now.getTime()-date.getTime();
            long day=l/(24*60*60*1000);
            long hour=(l/(60*60*1000)-day*24);
@@ -170,4 +165,10 @@ public class Utily {
 
        }
    }
-}
+
+    public void convertir(String inici)
+    {
+
+    }
+
+    }

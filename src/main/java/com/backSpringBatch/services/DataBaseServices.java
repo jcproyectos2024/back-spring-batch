@@ -3,6 +3,8 @@ package com.backSpringBatch.services;
 import com.backSpringBatch.Util.SaveMantDTO;
 import com.backSpringBatch.Util.ScheduleDTO;
 import com.backSpringBatch.Util.Utily;
+import com.backSpringBatch.dto.ConsultarEntradaSalida;
+import com.backSpringBatch.dto.ConsultarEntradaSalidaMarcacionResponses;
 import com.backSpringBatch.dto.HorasSuplementariasPersonalDto;
 import com.backSpringBatch.postgres.entity.*;
 import com.backSpringBatch.postgres.mapper.AsistNowMapper;
@@ -755,7 +757,8 @@ public class DataBaseServices {
                     List<AsistNow> lsIngresoPlanta=postGresRepository.findByElementByFechas(utily.obtenerFechaActual(marcacionEntradaG.getAsisFecha()),  utily.obtenerFechaActual(marcacionSalidaG.getAsisFecha()),regActual.getIdentificacion(),bioIngresoPlanta.getIpBiometrico(), Sort.by(Sort.Direction.ASC,"asisFecha"));
                     List<AsistNow> lsSalidaPlanta=postGresRepository.findByElementByFechasSalidaGaritaPlanta(utily.obtenerFechaActual(marcacionEntradaG.getAsisFecha()),  utily.obtenerFechaActual(marcacionSalidaG.getAsisFecha()),regActual.getIdentificacion(),biosSalidaGarita.getIpBiometrico(),biosSalidaPlanta.getIpBiometrico() , Sort.by(Sort.Direction.DESC,"asisFecha"));
 
-                    if(lsIngresoPlanta.size()>0 && lsSalidaPlanta.size()>0) {
+                    if(lsIngresoPlanta.size()>0 && lsSalidaPlanta.size()>0)
+                    {
 
                         AsistNow igPlantaHora=lsIngresoPlanta.get(0);
                         AsistNow salPlantaHora=lsSalidaPlanta.get(0);
@@ -881,8 +884,14 @@ public class DataBaseServices {
                     List<AsistNow> lsMarcacionesEntrada=postGresRepository.findByElementByFechasEmpresaEntrada(fechaActualMenosDias,fechaActual,asistNow.getIdentificacion(),personResponseS.getPersonCabeceraDTOC().getTipoBiometricoCalculo().getNombreBiometrico(), "INGRESO", asistNow.getEmpresa(),Sort.by(Sort.Direction.ASC,"asisFecha"));
                     List<AsistNow> lsMarcacionesSalida=postGresRepository.findByElementByFechasEmpresaEntrada(fechaActual,fechaActual,asistNow.getIdentificacion(),personResponseS.getPersonCabeceraDTOC().getTipoBiometricoCalculo().getNombreBiometrico(), "SALIDA", asistNow.getEmpresa(),Sort.by(Sort.Direction.ASC,"asisFecha"));
 
+                    if (!lsMarcacionesEntrada.isEmpty())
+                    {
+
+
+                    }
 
                     List<PoliticasHorasSuple> lsPoliticas=politicasHorasSupleRepository.findByEstadoTrue();
+
 
 
 
@@ -905,6 +914,40 @@ public class DataBaseServices {
             return response;
         }
 
+    }
+
+
+
+
+    public ConsultarEntradaSalidaMarcacionResponses consultarEntradaSalidaMarcacion(ConsultarEntradaSalida consultarEntradaSalida )
+    {
+        ConsultarEntradaSalidaMarcacionResponses response = new ConsultarEntradaSalidaMarcacionResponses();
+        try
+        {
+
+
+            List<AsistNow> lsMarcacionesEntrada=postGresRepository.listahoraEntradaBiometrico(consultarEntradaSalida.getFecha(),consultarEntradaSalida.getFecha(),consultarEntradaSalida.getIdentificacion(),consultarEntradaSalida.getBiometrico(), "INGRESO", consultarEntradaSalida.getEmpresa(),Sort.by(Sort.Direction.ASC,"asisFecha"));
+            List<AsistNow> lsMarcacionesSalida=postGresRepository.listahoraSalidadBiometrico(consultarEntradaSalida.getFecha(),consultarEntradaSalida.getFecha(),consultarEntradaSalida.getIdentificacion(),consultarEntradaSalida.getBiometrico(), "SALIDA", consultarEntradaSalida.getEmpresa(),Sort.by(Sort.Direction.ASC,"asisFecha"));
+            if (!lsMarcacionesEntrada.isEmpty() && !lsMarcacionesSalida.isEmpty())
+            {
+
+                response.setLsMarcacionesEntrada(lsMarcacionesEntrada);
+                response.setLsMarcacionesSalida(lsMarcacionesSalida);
+                response.setMensaje("Consulta Existosa");
+                response.setSuccess(true);
+                return response;
+            }
+
+        }
+        catch (Exception e)
+        {
+            // TODO: handle exception
+            response.setMensaje(e.getMessage());
+            response.setSuccess(false);
+            return response;
+        }
+
+        return response;
     }
 
 }
