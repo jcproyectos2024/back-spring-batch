@@ -166,9 +166,40 @@ public class Utily {
        }
    }
 
-    public void convertir(String inici)
+    public  String[] horasMinutosSegundosSplit(String horasMinutosSegundosEntradaNocturno)
     {
-
+        try
+        {
+            String[] horasMinutosSegundosSplit = horasMinutosSegundosEntradaNocturno.split(":");
+            return  horasMinutosSegundosSplit;
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
     }
 
+
+
+    public   String rangoHora( String horas )
+    {
+        String CASO="CASO 1";
+        switch(horas)
+        {
+            case "19":
+                CASO="CASO 1";
+                break;
+            case "20":
+                CASO="GRUPO DIOSMAR"; break;
+
+            case "GD08":
+                CASO="FAHDI S.A";
+                break;
+
+        }
+        return CASO;
     }
+
+
+
+}

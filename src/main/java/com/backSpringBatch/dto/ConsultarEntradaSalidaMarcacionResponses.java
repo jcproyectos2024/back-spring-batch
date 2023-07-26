@@ -9,8 +9,8 @@ public class ConsultarEntradaSalidaMarcacionResponses
 {
 
 
-    List<AsistNow> lsMarcacionesEntrada;
-    List<AsistNow> lsMarcacionesSalida;
+    List<RegistroMarcacionesDTO> lsMarcacionesEntrada;
+    List<RegistroMarcacionesDTO>  lsMarcacionesSalida;
 
 
     private String mensaje;
@@ -27,19 +27,19 @@ public class ConsultarEntradaSalidaMarcacionResponses
     public ConsultarEntradaSalidaMarcacionResponses() {
     }
 
-    public List<AsistNow> getLsMarcacionesEntrada() {
+    public List<RegistroMarcacionesDTO> getLsMarcacionesEntrada() {
         return lsMarcacionesEntrada;
     }
 
-    public void setLsMarcacionesEntrada(List<AsistNow> lsMarcacionesEntrada) {
+    public void setLsMarcacionesEntrada(List<RegistroMarcacionesDTO> lsMarcacionesEntrada) {
         this.lsMarcacionesEntrada = lsMarcacionesEntrada;
     }
 
-    public List<AsistNow> getLsMarcacionesSalida() {
+    public List<RegistroMarcacionesDTO> getLsMarcacionesSalida() {
         return lsMarcacionesSalida;
     }
 
-    public void setLsMarcacionesSalida(List<AsistNow> lsMarcacionesSalida) {
+    public void setLsMarcacionesSalida(List<RegistroMarcacionesDTO> lsMarcacionesSalida) {
         this.lsMarcacionesSalida = lsMarcacionesSalida;
     }
 

@@ -3,7 +3,8 @@ package com.backSpringBatch.dto;
 public class ConsultarEntradaSalida
 {
     private  String identificacion;
-    private String fecha;
+    private String fechaInicio;
+    private String fechaFin;
     private  String biometrico;
 
 
@@ -20,12 +21,20 @@ public class ConsultarEntradaSalida
         this.identificacion = identificacion;
     }
 
-    public String getFecha() {
-        return fecha;
+    public String getFechaInicio() {
+        return fechaInicio;
     }
 
-    public void setFecha(String fecha) {
-        this.fecha = fecha;
+    public void setFechaInicio(String fechaInicio) {
+        this.fechaInicio = fechaInicio;
+    }
+
+    public String getFechaFin() {
+        return fechaFin;
+    }
+
+    public void setFechaFin(String fechaFin) {
+        this.fechaFin = fechaFin;
     }
 
     public String getBiometrico() {

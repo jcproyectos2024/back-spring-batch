@@ -29,6 +29,12 @@ public class AsistNowRegistro {
     @Column (name = "empresa")
     private String empresa;
 
+    @Column (name = "nomina_nom")
+    private String nombres;
+
+    @Column (name = "nomina_ape")
+    private String apellidos;
+
 
     public AsistnowRegistroPK getId() {
         return id;
@@ -84,5 +90,21 @@ public class AsistNowRegistro {
 
     public void setEmpresa(String empresa) {
         this.empresa = empresa;
+    }
+
+    public String getNombres() {
+        return nombres;
+    }
+
+    public void setNombres(String nombres) {
+        this.nombres = nombres;
+    }
+
+    public String getApellidos() {
+        return apellidos;
+    }
+
+    public void setApellidos(String apellidos) {
+        this.apellidos = apellidos;
     }
 }

@@ -33,6 +33,12 @@ public class AsistNow implements Serializable  {
     @Column (name = "empresa")
     private String empresa;
 
+    @Column (name = "nomina_nom")
+    private String nombres;
+
+    @Column (name = "nomina_ape")
+    private String apellidos;
+
    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "asis_zona", referencedColumnName="ip_biometrico",  insertable = false, updatable = false)
     private  Biometrico  biometrico;
@@ -99,6 +105,22 @@ public class AsistNow implements Serializable  {
 
     public void setBiometrico(Biometrico biometrico) {
         this.biometrico = biometrico;
+    }
+
+    public String getNombres() {
+        return nombres;
+    }
+
+    public void setNombres(String nombres) {
+        this.nombres = nombres;
+    }
+
+    public String getApellidos() {
+        return apellidos;
+    }
+
+    public void setApellidos(String apellidos) {
+        this.apellidos = apellidos;
     }
 }
 

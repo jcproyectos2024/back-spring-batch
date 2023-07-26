@@ -6,11 +6,9 @@ import com.backSpringBatch.Util.Utily;
 import com.backSpringBatch.dto.ConsultarEntradaSalida;
 import com.backSpringBatch.dto.ConsultarEntradaSalidaMarcacionResponses;
 import com.backSpringBatch.dto.HorasSuplementariasPersonalDto;
+import com.backSpringBatch.dto.RegistroMarcacionesDTO;
 import com.backSpringBatch.postgres.entity.*;
-import com.backSpringBatch.postgres.mapper.AsistNowMapper;
-import com.backSpringBatch.postgres.mapper.AtrasosMapper;
-import com.backSpringBatch.postgres.mapper.HorasProduccionMapper;
-import com.backSpringBatch.postgres.mapper.HorasSuplementariasPersonalMapper;
+import com.backSpringBatch.postgres.mapper.*;
 import com.backSpringBatch.postgres.models.*;
 import com.backSpringBatch.postgres.repository.*;
 import com.backSpringBatch.sqlserver.entity.AsistNowRegistro;
@@ -83,7 +81,8 @@ public class DataBaseServices {
 
     @Autowired
     private HorasSuplementariasPersonalMapper  horasSuplementariasPersonalMapper;
-
+    @Autowired
+    RegistroMarcacionesMapper registroMarcacionesMapper;
     @Transactional(rollbackFor = { Exception.class })
     public void insertSqlToPostgres(){
 
@@ -871,6 +870,7 @@ public class DataBaseServices {
         try {
 
 
+            String horasMinutosSegundosEntradaNocturno;
             PersonResponseS  personResponseS=   restServices.consultarPersonaTipoBiometricoCalculo(asistNow.getIdentificacion());
 
             if (personResponseS!=null)
@@ -884,13 +884,15 @@ public class DataBaseServices {
                     List<AsistNow> lsMarcacionesEntrada=postGresRepository.findByElementByFechasEmpresaEntrada(fechaActualMenosDias,fechaActual,asistNow.getIdentificacion(),personResponseS.getPersonCabeceraDTOC().getTipoBiometricoCalculo().getNombreBiometrico(), "INGRESO", asistNow.getEmpresa(),Sort.by(Sort.Direction.ASC,"asisFecha"));
                     List<AsistNow> lsMarcacionesSalida=postGresRepository.findByElementByFechasEmpresaEntrada(fechaActual,fechaActual,asistNow.getIdentificacion(),personResponseS.getPersonCabeceraDTOC().getTipoBiometricoCalculo().getNombreBiometrico(), "SALIDA", asistNow.getEmpresa(),Sort.by(Sort.Direction.ASC,"asisFecha"));
 
+                    List<PoliticasHorasSuple> lsPoliticas=politicasHorasSupleRepository.findByEstadoTrue();
+
                     if (!lsMarcacionesEntrada.isEmpty())
                     {
-
+                        horasMinutosSegundosEntradaNocturno=  lsMarcacionesEntrada.get(0).getAsisHora();
 
                     }
 
-                    List<PoliticasHorasSuple> lsPoliticas=politicasHorasSupleRepository.findByEstadoTrue();
+
 
 
 
@@ -926,13 +928,17 @@ public class DataBaseServices {
         {
 
 
-            List<AsistNow> lsMarcacionesEntrada=postGresRepository.listahoraEntradaBiometrico(consultarEntradaSalida.getFecha(),consultarEntradaSalida.getFecha(),consultarEntradaSalida.getIdentificacion(),consultarEntradaSalida.getBiometrico(), "INGRESO", consultarEntradaSalida.getEmpresa(),Sort.by(Sort.Direction.ASC,"asisFecha"));
-            List<AsistNow> lsMarcacionesSalida=postGresRepository.listahoraSalidadBiometrico(consultarEntradaSalida.getFecha(),consultarEntradaSalida.getFecha(),consultarEntradaSalida.getIdentificacion(),consultarEntradaSalida.getBiometrico(), "SALIDA", consultarEntradaSalida.getEmpresa(),Sort.by(Sort.Direction.ASC,"asisFecha"));
-            if (!lsMarcacionesEntrada.isEmpty() && !lsMarcacionesSalida.isEmpty())
+            List<AsistNow> lsMarcacionesEntrada=postGresRepository.listahoraEntradaBiometrico(consultarEntradaSalida.getFechaInicio(),consultarEntradaSalida.getFechaFin(),consultarEntradaSalida.getIdentificacion(),consultarEntradaSalida.getBiometrico(), "INGRESO", consultarEntradaSalida.getEmpresa(),Sort.by(Sort.Direction.ASC,"asisFecha"));
+            List<AsistNow> lsMarcacionesSalidad=postGresRepository.listahoraSalidadBiometrico(consultarEntradaSalida.getFechaInicio(),consultarEntradaSalida.getFechaFin(),consultarEntradaSalida.getIdentificacion(),consultarEntradaSalida.getBiometrico(), "SALIDA", consultarEntradaSalida.getEmpresa(),Sort.by(Sort.Direction.ASC,"asisFecha"));
+            if (!lsMarcacionesEntrada.isEmpty()  || !lsMarcacionesSalidad.isEmpty())
             {
 
-                response.setLsMarcacionesEntrada(lsMarcacionesEntrada);
-                response.setLsMarcacionesSalida(lsMarcacionesSalida);
+                List<RegistroMarcacionesDTO> registroMarcacionesEntradaDTOList  =registroMarcacionesMapper.toRegistroMarcacionesDTOList(lsMarcacionesEntrada);
+                List<RegistroMarcacionesDTO> registroMarcacionesSalidadDTOList  =registroMarcacionesMapper.toRegistroMarcacionesDTOList(lsMarcacionesSalidad);
+                response.setLsMarcacionesEntrada(registroMarcacionesEntradaDTOList);
+                response.setTotalRegistrosEntrada(registroMarcacionesEntradaDTOList.size());
+                response.setLsMarcacionesSalida(registroMarcacionesSalidadDTOList);
+                response.setTotalRegistrosSalidad(registroMarcacionesSalidadDTOList.size());
                 response.setMensaje("Consulta Existosa");
                 response.setSuccess(true);
                 return response;
