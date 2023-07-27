@@ -3,10 +3,7 @@ package com.backSpringBatch.services;
 import com.backSpringBatch.Util.SaveMantDTO;
 import com.backSpringBatch.Util.ScheduleDTO;
 import com.backSpringBatch.Util.Utily;
-import com.backSpringBatch.dto.ConsultarEntradaSalida;
-import com.backSpringBatch.dto.ConsultarEntradaSalidaMarcacionResponses;
-import com.backSpringBatch.dto.HorasSuplementariasPersonalDto;
-import com.backSpringBatch.dto.RegistroMarcacionesDTO;
+import com.backSpringBatch.dto.*;
 import com.backSpringBatch.postgres.entity.*;
 import com.backSpringBatch.postgres.mapper.*;
 import com.backSpringBatch.postgres.models.*;
@@ -27,7 +24,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 @Service
@@ -924,21 +922,50 @@ public class DataBaseServices {
     public ConsultarEntradaSalidaMarcacionResponses consultarEntradaSalidaMarcacion(ConsultarEntradaSalida consultarEntradaSalida )
     {
         ConsultarEntradaSalidaMarcacionResponses response = new ConsultarEntradaSalidaMarcacionResponses();
+        List<RegistroMarcacionesDTO> registroMarcacionesEntradaSalidadDTOList  =new ArrayList<>();
+        int cont = 0;
         try
         {
 
+            consultarEntradaSalida.setEmpresa(utily.empresa(consultarEntradaSalida.getEmpresa()));
 
-            List<AsistNow> lsMarcacionesEntrada=postGresRepository.listahoraEntradaBiometrico(consultarEntradaSalida.getFechaInicio(),consultarEntradaSalida.getFechaFin(),consultarEntradaSalida.getIdentificacion(),consultarEntradaSalida.getBiometrico(), "INGRESO", consultarEntradaSalida.getEmpresa(),Sort.by(Sort.Direction.ASC,"asisFecha"));
-            List<AsistNow> lsMarcacionesSalidad=postGresRepository.listahoraSalidadBiometrico(consultarEntradaSalida.getFechaInicio(),consultarEntradaSalida.getFechaFin(),consultarEntradaSalida.getIdentificacion(),consultarEntradaSalida.getBiometrico(), "SALIDA", consultarEntradaSalida.getEmpresa(),Sort.by(Sort.Direction.ASC,"asisFecha"));
-            if (!lsMarcacionesEntrada.isEmpty()  || !lsMarcacionesSalidad.isEmpty())
+            List<AsistNow> lsMarcacionesEntrada=postGresRepository.listahoraEntradaBiometrico(consultarEntradaSalida.getFechaInicio(),consultarEntradaSalida.getFechaFin(),consultarEntradaSalida.getIdentificacion(),consultarEntradaSalida.getBiometrico(),  consultarEntradaSalida.getEmpresa(),Sort.by(Sort.Direction.ASC,"asisFecha"));
+            if (!lsMarcacionesEntrada.isEmpty() )
             {
 
                 List<RegistroMarcacionesDTO> registroMarcacionesEntradaDTOList  =registroMarcacionesMapper.toRegistroMarcacionesDTOList(lsMarcacionesEntrada);
-                List<RegistroMarcacionesDTO> registroMarcacionesSalidadDTOList  =registroMarcacionesMapper.toRegistroMarcacionesDTOList(lsMarcacionesSalidad);
-                response.setLsMarcacionesEntrada(registroMarcacionesEntradaDTOList);
-                response.setTotalRegistrosEntrada(registroMarcacionesEntradaDTOList.size());
-                response.setLsMarcacionesSalida(registroMarcacionesSalidadDTOList);
-                response.setTotalRegistrosSalidad(registroMarcacionesSalidadDTOList.size());
+               for (RegistroMarcacionesDTO x:registroMarcacionesEntradaDTOList )
+               {
+
+                   if(cont>0)
+                   {
+
+                       if (x.getBiometrico().getTipoBiometrinco().equals(registroMarcacionesEntradaDTOList.get(cont-1).getBiometrico().getTipoBiometrinco()))
+                       {
+                           System.out.println("ENTRO REPETIDOS-------cont"+cont);
+                           System.out.println("ENTRO REPETIDOS-------"+x.getBiometrico().getTipoBiometrinco());
+                           System.out.println("x"+x.toString());
+                           RegistroMarcacionesDTO  registroMarcacionesDTO =  new RegistroMarcacionesDTO();
+                           BiometricoDto biometrico =  new BiometricoDto();
+                           biometrico.setNombreBiometrico(x.getBiometrico().getNombreBiometrico());
+                           registroMarcacionesDTO.setBiometrico(biometrico);
+                           registroMarcacionesDTO.setApellidos(x.getApellidos());
+                           registroMarcacionesDTO.setNombres(x.getNombres());
+                           registroMarcacionesDTO.setEmpresa(x.getEmpresa());
+                           registroMarcacionesDTO.setIdentificacion(x.getIdentificacion());
+                           registroMarcacionesEntradaSalidadDTOList.add(registroMarcacionesDTO);
+                       }
+
+                   }
+
+                   registroMarcacionesEntradaSalidadDTOList.add(x);
+
+                   cont++;
+
+
+               }
+                response.setLsMarcacionesEntradaSalida(registroMarcacionesEntradaSalidadDTOList);
+                response.setTotalRegistrosEntradaSalidad(registroMarcacionesEntradaSalidadDTOList.size());
                 response.setMensaje("Consulta Existosa");
                 response.setSuccess(true);
                 return response;
@@ -954,6 +981,42 @@ public class DataBaseServices {
         }
 
         return response;
+    }
+
+
+
+    public RegistroMarcacionesResponses guardadoEntradaSalidaMarcacion(RegistroMarcacionesDTO registroMarcacionesDTO)
+    {
+        RegistroMarcacionesResponses response = new RegistroMarcacionesResponses();
+
+        try
+        {
+            Random random = new Random();
+            AsistnowPK  asistnowPK  = new AsistnowPK();
+            Biometrico biometrico=biometricoRepository.findByTipoBiometrincoAndNombreBiometrico(registroMarcacionesDTO.getBiometrico().getTipoBiometrinco(),registroMarcacionesDTO.getBiometrico().getNombreBiometrico());
+            AsistNow registroMarcaciones=  registroMarcacionesMapper.registroMarcacionesDTOToAsistNow(registroMarcacionesDTO);
+            asistnowPK.setAsisId(""+random);
+            asistnowPK.setAsisIng(registroMarcacionesDTO.getAsisFecha());
+            asistnowPK.setAsisZona(biometrico.getIpBiometrico());
+            registroMarcaciones.setBiometrico(biometrico);
+            registroMarcaciones.setAsisTipo(biometrico.getTipoBiometrinco());
+            AsistNow registroMarcacionesSave =postGresRepository.save(registroMarcaciones);
+            RegistroMarcacionesDTO  marcacionesDTO=registroMarcacionesMapper.asistNowToRegistroMarcacionesDTO(registroMarcacionesSave);
+            response.setMensaje("GUARDADO CON EXISTO");
+            response.setSuccess(true);
+            response.setRegistroMarcacionesDTO(marcacionesDTO);
+            return response;
+
+        }
+        catch (Exception e)
+        {
+            // TODO: handle exception
+            response.setMensaje(e.getMessage());
+            response.setSuccess(false);
+            return response;
+        }
+
+
     }
 
 }

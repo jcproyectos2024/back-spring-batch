@@ -9,16 +9,16 @@ public class ConsultarEntradaSalidaMarcacionResponses
 {
 
 
-    List<RegistroMarcacionesDTO> lsMarcacionesEntrada;
-    List<RegistroMarcacionesDTO>  lsMarcacionesSalida;
+    List<RegistroMarcacionesDTO> lsMarcacionesEntradaSalida;
+
 
 
     private String mensaje;
 
 
-    private Integer totalRegistrosEntrada;
+    private Integer totalRegistrosEntradaSalidad;
 
-    private Integer totalRegistrosSalidad;
+
 
 
     private   boolean  success;
@@ -27,20 +27,12 @@ public class ConsultarEntradaSalidaMarcacionResponses
     public ConsultarEntradaSalidaMarcacionResponses() {
     }
 
-    public List<RegistroMarcacionesDTO> getLsMarcacionesEntrada() {
-        return lsMarcacionesEntrada;
+    public List<RegistroMarcacionesDTO> getLsMarcacionesEntradaSalida() {
+        return lsMarcacionesEntradaSalida;
     }
 
-    public void setLsMarcacionesEntrada(List<RegistroMarcacionesDTO> lsMarcacionesEntrada) {
-        this.lsMarcacionesEntrada = lsMarcacionesEntrada;
-    }
-
-    public List<RegistroMarcacionesDTO> getLsMarcacionesSalida() {
-        return lsMarcacionesSalida;
-    }
-
-    public void setLsMarcacionesSalida(List<RegistroMarcacionesDTO> lsMarcacionesSalida) {
-        this.lsMarcacionesSalida = lsMarcacionesSalida;
+    public void setLsMarcacionesEntradaSalida(List<RegistroMarcacionesDTO> lsMarcacionesEntradaSalida) {
+        this.lsMarcacionesEntradaSalida = lsMarcacionesEntradaSalida;
     }
 
     public String getMensaje() {
@@ -51,20 +43,12 @@ public class ConsultarEntradaSalidaMarcacionResponses
         this.mensaje = mensaje;
     }
 
-    public Integer getTotalRegistrosEntrada() {
-        return totalRegistrosEntrada;
+    public Integer getTotalRegistrosEntradaSalidad() {
+        return totalRegistrosEntradaSalidad;
     }
 
-    public void setTotalRegistrosEntrada(Integer totalRegistrosEntrada) {
-        this.totalRegistrosEntrada = totalRegistrosEntrada;
-    }
-
-    public Integer getTotalRegistrosSalidad() {
-        return totalRegistrosSalidad;
-    }
-
-    public void setTotalRegistrosSalidad(Integer totalRegistrosSalidad) {
-        this.totalRegistrosSalidad = totalRegistrosSalidad;
+    public void setTotalRegistrosEntradaSalidad(Integer totalRegistrosEntradaSalidad) {
+        this.totalRegistrosEntradaSalidad = totalRegistrosEntradaSalidad;
     }
 
     public boolean isSuccess() {

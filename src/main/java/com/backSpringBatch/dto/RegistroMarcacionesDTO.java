@@ -1,17 +1,14 @@
 package com.backSpringBatch.dto;
 
-import com.backSpringBatch.postgres.entity.BiometricoDto;
+import com.backSpringBatch.postgres.entity.Biometrico;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
-import javax.persistence.Column;
 import java.io.Serializable;
 import java.util.Date;
 
-/**
- * A DTO for the {@link com.backSpringBatch.postgres.entity.AsistNow} entity
- */
+
 @Data
 public class RegistroMarcacionesDTO implements Serializable
 {
@@ -30,6 +27,7 @@ public class RegistroMarcacionesDTO implements Serializable
 
     private String apellidos;
 
+    private BiometricoDto biometrico;
 
     public RegistroMarcacionesDTO() {
     }
@@ -65,6 +63,30 @@ public class RegistroMarcacionesDTO implements Serializable
 
     public void setEmpresa(String empresa) {
         this.empresa = empresa;
+    }
+
+    public String getNombres() {
+        return nombres;
+    }
+
+    public void setNombres(String nombres) {
+        this.nombres = nombres;
+    }
+
+    public String getApellidos() {
+        return apellidos;
+    }
+
+    public void setApellidos(String apellidos) {
+        this.apellidos = apellidos;
+    }
+
+    public BiometricoDto getBiometrico() {
+        return biometrico;
+    }
+
+    public void setBiometrico(BiometricoDto biometrico) {
+        this.biometrico = biometrico;
     }
 
 

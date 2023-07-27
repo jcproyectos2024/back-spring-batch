@@ -4,6 +4,8 @@ package com.backSpringBatch.controller;
 import com.backSpringBatch.Util.SaveMantDTO;
 import com.backSpringBatch.dto.ConsultarEntradaSalida;
 import com.backSpringBatch.dto.ConsultarEntradaSalidaMarcacionResponses;
+import com.backSpringBatch.dto.RegistroMarcacionesDTO;
+import com.backSpringBatch.dto.RegistroMarcacionesResponses;
 import com.backSpringBatch.postgres.models.*;
 import com.backSpringBatch.services.DataBaseServices;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,6 +98,14 @@ public class DataBaseontroller {
 	{
 
 		return dataBaseServices.consultarEntradaSalidaMarcacion(consultarEntradaSalida);
+	}
+
+
+	@PostMapping("guardadoEntradaSalidaMarcacion/")
+	public RegistroMarcacionesResponses guardadoEntradaSalidaMarcacion(@RequestBody @Validated RegistroMarcacionesDTO registroMarcacionesDTO)
+	{
+
+		return dataBaseServices.guardadoEntradaSalidaMarcacion(registroMarcacionesDTO);
 	}
 }
 	

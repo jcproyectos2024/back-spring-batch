@@ -181,23 +181,22 @@ public class Utily {
 
 
 
-    public   String rangoHora( String horas )
+    public   String empresa( String codigoEmpresa )
     {
-        String CASO="CASO 1";
-        switch(horas)
-        {
-            case "19":
-                CASO="CASO 1";
+        String empresa="PROCAMARONEX";
+        switch(codigoEmpresa) {
+            case "GD10":
+                empresa="PROCAMARONEX";
                 break;
-            case "20":
-                CASO="GRUPO DIOSMAR"; break;
+            case "GD00":
+                empresa="GRUPO DIOSMAR"; break;
 
             case "GD08":
-                CASO="FAHDI S.A";
+                empresa="FAHDI S.A";
                 break;
 
         }
-        return CASO;
+        return empresa;
     }
 
 
