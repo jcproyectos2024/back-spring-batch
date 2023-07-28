@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -72,10 +73,10 @@ public interface PostGresRepository extends JpaRepository<AsistNow, String> {
 
 
     @Query(nativeQuery=false, value="select an from AsistNow an  "
-            + " where to_char(an.asisFecha,'yyyy-MM-dd') between :fechaIni  and :fechaFin "
+            + " where an.asisFecha between :fechaIni  and :fechaFin "
             + " and an.identificacion=:nominaCod "
-            + " and   an.empresa=:empresa and an.biometrico.nombreBiometrico=:nombreBiometrico ")
-    List<AsistNow> listahoraEntradaBiometrico(String fechaIni, String fechaFin,String nominaCod, String nombreBiometrico , String empresa  ,Sort sort);
+            + " and   an.empresa=:empresa and an.biometrico.nombreBiometrico=:nombreBiometrico   ORDER BY an.asisFecha ASC ")
+    List<AsistNow> listahoraEntradaBiometrico(Date fechaIni, Date fechaFin, String nominaCod, String nombreBiometrico , String empresa  );
 
 
 

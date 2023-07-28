@@ -7,6 +7,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Random;
+
 @Component
 public class Utily {
 
@@ -199,6 +201,34 @@ public class Utily {
         return empresa;
     }
 
+    public int randomSeisCifra ()
+    {
+        try
+        {
+            Random r = new Random();
+            int cantidad = r.nextInt(900000) + 100000;
+            return cantidad;
+        }
+        catch (Exception e)
+        {
+        }
 
+        return 0;
+    }
+
+    public  Date convertirStringDate(String fecha)
+    {
+        try
+        {
+            SimpleDateFormat formato = new SimpleDateFormat("yyyy/MM/dd");
+            Date fechaDate = formato.parse(fecha);
+            return  fechaDate;
+        }
+        catch (Exception e)
+        {
+        }
+
+        return null;
+    }
 
 }
