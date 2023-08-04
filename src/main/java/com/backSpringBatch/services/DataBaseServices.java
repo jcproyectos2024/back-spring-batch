@@ -929,7 +929,7 @@ public class DataBaseServices {
 
             consultarEntradaSalida.setEmpresa(utily.empresa(consultarEntradaSalida.getEmpresa()));
 
-            List<AsistNow> lsMarcacionesEntrada=postGresRepository.listahoraEntradaBiometrico(utily.convertirStringDate(consultarEntradaSalida.getFechaInicio()),utily.convertirStringDate(consultarEntradaSalida.getFechaFin()),consultarEntradaSalida.getIdentificacion(),consultarEntradaSalida.getBiometrico(),  consultarEntradaSalida.getEmpresa());
+            List<AsistNow> lsMarcacionesEntrada=postGresRepository.listahoraEntradaBiometrico(consultarEntradaSalida.getFechaInicio(),consultarEntradaSalida.getFechaFin(),consultarEntradaSalida.getIdentificacion(),consultarEntradaSalida.getBiometrico(),  consultarEntradaSalida.getEmpresa());
             if (!lsMarcacionesEntrada.isEmpty() )
             {
 
@@ -939,26 +939,26 @@ public class DataBaseServices {
                {
 
                    System.out.println("ENTRO ordenado-------"+x);
-//                   if(cont>0)
-//                   {
-//
-//                       if (x.getBiometrico().getTipoBiometrinco().equals(registroMarcacionesEntradaDTOList.get(cont-1).getBiometrico().getTipoBiometrinco()))
-//                       {
-//                           System.out.println("ENTRO REPETIDOS-------cont"+cont);
-//                           System.out.println("ENTRO REPETIDOS-------"+x.getBiometrico().getTipoBiometrinco());
-//                           System.out.println("x"+x.toString());
-//                           RegistroMarcacionesDTO  registroMarcacionesDTO =  new RegistroMarcacionesDTO();
-//                           BiometricoDto biometrico =  new BiometricoDto();
-//                           biometrico.setNombreBiometrico(x.getBiometrico().getNombreBiometrico());
-//                           registroMarcacionesDTO.setBiometrico(biometrico);
-//                           registroMarcacionesDTO.setApellidos(x.getApellidos());
-//                           registroMarcacionesDTO.setNombres(x.getNombres());
-//                           registroMarcacionesDTO.setEmpresa(x.getEmpresa());
-//                           registroMarcacionesDTO.setIdentificacion(x.getIdentificacion());
-//                           registroMarcacionesEntradaSalidadDTOList.add(registroMarcacionesDTO);
-//                       }
-//
-//                   }
+                   if(cont>0)
+                   {
+
+                       if (x.getBiometrico().getTipoBiometrinco().equals(registroMarcacionesEntradaDTOList.get(cont-1).getBiometrico().getTipoBiometrinco()))
+                       {
+                           System.out.println("ENTRO REPETIDOS-------cont"+cont);
+                           System.out.println("ENTRO REPETIDOS-------"+x.getBiometrico().getTipoBiometrinco());
+                           System.out.println("x"+x.toString());
+                           RegistroMarcacionesDTO  registroMarcacionesDTO =  new RegistroMarcacionesDTO();
+                           BiometricoDto biometrico =  new BiometricoDto();
+                           biometrico.setNombreBiometrico(x.getBiometrico().getNombreBiometrico());
+                           registroMarcacionesDTO.setBiometrico(biometrico);
+                           registroMarcacionesDTO.setApellidos(x.getApellidos());
+                           registroMarcacionesDTO.setNombres(x.getNombres());
+                           registroMarcacionesDTO.setEmpresa(x.getEmpresa());
+                           registroMarcacionesDTO.setIdentificacion(x.getIdentificacion());
+                           registroMarcacionesEntradaSalidadDTOList.add(registroMarcacionesDTO);
+                       }
+
+                   }
 
                    registroMarcacionesEntradaSalidadDTOList.add(x);
 
