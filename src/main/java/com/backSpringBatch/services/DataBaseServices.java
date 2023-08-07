@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -228,7 +229,11 @@ public class DataBaseServices {
                     });  
                     
                 }
-                
+                if(bio.getNombreBiometrico().equals("GARITA") && bio.getTipoBiometrinco().equals("SALIDA"))
+             {
+                 calculoHorasSuplementariasPersonalProduccionFija(regActual);
+             }
+
 //                //logica para el calculo de las horas suplementarias de producción
 //                if(bio.getNombreBiometrico().equals("GARITA") && bio.getTipoBiometrinco().equals("SALIDA"))
 //                {
@@ -769,7 +774,8 @@ public class DataBaseServices {
 
 
 
-                        if(lsPoliticas.size()>0) {
+                        if(lsPoliticas.size()>0)
+                        {
 
 
 
@@ -784,15 +790,18 @@ public class DataBaseServices {
                                 horaArrastrada=utily.horasMilisegundosGeneral(rangoMarcadoFin)-utily.horasMilisegundosGeneral(lsPoliticas.get(0).getRangoHoraFinal());
                                 System.out.println("horas arrastradas i:"+  horaArrastrada);
 
-                                for(int i=0;i<lsPoliticas.size();i++) {
+                                for(int i=0;i<lsPoliticas.size();i++)
+                                {
                                     PoliticasHorasSuple polHoras=lsPoliticas.get(i);
 
                                     HorasSuplementariasPersonal horaPersonal=horasSuplementariasPersonalRepository.findByIdentificacionAndEstadoTrueAndPorcentaje(regActual.getIdentificacion(),polHoras.getPorcentaje());
-                                    if(horaPersonal==null) {
+                                    if(horaPersonal==null)
+                                    {
                                         horaPersonal=new HorasSuplementariasPersonal();
                                         horaPersonal.setIdentificacion(regActual.getIdentificacion());
                                     }
-                                    if(i==0){
+                                    if(i==0)
+                                    {
                                         if(utily.horasMilisegundosGeneral(rangoMarcadoFin)>=utily.horasMilisegundosGeneral(polHoras.getRangoHoraFinal())){
                                             horaArrastrada=horaArrastrada;//-utily.horasMilisegundosGeneral(polHoras.getRangoHoraFinal());
 							                            /*Date difference = utily.getDifferenceBetwenDates(utily.concatenaHoraFechaActual(polHoras.getRangoHoraFinal(),1), utily.concatenaHoraFechaActual(polHoras.getRangoHoraInicial(),0));
@@ -816,14 +825,16 @@ public class DataBaseServices {
                                     }else if (i>0){
                                         Integer dif=utily.horasMilisegundosGeneral(polHoras.getRangoHoraFinal())-utily.horasMilisegundosGeneral(polHoras.getRangoHoraInicial());
                                         System.out.println("diferencia:"+dif);
-                                        if(horaArrastrada>0 && horaArrastrada>=dif){
+                                        if(horaArrastrada>0 && horaArrastrada>=dif)
+                                        {
                                             horaArrastrada=horaArrastrada-dif;
 
                                             horaPersonal.setHoras(horaPersonal.getHoras()+horaArrastrada);
                                             horaPersonal.setPorcentaje(polHoras.getPorcentaje());
                                             horasSuplementariasPersonalRepository.save(horaPersonal);
                                             System.out.println("horas arrastradas i:"+i+"   "+  horaArrastrada+"_____________Porcentaje:"+polHoras.getPorcentaje());
-                                        }else if(horaArrastrada<dif){
+                                        }
+                                        else if(horaArrastrada<dif){
                                             horaArrastrada= (utily.horasMilisegundosGeneral(polHoras.getRangoHoraFinal())-horaArrastrada)-utily.horasMilisegundosGeneral(polHoras.getRangoHoraInicial());
 
                                             horaPersonal.setHoras(horaPersonal.getHoras()+horaArrastrada);
@@ -868,8 +879,13 @@ public class DataBaseServices {
         try {
 
 
+            List<PoliticasHorasSuple> lsPoliticas=politicasHorasSupleRepository.findByEstadoTrue();
             String horasMinutosSegundosEntradaNocturno;
             PersonResponseS  personResponseS=   restServices.consultarPersonaTipoBiometricoCalculo(asistNow.getIdentificacion());
+
+            if(lsPoliticas.size()>0)
+            {
+
 
             if (personResponseS!=null)
             {
@@ -882,11 +898,104 @@ public class DataBaseServices {
                     List<AsistNow> lsMarcacionesEntrada=postGresRepository.findByElementByFechasEmpresaEntrada(fechaActualMenosDias,fechaActual,asistNow.getIdentificacion(),personResponseS.getPersonCabeceraDTOC().getTipoBiometricoCalculo().getNombreBiometrico(), "INGRESO", asistNow.getEmpresa(),Sort.by(Sort.Direction.ASC,"asisFecha"));
                     List<AsistNow> lsMarcacionesSalida=postGresRepository.findByElementByFechasEmpresaEntrada(fechaActual,fechaActual,asistNow.getIdentificacion(),personResponseS.getPersonCabeceraDTOC().getTipoBiometricoCalculo().getNombreBiometrico(), "SALIDA", asistNow.getEmpresa(),Sort.by(Sort.Direction.ASC,"asisFecha"));
 
-                    List<PoliticasHorasSuple> lsPoliticas=politicasHorasSupleRepository.findByEstadoTrue();
-
-                    if (!lsMarcacionesEntrada.isEmpty())
+                    if (!lsMarcacionesEntrada.isEmpty() && !lsMarcacionesSalida.isEmpty() )
                     {
-                        horasMinutosSegundosEntradaNocturno=  lsMarcacionesEntrada.get(0).getAsisHora();
+                        //calcular total de horas trabajadas
+                        String  totalHorasTrabajadas= utily.calculaDiferencia(utily.convertirDateString(lsMarcacionesSalida.get(0).getId().getAsisIng()) ,utily.convertirDateString(lsMarcacionesEntrada.get(0).getId().getAsisIng()));
+                        String[]  totalHorasTrabajadasSplit= utily.horasMinutosSegundosSplit(totalHorasTrabajadas);
+                        String horasTrabajadasSplit = totalHorasTrabajadasSplit[0];
+                        String minutosTrabajadasSplit = totalHorasTrabajadasSplit[1];
+                        String segundosTrabajadasSplit = totalHorasTrabajadasSplit[2];
+                        //Politica del 25 % horas
+                      if ( Integer.valueOf(horasTrabajadasSplit) > 8 )
+                      {
+                          List<PoliticasHorasSuple>  lsPoliticasFilter25=lsPoliticas.stream().filter(x->(x.getPorcentaje()==25)).collect(Collectors.toList());
+
+                          HorasSuplementariasPersonal horaPersonal=horasSuplementariasPersonalRepository.findByIdentificacionAndEstadoTrueAndPorcentaje(asistNow.getIdentificacion(),lsPoliticasFilter25.get(0).getPorcentaje());
+                          if(horaPersonal==null)
+                          {
+                              horaPersonal=new HorasSuplementariasPersonal();
+                              horaPersonal.setIdentificacion(asistNow.getIdentificacion());
+                          }
+
+                          Integer horasPaso=utily.horasMilisegundosGeneral("8:00:00");
+
+                          horaPersonal.setHoras(horaPersonal.getHoras()+horasPaso);
+                          horaPersonal.setPorcentaje(lsPoliticasFilter25.get(0).getPorcentaje());
+                          horasSuplementariasPersonalRepository.save(horaPersonal);
+                          System.out.println("horas arrastradas "+  horasPaso+"_____________Porcentaje:"+lsPoliticasFilter25.get(0).getPorcentaje());
+                      }
+                      // calcular cuantas horas de diferencia me queda despues de mis 9.5 horas trabajadas
+                        //        String hora1 = "09:30:00";
+                        //        String hora2 = "11:30:00";
+                        String fechaSinHhMnSs= utily.convertirDateStringSinHhMnSs(lsMarcacionesSalida.get(0).getId().getAsisIng());
+                        System.out.println(fechaSinHhMnSs+" "+totalHorasTrabajadas);
+                        String horasTrabajadas =fechaSinHhMnSs+" "+totalHorasTrabajadas;
+                        String horasHaTrabajadas =fechaSinHhMnSs+" "+personResponseS.getPersonCabeceraDTOC().getTipoBiometricoCalculo().getHoraTrabajada();
+                        String diferenciaHorasTrabajadas =utily.calculaDiferencia(horasTrabajadas,horasHaTrabajadas);
+                        // me queda 2:0:0 horas despues de haber cumpñidos mis 9.5 horas traabajadas
+                        //tomo la hora de salida de la marcacion 07:00:00 y le restro las  2:00:00 para saber ah que hora culmino sus 9.5 poder calcular
+                        //las horas suplemetarias
+                        String diferenciaHorasTrabajadasHhMmSS =fechaSinHhMnSs+" "+diferenciaHorasTrabajadas;
+                       String horaMinutosSegundo100= utily.calculaDiferencia(utily.convertirDateString(lsMarcacionesSalida.get(0).getId().getAsisIng()),diferenciaHorasTrabajadasHhMmSS);
+                        String[]  horaMinutosSegundo100Split= utily.horasMinutosSegundosSplit(horaMinutosSegundo100);
+                        String horasTrabajadas100Split = horaMinutosSegundo100Split[0];
+                        String minutosTrabajadas100Split = horaMinutosSegundo100Split[1];
+                        String segundosTrabajadas100Split = horaMinutosSegundo100Split[2];
+                        System.out.println("horasTrabajadas100Split"+horasTrabajadas100Split);
+                        String horasGeneral100 = null;
+                        if ( Integer.valueOf(horasTrabajadas100Split) ==5 )
+                        {
+                            List<PoliticasHorasSuple>  lsPoliticasFilter100=lsPoliticas.stream().filter(x->(x.getPorcentaje()==100)).collect(Collectors.toList());
+
+                            HorasSuplementariasPersonal horaPersonal=horasSuplementariasPersonalRepository.findByIdentificacionAndEstadoTrueAndPorcentaje(asistNow.getIdentificacion(),lsPoliticasFilter100.get(0).getPorcentaje());
+                            if(horaPersonal==null)
+                            {
+                                horaPersonal=new HorasSuplementariasPersonal();
+                                horaPersonal.setIdentificacion(asistNow.getIdentificacion());
+                            }
+
+                            String rangoHoraFinal100 =fechaSinHhMnSs+" "+lsPoliticasFilter100.get(0).getRangoHoraFinal();
+                             horasGeneral100= utily.calculaDiferencia(rangoHoraFinal100,horaMinutosSegundo100);
+                            System.out.println("horasGeneral100"+horasGeneral100);
+                            Integer horasPaso=utily.horasMilisegundosGeneral(horasGeneral100);
+
+                            horaPersonal.setHoras(horaPersonal.getHoras()+horasPaso);
+                            horaPersonal.setPorcentaje(lsPoliticasFilter100.get(0).getPorcentaje());
+                            horasSuplementariasPersonalRepository.save(horaPersonal);
+                            System.out.println("horas arrastradas "+  horasPaso+"_____________Porcentaje:"+lsPoliticasFilter100.get(0).getPorcentaje());
+
+                        }
+
+
+                        String diferenciaHorasTrabajadasHhMmS50 =fechaSinHhMnSs+" "+horasGeneral100;
+                        String horaMinutosSegundo50= utily.calculaDiferencia(utily.convertirDateString(lsMarcacionesSalida.get(0).getId().getAsisIng()),diferenciaHorasTrabajadasHhMmS50);
+                        String[]  horaMinutosSegundo50Split= utily.horasMinutosSegundosSplit(horaMinutosSegundo50);
+                        String horasTrabajadas50Split = horaMinutosSegundo50Split[0];
+                        String minutosTrabajadas50Split = horaMinutosSegundo50Split[1];
+                        String segundosTrabajadas50Split = horaMinutosSegundo50Split[2];
+                        System.out.println("horasTrabajadas50Split"+horaMinutosSegundo50Split);
+                        if ( Integer.valueOf(horasTrabajadas50Split) ==6 )
+                        {
+                            List<PoliticasHorasSuple>  lsPoliticasFilter50=lsPoliticas.stream().filter(x->(x.getPorcentaje()==50)).collect(Collectors.toList());
+
+                            HorasSuplementariasPersonal horaPersonal=horasSuplementariasPersonalRepository.findByIdentificacionAndEstadoTrueAndPorcentaje(asistNow.getIdentificacion(),lsPoliticasFilter50.get(0).getPorcentaje());
+                            if(horaPersonal==null)
+                            {
+                                horaPersonal=new HorasSuplementariasPersonal();
+                                horaPersonal.setIdentificacion(asistNow.getIdentificacion());
+                            }
+
+                            String rangoHoraFinal50 =fechaSinHhMnSs+" "+lsPoliticasFilter50.get(0).getRangoHoraFinal();
+                            String horasGeneral50= utily.calculaDiferencia(rangoHoraFinal50,horaMinutosSegundo50);
+                            Integer horasPaso=utily.horasMilisegundosGeneral(horasGeneral50);
+
+                            horaPersonal.setHoras(horaPersonal.getHoras()+horasPaso);
+                            horaPersonal.setPorcentaje(lsPoliticasFilter50.get(0).getPorcentaje());
+                            horasSuplementariasPersonalRepository.save(horaPersonal);
+                            System.out.println("horas arrastradas "+  horasPaso+"_____________Porcentaje:"+lsPoliticasFilter50.get(0).getPorcentaje());
+
+                        }
 
                     }
 
@@ -900,7 +1009,7 @@ public class DataBaseServices {
 
             }
 
-
+            }
 
                 return response;
 

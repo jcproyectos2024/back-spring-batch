@@ -11,7 +11,7 @@ import java.sql.Timestamp;
 @Data
 public class TipoBiometricoCalculoDto implements Serializable {
     private  Long idTipoBiometricoCalculo;
-    private  Double horaTrabajada;
+    private  String horaTrabajada;
     private  Boolean estado;
     private  String nombreBiometrico;
     private  String tipoBiometrico;
@@ -32,11 +32,11 @@ public class TipoBiometricoCalculoDto implements Serializable {
         this.idTipoBiometricoCalculo = idTipoBiometricoCalculo;
     }
 
-    public Double getHoraTrabajada() {
+    public String getHoraTrabajada() {
         return horaTrabajada;
     }
 
-    public void setHoraTrabajada(Double horaTrabajada) {
+    public void setHoraTrabajada(String horaTrabajada) {
         this.horaTrabajada = horaTrabajada;
     }
 
