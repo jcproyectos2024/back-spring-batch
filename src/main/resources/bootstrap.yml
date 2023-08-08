@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: back-spring-batch
+  cloud:
+    config:
+      uri: http://172.16.11.25:8081
+      username: root
+      password: s3cr3t
+      enabled: true

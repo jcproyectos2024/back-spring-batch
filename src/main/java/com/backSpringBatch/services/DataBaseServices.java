@@ -235,7 +235,7 @@ public class DataBaseServices {
              }
 
 //                //logica para el calculo de las horas suplementarias de producción
-//                if(bio.getNombreBiometrico().equals("GARITA") && bio.getTipoBiometrinco().equals("SALIDA"))
+//                if(bio.getNombreBiometñrico().equals("GARITA") && bio.getTipoBiometrinco().equals("SALIDA"))
 //                {
 //
 //                	try {
@@ -883,11 +883,9 @@ public class DataBaseServices {
             String horasMinutosSegundosEntradaNocturno;
             PersonResponseS  personResponseS=   restServices.consultarPersonaTipoBiometricoCalculo(asistNow.getIdentificacion());
 
-            if(lsPoliticas.size()>0)
-            {
 
 
-            if (personResponseS!=null)
+            if (personResponseS!=null && lsPoliticas.size()>0 )
             {
                 if (personResponseS.getPersonalCorpDTOS().getSchedule().getTurns().getNameTurns().equalsIgnoreCase("Nocturno"))
                 {
@@ -1009,7 +1007,7 @@ public class DataBaseServices {
 
             }
 
-            }
+
 
                 return response;
 
