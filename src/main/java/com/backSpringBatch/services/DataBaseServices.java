@@ -909,6 +909,7 @@ public class DataBaseServices {
                       if ( Integer.valueOf(horasTrabajadasSplit) > 8 )
                       {
                           List<PoliticasHorasSuple>  lsPoliticasFilter25=lsPoliticas.stream().filter(x->(x.getPorcentaje()==25)).collect(Collectors.toList());
+                          System.out.println("lsPoliticasFilter25"+lsPoliticasFilter25.get(0));
 
                           HorasSuplementariasPersonal horaPersonal=horasSuplementariasPersonalRepository.findByIdentificacionAndEstadoTrueAndPorcentaje(asistNow.getIdentificacion(),lsPoliticasFilter25.get(0).getPorcentaje());
                           if(horaPersonal==null)
