@@ -681,7 +681,8 @@ public class DataBaseServices {
     public HorasSuplementariasPersonalResponses findAllByHorasSuplementariasPersonal(HorasSuplementariasPersonalBody  horasSuplementariasPersonalBody )
     {
         HorasSuplementariasPersonalResponses response = new HorasSuplementariasPersonalResponses();
-        calculoHorasSuplementariasProduccion(horasSuplementariasPersonalBody.getFechaIni(),horasSuplementariasPersonalBody.getFechaFin(),horasSuplementariasPersonalBody.getIdentificacion(),horasSuplementariasPersonalBody.getEmpresa());
+        //Comienza a calcular las horas suplementariasProduccion Fijas
+        //calculoHorasSuplementariasProduccion(horasSuplementariasPersonalBody.getFechaIni(),horasSuplementariasPersonalBody.getFechaFin(),horasSuplementariasPersonalBody.getIdentificacion(),horasSuplementariasPersonalBody.getEmpresa());
         try {
 
             List<HorasSuplementariasPersonal> horasSuplementariasPersonalList = horasSuplementariasPersonalRepository.findAllByEstadoTrueAndIdentificacion(horasSuplementariasPersonalBody.getIdentificacion());
@@ -1041,19 +1042,18 @@ public class DataBaseServices {
             {
 
                 List<RegistroMarcacionesDTO> registroMarcacionesEntradaDTOList  =registroMarcacionesMapper.toRegistroMarcacionesDTOList(lsMarcacionesEntrada);
-                System.out.println("registroMarcacionesEntradaDTOList -------"+registroMarcacionesEntradaDTOList.size());
+
                for (RegistroMarcacionesDTO x:registroMarcacionesEntradaDTOList )
                {
 
-                   System.out.println("ENTRO ordenado-------"+x);
+
                    if(cont>0)
                    {
 
                        if (x.getBiometrico().getTipoBiometrinco().equals(registroMarcacionesEntradaDTOList.get(cont-1).getBiometrico().getTipoBiometrinco()))
                        {
-                           System.out.println("ENTRO REPETIDOS-------cont"+cont);
-                           System.out.println("ENTRO REPETIDOS-------"+x.getBiometrico().getTipoBiometrinco());
-                           System.out.println("x"+x.toString());
+
+
                            RegistroMarcacionesDTO  registroMarcacionesDTO =  new RegistroMarcacionesDTO();
                            BiometricoDto biometrico =  new BiometricoDto();
                            biometrico.setNombreBiometrico(x.getBiometrico().getNombreBiometrico());
@@ -1100,24 +1100,27 @@ public class DataBaseServices {
 
         try
         {
-            AsistnowPK  asistnowPK  = new AsistnowPK();
-            Biometrico biometrico=biometricoRepository.findByTipoBiometrincoAndNombreBiometrico(registroMarcacionesDTO.getBiometrico().getTipoBiometrinco(),registroMarcacionesDTO.getBiometrico().getNombreBiometrico());
-            AsistNow registroMarcaciones=  registroMarcacionesMapper.registroMarcacionesDTOToAsistNow(registroMarcacionesDTO);
-            registroMarcaciones.setBiometrico(biometrico);
-            asistnowPK.setAsisId(""+utily.randomSeisCifra());
-            Date date = new Date();
-            asistnowPK.setAsisIng(registroMarcacionesDTO.getAsisFecha());
-            asistnowPK.setAsisZona(biometrico.getIpBiometrico());
-            registroMarcaciones.setId(asistnowPK);
-            registroMarcaciones.setAsisRes("OK");
-            registroMarcaciones.setAsisTipo(biometrico.getTipoBiometrinco());
-            registroMarcaciones.setAsisFecha(registroMarcacionesDTO.getAsisFecha());
-            AsistNow registroMarcacionesSave =postGresRepository.save(registroMarcaciones);
-            RegistroMarcacionesDTO  marcacionesDTO=registroMarcacionesMapper.asistNowToRegistroMarcacionesDTO(registroMarcacionesSave);
-            response.setMensaje("GUARDADO CON EXISTO");
-            response.setSuccess(true);
-            response.setRegistroMarcacionesDTO(marcacionesDTO);
-            return response;
+
+            List<AsistNow>   asistNowExiste=  postGresRepository.findAllByIdentificacion(registroMarcacionesDTO.getIdentificacion());
+            if (!asistNowExiste.isEmpty()) {
+                AsistnowPK asistnowPK = new AsistnowPK();
+                Biometrico biometrico = biometricoRepository.findByTipoBiometrincoAndNombreBiometrico(registroMarcacionesDTO.getBiometrico().getTipoBiometrinco(), registroMarcacionesDTO.getBiometrico().getNombreBiometrico());
+                AsistNow registroMarcaciones = registroMarcacionesMapper.registroMarcacionesDTOToAsistNow(registroMarcacionesDTO);
+                registroMarcaciones.setBiometrico(biometrico);
+                asistnowPK.setAsisId(asistNowExiste.get(0).getId().getAsisId());
+                asistnowPK.setAsisIng(utily.concatenaHoraFechaEntradaSalidaMarcacion(registroMarcacionesDTO.getAsisFecha(),registroMarcacionesDTO.getAsisHora()));
+                asistnowPK.setAsisZona(biometrico.getIpBiometrico());
+                registroMarcaciones.setId(asistnowPK);
+                registroMarcaciones.setAsisRes("OK");
+                registroMarcaciones.setAsisTipo(biometrico.getTipoBiometrinco());
+                registroMarcaciones.setAsisFecha(registroMarcacionesDTO.getAsisFecha());
+                AsistNow registroMarcacionesSave = postGresRepository.save(registroMarcaciones);
+                RegistroMarcacionesDTO marcacionesDTO = registroMarcacionesMapper.asistNowToRegistroMarcacionesDTO(registroMarcacionesSave);
+                response.setMensaje("GUARDADO CON EXISTO");
+                response.setSuccess(true);
+                response.setRegistroMarcacionesDTO(marcacionesDTO);
+                return response;
+            }
 
         }
         catch (Exception e)
@@ -1129,6 +1132,7 @@ public class DataBaseServices {
         }
 
 
+        return response;
     }
 
 }

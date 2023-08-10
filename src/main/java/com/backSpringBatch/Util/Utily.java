@@ -247,6 +247,15 @@ public class Utily {
     }
 
 
+    public Date concatenaHoraFechaEntradaSalidaMarcacion(Date fecha ,String horaPendienteFormat) throws ParseException {
+        SimpleDateFormat dtf = new SimpleDateFormat("yyyy-MM-dd");
+        String formattedDate = dtf.format(fecha);
+        SimpleDateFormat fechaHora= new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        Date fh= fechaHora.parse(formattedDate+" "+horaPendienteFormat);
+        return fh;
+
+    }
+
 
 
 

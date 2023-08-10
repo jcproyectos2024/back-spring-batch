@@ -74,7 +74,7 @@ public interface PostGresRepository extends JpaRepository<AsistNow, String> {
     @Query(nativeQuery=false, value="select an from AsistNow an  "
             + " where to_char(an.asisFecha,'yyyy-MM-dd') between :fechaIni  and :fechaFin "
             + " and an.identificacion=:nominaCod "
-            + " and   an.empresa=:empresa and an.biometrico.nombreBiometrico=:nombreBiometrico   ORDER BY an.asisFecha ASC ")
+            + " and   an.empresa=:empresa and an.biometrico.nombreBiometrico=:nombreBiometrico   ORDER BY an.id.asisIng ASC ")
     List<AsistNow> listahoraEntradaBiometrico(String fechaIni, String fechaFin,String nominaCod, String nombreBiometrico , String empresa  );
 
 
@@ -86,4 +86,5 @@ public interface PostGresRepository extends JpaRepository<AsistNow, String> {
     List<AsistNow> listahoraSalidadBiometrico(String fechaIni, String fechaFin,String nominaCod, String nombreBiometrico, String tipoBiometrinco , String empresa  ,Sort sort);
 
 
+    List<AsistNow>   findAllByIdentificacion(String identificacion);
 }
