@@ -100,7 +100,7 @@ public class DataBaseServices {
               Biometrico biometricoGuarado  = biometricoRepository.findByIpBiometrico(regActual.getId().getAsisZona());
               regActual.setBiometrico(biometricoGuarado);
                 postGresRepository.save(regActual);
-                guardadoHistorialMarcaciones(regActual);
+                //guardadoHistorialMarcaciones(regActual);
                 //aqui se inserta el refactorizado 
                 //ini will 10/05/23
                 AsistNowRefactor busquedaRef=asistNowRefactorRepository.findByAsisFechaAndIdentificacion(x.getAsisFecha(), x.getIdentificacion());
