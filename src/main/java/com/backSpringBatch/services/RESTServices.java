@@ -29,28 +29,29 @@ public class RESTServices {
 
     public ScheduleDTO getSchedulePerson(String identificacion)
     {
-        HttpServletRequest request1 = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        String token1 = request1.getHeader("authorization").toString();
+
+       // HttpServletRequest request1 = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        //String token = request1.getHeader("authorization").toString();
 
         String ruta = env.getProperty("url_get_schedule");
         ScheduleDTO rootc = null;
         String rutahistory=ruta;
         rutahistory+="?identificacion="+identificacion;
         try {
-//            Response response =
-//                    RestAssured.given().contentType("application/json")
-//                            .when().get(rutahistory).then().extract().response();
+          Response response =
+               RestAssured.given().contentType("application/json")
+                         .when().get(rutahistory).then().extract().response();
 
-            Response response = RestAssured.given()
+       /*     Response response = RestAssured.given()
                     .headers(
                             "Authorization",
-                            token1 ,
+                            token ,
                             "Content-Type",
                             ContentType.JSON,
                             "Accept",
                             ContentType.JSON)
                     .contentType("application/json").when().get(rutahistory)
-                    .then().extract().response();
+                    .then().extract().response();*/
 
             String json = response.getBody().asString();
             Gson gson = new Gson();
