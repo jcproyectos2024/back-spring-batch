@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
-@Table(name ="atrasos", schema = "public")
+@Table(name ="atrasos", schema = "marcaciones")
 public class Atrasos {
 
 

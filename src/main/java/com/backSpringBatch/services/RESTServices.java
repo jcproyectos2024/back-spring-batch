@@ -2,6 +2,9 @@ package com.backSpringBatch.services;
 
 import com.backSpringBatch.Util.ScheduleDTO;
 import com.backSpringBatch.postgres.models.PersonResponseS;
+import com.backSpringBatch.sqlserver.models.MarcacionesMongo;
+import com.backSpringBatch.sqlserver.models.ResponseMarcacionesMongo;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import io.restassured.RestAssured;
@@ -88,6 +91,32 @@ public class RESTServices {
             Gson gson = new Gson();
             rootc = gson.fromJson(json, new TypeToken<PersonResponseS>() {
             }.getType());
+        } catch (Exception e) {
+            // TODO: handle exception
+            e.printStackTrace();
+        }
+        return rootc;
+    }
+
+
+    /*Servicios de Mongo*/
+    public ResponseMarcacionesMongo saveMarcacionesMongo (MarcacionesMongo marcacionesMongo) {
+        String urlRemote = env.getProperty("urlRecursoHumanoslogs");
+
+        ResponseMarcacionesMongo rootc = null;
+        try {
+            Response response = RestAssured.given()
+                    .headers(
+                            "Content-Type",
+                            ContentType.JSON,
+                            "Accept",
+                            ContentType.JSON)
+                    .contentType("application/json").body(marcacionesMongo)
+                    .when().post(urlRemote)
+                    .then().extract().response();
+            String json = response.getBody().asString();
+            ObjectMapper om = new ObjectMapper();
+          //  rootc = om.readValue(json, ResponseMarcacionesMongo.class);
         } catch (Exception e) {
             // TODO: handle exception
             e.printStackTrace();

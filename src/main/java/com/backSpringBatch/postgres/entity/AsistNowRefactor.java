@@ -6,7 +6,7 @@ import java.util.Date;
 
 
 @Entity
-@Table(name ="asistnow_refactor", schema = "public")
+@Table(name ="asistnow_refactor", schema = "marcaciones")
 public class AsistNowRefactor {
 
 

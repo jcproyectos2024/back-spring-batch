@@ -7,7 +7,7 @@ import java.util.Date;
 
 
 @Entity
-@Table(name ="asistnow", schema = "public")
+@Table(name ="asistnow", schema = "marcaciones")
 public class AsistNow implements Serializable  {
 
 

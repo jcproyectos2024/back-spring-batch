@@ -6,20 +6,45 @@ import java.util.Date;
 public class AsistNowRegistroDTO {
 
 
+
     private String asisId;
 
-    private Date asisIng;
+
+    private String asisIng;
+
 
     private String asisZona;
 
-    private Date asisFecha;
+    private String asisFecha;
+
 
     private String asisHora;
 
+
     private String asisTipo;
+
 
     private String asisRes;
 
+
+    private String identificacion;
+
+
+    private String empresa;
+
+
+    private String nombres;
+
+
+    private String apellidos;
+
+    private String accion;
+
+    private String fechaAccion;
+
+
+    public AsistNowRegistroDTO() {
+    }
 
     public String getAsisId() {
         return asisId;
@@ -29,11 +54,11 @@ public class AsistNowRegistroDTO {
         this.asisId = asisId;
     }
 
-    public Date getAsisIng() {
+    public String getAsisIng() {
         return asisIng;
     }
 
-    public void setAsisIng(Date asisIng) {
+    public void setAsisIng(String asisIng) {
         this.asisIng = asisIng;
     }
 
@@ -45,11 +70,11 @@ public class AsistNowRegistroDTO {
         this.asisZona = asisZona;
     }
 
-    public Date getAsisFecha() {
+    public String getAsisFecha() {
         return asisFecha;
     }
 
-    public void setAsisFecha(Date asisFecha) {
+    public void setAsisFecha(String asisFecha) {
         this.asisFecha = asisFecha;
     }
 
@@ -75,6 +100,54 @@ public class AsistNowRegistroDTO {
 
     public void setAsisRes(String asisRes) {
         this.asisRes = asisRes;
+    }
+
+    public String getIdentificacion() {
+        return identificacion;
+    }
+
+    public void setIdentificacion(String identificacion) {
+        this.identificacion = identificacion;
+    }
+
+    public String getEmpresa() {
+        return empresa;
+    }
+
+    public void setEmpresa(String empresa) {
+        this.empresa = empresa;
+    }
+
+    public String getNombres() {
+        return nombres;
+    }
+
+    public void setNombres(String nombres) {
+        this.nombres = nombres;
+    }
+
+    public String getApellidos() {
+        return apellidos;
+    }
+
+    public void setApellidos(String apellidos) {
+        this.apellidos = apellidos;
+    }
+
+    public String getAccion() {
+        return accion;
+    }
+
+    public void setAccion(String accion) {
+        this.accion = accion;
+    }
+
+    public String getFechaAccion() {
+        return fechaAccion;
+    }
+
+    public void setFechaAccion(String fechaAccion) {
+        this.fechaAccion = fechaAccion;
     }
 }
 

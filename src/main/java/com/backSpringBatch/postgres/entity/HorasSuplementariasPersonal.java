@@ -12,7 +12,7 @@ import groovyjarjarantlr4.v4.runtime.misc.Nullable;
 
 
 @Entity
-@Table(name ="horas_suplementarias_personal", schema = "public")
+@Table(name ="horas_suplementarias_personal", schema = "marcaciones")
 public class HorasSuplementariasPersonal {
 
 	@Id

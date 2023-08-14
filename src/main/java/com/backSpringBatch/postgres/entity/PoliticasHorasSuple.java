@@ -5,7 +5,7 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name ="politicas_horas_suple", schema = "public")
+@Table(name ="politicas_horas_suple", schema = "marcaciones")
 
 public class PoliticasHorasSuple {
 

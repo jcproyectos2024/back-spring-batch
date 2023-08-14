@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 
 @Entity
-@Table(name ="biometricos", schema = "public")
+@Table(name ="biometricos", schema = "marcaciones")
 public class Biometrico implements Serializable {
 
 

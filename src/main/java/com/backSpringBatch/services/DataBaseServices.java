@@ -10,8 +10,12 @@ import com.backSpringBatch.postgres.models.*;
 import com.backSpringBatch.postgres.repository.*;
 import com.backSpringBatch.sqlserver.entity.AsistNowRegistro;
 import com.backSpringBatch.sqlserver.mapper.AsisRegistroMapper;
+import com.backSpringBatch.sqlserver.models.AsistNowRegistroDTO;
+import com.backSpringBatch.sqlserver.models.MarcacionesMongo;
+import com.backSpringBatch.sqlserver.models.ResponseMarcacionesMongo;
 import com.backSpringBatch.sqlserver.repository.SQLRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -82,6 +86,8 @@ public class DataBaseServices {
     private HorasSuplementariasPersonalMapper  horasSuplementariasPersonalMapper;
     @Autowired
     RegistroMarcacionesMapper registroMarcacionesMapper;
+    @Autowired
+    private Environment ev;
     @Transactional(rollbackFor = { Exception.class })
     public void insertSqlToPostgres(){
 
@@ -94,7 +100,7 @@ public class DataBaseServices {
               Biometrico biometricoGuarado  = biometricoRepository.findByIpBiometrico(regActual.getId().getAsisZona());
               regActual.setBiometrico(biometricoGuarado);
                 postGresRepository.save(regActual);
-                
+                guardadoHistorialMarcaciones(regActual);
                 //aqui se inserta el refactorizado 
                 //ini will 10/05/23
                 AsistNowRefactor busquedaRef=asistNowRefactorRepository.findByAsisFechaAndIdentificacion(x.getAsisFecha(), x.getIdentificacion());
@@ -1120,8 +1126,60 @@ public class DataBaseServices {
                 response.setMensaje("GUARDADO CON EXISTO");
                 response.setSuccess(true);
                 response.setRegistroMarcacionesDTO(marcacionesDTO);
+                guardadoHistorialMarcaciones(registroMarcacionesSave);
                 return response;
             }
+
+        }
+        catch (Exception e)
+        {
+            // TODO: handle exception
+            response.setMensaje(e.getMessage());
+            response.setSuccess(false);
+            return response;
+        }
+
+
+        return response;
+    }
+
+
+
+
+    public RegistroMarcacionesResponses guardadoHistorialMarcaciones(AsistNow asistNow)
+    {
+        RegistroMarcacionesResponses response = new RegistroMarcacionesResponses();
+
+        try
+        {
+
+            //History
+            AsistNowRegistroDTO  historyAsistNowRDTO = new AsistNowRegistroDTO();
+            MarcacionesMongo  marcacionesMongo = new MarcacionesMongo();
+            List<AsistNowRegistroDTO>  asistNowRegistroDTOS= new ArrayList<>();
+            //Datos de multi Tenant
+            System.out.println("tenant"+ev.getProperty("tenant"));
+            marcacionesMongo.setTenant(ev.getProperty("tenant"));
+            marcacionesMongo.setDatabase(ev.getProperty("database"));
+            marcacionesMongo.setCollection(ev.getProperty("collectionAsistencias"));
+            marcacionesMongo.setCompositeKey(asistNow.getIdentificacion());
+            historyAsistNowRDTO.setAsisId(asistNow.getId().getAsisId());
+            historyAsistNowRDTO.setAsisIng(utily.convertirDateString(asistNow.getId().getAsisIng()));
+            historyAsistNowRDTO.setAsisZona(asistNow.getId().getAsisZona());
+            historyAsistNowRDTO.setAsisFecha(utily.convertirDateString(asistNow.getAsisFecha()));
+            historyAsistNowRDTO.setAsisHora(asistNow.getAsisHora());
+            historyAsistNowRDTO.setAsisTipo(asistNow.getAsisTipo());
+            historyAsistNowRDTO.setAsisRes(asistNow.getAsisRes());
+            historyAsistNowRDTO.setIdentificacion(asistNow.getIdentificacion());
+            historyAsistNowRDTO.setEmpresa(asistNow.getEmpresa());
+            historyAsistNowRDTO.setNombres(asistNow.getNombres());
+            historyAsistNowRDTO.setApellidos(asistNow.getApellidos());
+            historyAsistNowRDTO.setFechaAccion(utily.convertirDateString(new Date()));
+            historyAsistNowRDTO.setAccion("GUARDADO");
+            historyAsistNowRDTO.setFechaAccion(utily.convertirDateString(new Date()));
+            asistNowRegistroDTOS.add(historyAsistNowRDTO);
+            marcacionesMongo.setPayload(asistNowRegistroDTOS);
+            restServices.saveMarcacionesMongo(marcacionesMongo);
 
         }
         catch (Exception e)

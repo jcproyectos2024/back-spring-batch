@@ -8,7 +8,7 @@ import javax.persistence.Table;
 import java.util.Date;
 
 @Entity
-@Table(name ="hora_produccion", schema = "public")
+@Table(name ="hora_produccion", schema = "marcaciones")
 public class HorasProduccion {
 
     @EmbeddedId
