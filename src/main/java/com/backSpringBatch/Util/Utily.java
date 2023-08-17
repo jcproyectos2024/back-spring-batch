@@ -5,9 +5,7 @@ import org.springframework.stereotype.Component;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Random;
+import java.util.*;
 
 @Component
 public class Utily {
@@ -256,6 +254,21 @@ public class Utily {
 
     }
 
+
+
+    public  List<Date> recorrerDosRangosFechas(Date fechaInicio, Date fechaFin)
+    {
+        Calendar c1 = Calendar.getInstance();
+        c1.setTime(fechaInicio);
+        Calendar c2 = Calendar.getInstance();
+        c2.setTime(fechaFin);
+        List<Date> listaFechas = new ArrayList<>();
+        while (!c1.after(c2)) {
+            listaFechas.add(c1.getTime());
+            c1.add(Calendar.DAY_OF_MONTH, 1);
+        }
+        return listaFechas;
+    }
 
 
 

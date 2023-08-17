@@ -1194,4 +1194,42 @@ public class DataBaseServices {
         return response;
     }
 
+
+
+
+    public ConsultarEntradaSalidaMarcacionResponses consultarEntradaSalidaMarcacionPorDia(ConsultarAsistenciasDias consultarAsistenciasDias )
+    {
+        ConsultarEntradaSalidaMarcacionResponses response = new ConsultarEntradaSalidaMarcacionResponses();
+        List<RegistroMarcacionesDTO> registroMarcacionesEntradaSalidadDTOList  =new ArrayList<>();
+        int cont = 0;
+        try
+        {
+
+            consultarAsistenciasDias.setEmpresa(utily.empresa(consultarAsistenciasDias.getEmpresa()));
+
+            List<AsistNow> lsMarcacionesEntrada=postGresRepository.listaDiaAsistenciasBiometrico(consultarAsistenciasDias.getFechaInicio(),consultarAsistenciasDias.getFechaFin(),consultarAsistenciasDias.getIdentificacion(),"GARITA","INGRESO", consultarAsistenciasDias.getEmpresa());
+            List<AsistNow> lsMarcacionesSalida=postGresRepository.listaDiaAsistenciasBiometrico(consultarAsistenciasDias.getFechaInicio(),consultarAsistenciasDias.getFechaFin(),consultarAsistenciasDias.getIdentificacion(),"GARITA","SALIDA", consultarAsistenciasDias.getEmpresa());
+            if (!lsMarcacionesEntrada.isEmpty() && !lsMarcacionesSalida.isEmpty())
+            {
+
+
+                response.setLsMarcacionesEntradaSalida(registroMarcacionesEntradaSalidadDTOList);
+                response.setTotalRegistrosEntradaSalidad(registroMarcacionesEntradaSalidadDTOList.size());
+                response.setMensaje("Consulta Existosa");
+                response.setSuccess(true);
+                return response;
+            }
+
+        }
+        catch (Exception e)
+        {
+            // TODO: handle exception
+            response.setMensaje(e.getMessage());
+            response.setSuccess(false);
+            return response;
+        }
+
+        return response;
+    }
+
 }
