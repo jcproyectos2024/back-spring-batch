@@ -13,6 +13,7 @@ import com.backSpringBatch.sqlserver.mapper.AsisRegistroMapper;
 import com.backSpringBatch.sqlserver.models.AsistNowRegistroDTO;
 import com.backSpringBatch.sqlserver.models.MarcacionesMongo;
 import com.backSpringBatch.sqlserver.models.ResponseMarcacionesMongo;
+import com.backSpringBatch.sqlserver.models.ResponsesEntradaSalidaMarcacionDias;
 import com.backSpringBatch.sqlserver.repository.SQLRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -100,7 +101,7 @@ public class DataBaseServices {
               Biometrico biometricoGuarado  = biometricoRepository.findByIpBiometrico(regActual.getId().getAsisZona());
               regActual.setBiometrico(biometricoGuarado);
                 postGresRepository.save(regActual);
-                //guardadoHistorialMarcaciones(regActual);
+              //  guardadoHistorialMarcaciones(regActual);
                 //aqui se inserta el refactorizado 
                 //ini will 10/05/23
                 AsistNowRefactor busquedaRef=asistNowRefactorRepository.findByAsisFechaAndIdentificacion(x.getAsisFecha(), x.getIdentificacion());
@@ -230,7 +231,7 @@ public class DataBaseServices {
                     List<HorasProduccionTemp> temp= horaTempRepository.findAll();
                     temp.forEach(t->{
                        if( t.getStatus()){
-                           horaTempRepository.delete(t);
+                         //  horaTempRepository.delete(t);
                        }
                     });  
                     
@@ -360,7 +361,7 @@ public class DataBaseServices {
 //					}
 //                }
 
-                sqlRepository.delete(x);
+              //  sqlRepository.delete(x);
             });
 
         }catch (Exception ex){
@@ -1197,29 +1198,18 @@ public class DataBaseServices {
 
 
 
-    public ConsultarEntradaSalidaMarcacionResponses consultarEntradaSalidaMarcacionPorDia(ConsultarAsistenciasDias consultarAsistenciasDias )
+    public ResponsesEntradaSalidaMarcacionDias consultarEntradaSalidaMarcacionPorDia(ConsultarAsistenciasDias consultarAsistenciasDias )
     {
-        ConsultarEntradaSalidaMarcacionResponses response = new ConsultarEntradaSalidaMarcacionResponses();
-        List<RegistroMarcacionesDTO> registroMarcacionesEntradaSalidadDTOList  =new ArrayList<>();
-        int cont = 0;
+        ResponsesEntradaSalidaMarcacionDias response = new ResponsesEntradaSalidaMarcacionDias();
         try
         {
-
             consultarAsistenciasDias.setEmpresa(utily.empresa(consultarAsistenciasDias.getEmpresa()));
-
             List<AsistNow> lsMarcacionesEntrada=postGresRepository.listaDiaAsistenciasBiometrico(consultarAsistenciasDias.getFechaInicio(),consultarAsistenciasDias.getFechaFin(),consultarAsistenciasDias.getIdentificacion(),"GARITA","INGRESO", consultarAsistenciasDias.getEmpresa());
             List<AsistNow> lsMarcacionesSalida=postGresRepository.listaDiaAsistenciasBiometrico(consultarAsistenciasDias.getFechaInicio(),consultarAsistenciasDias.getFechaFin(),consultarAsistenciasDias.getIdentificacion(),"GARITA","SALIDA", consultarAsistenciasDias.getEmpresa());
-            if (!lsMarcacionesEntrada.isEmpty() && !lsMarcacionesSalida.isEmpty())
-            {
-
-
-                response.setLsMarcacionesEntradaSalida(registroMarcacionesEntradaSalidadDTOList);
-                response.setTotalRegistrosEntradaSalidad(registroMarcacionesEntradaSalidadDTOList.size());
-                response.setMensaje("Consulta Existosa");
-                response.setSuccess(true);
-                return response;
-            }
-
+            response.setLsMarcacionesEntrada(lsMarcacionesEntrada);
+            response.setLsMarcacionesSalida(lsMarcacionesSalida);
+            response.setMensaje("Consulta Existosa");
+            response.setSuccess(true);
         }
         catch (Exception e)
         {
