@@ -1,9 +1,12 @@
 package com.backSpringBatch.postgres.models;
+
+import java.util.List;
+
 public class PersonResponseS
 {
 
-    PersonCabeceraDTOC  personCabeceraDTOC;
-    private PersonalCorpDTOS  personalCorpDTOS;
+    private  TipoBiometricoCalculoDto  tipoBiometricoCalculoDto;
+    private List<ScheduleDTO> scheduleDTOList;
 
     private String mensaje;
 
@@ -12,20 +15,20 @@ public class PersonResponseS
     public PersonResponseS() {
     }
 
-    public PersonCabeceraDTOC getPersonCabeceraDTOC() {
-        return personCabeceraDTOC;
+    public TipoBiometricoCalculoDto getTipoBiometricoCalculoDto() {
+        return tipoBiometricoCalculoDto;
     }
 
-    public void setPersonCabeceraDTOC(PersonCabeceraDTOC personCabeceraDTOC) {
-        this.personCabeceraDTOC = personCabeceraDTOC;
+    public void setTipoBiometricoCalculoDto(TipoBiometricoCalculoDto tipoBiometricoCalculoDto) {
+        this.tipoBiometricoCalculoDto = tipoBiometricoCalculoDto;
     }
 
-    public PersonalCorpDTOS getPersonalCorpDTOS() {
-        return personalCorpDTOS;
+    public List<ScheduleDTO> getScheduleDTOList() {
+        return scheduleDTOList;
     }
 
-    public void setPersonalCorpDTOS(PersonalCorpDTOS personalCorpDTOS) {
-        this.personalCorpDTOS = personalCorpDTOS;
+    public void setScheduleDTOList(List<ScheduleDTO> scheduleDTOList) {
+        this.scheduleDTOList = scheduleDTOList;
     }
 
     public String getMensaje() {
@@ -43,6 +46,4 @@ public class PersonResponseS
     public void setSuccess(boolean success) {
         this.success = success;
     }
-
-
 }

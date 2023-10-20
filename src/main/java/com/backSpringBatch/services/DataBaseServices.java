@@ -1,7 +1,6 @@
 package com.backSpringBatch.services;
 
 import com.backSpringBatch.Util.SaveMantDTO;
-import com.backSpringBatch.Util.ScheduleDTO;
 import com.backSpringBatch.Util.Utily;
 import com.backSpringBatch.dto.*;
 import com.backSpringBatch.postgres.entity.*;
@@ -98,9 +97,17 @@ public class DataBaseServices {
             List<AsistNowRegistro> lsRegistros=sqlRepository.findAll();
             lsRegistros.forEach(x->{
                 AsistNow regActual=asisRegistroMapper.asistNowRegistroToAsistNow(x);
-              Biometrico biometricoGuarado  = biometricoRepository.findByIpBiometrico(regActual.getId().getAsisZona());
-              regActual.setBiometrico(biometricoGuarado);
-                postGresRepository.save(regActual);
+                Biometrico biometricoGuarado  = biometricoRepository.findByIpBiometrico(regActual.getId().getAsisZona());
+                regActual.setBiometrico(biometricoGuarado);
+
+                postGresRepository.findById_AsisIdAndId_AsisIngAndId_AsisZona(regActual.getId().getAsisId(),regActual.getId().getAsisIng(),regActual.getId().getAsisZona()).ifPresentOrElse(asistNow ->
+                {
+                    System.out.println("YA ESTA GUARDADO");
+                }, () -> {
+                    System.out.println("NUEVO.");
+                    postGresRepository.save(regActual);
+                });
+
               //  guardadoHistorialMarcaciones(regActual);
                 //aqui se inserta el refactorizado 
                 //ini will 10/05/23
@@ -144,11 +151,12 @@ public class DataBaseServices {
                 
 
 
+                System.out.println("regActual.getId().getAsisZona()"+regActual.getId().getAsisZona());
                 Biometrico bio = biometricoRepository.findByIpBiometrico(regActual.getId().getAsisZona());
                 //Validar si existe un atraso
                 Atrasos atra= atrasosRepository.findByIdentificacionAndAndFecha(regActual.getIdentificacion(), regActual.getAsisFecha());
                 if(atra==null) {
-                    if (bio.getTipoBiometrinco().equals("INGRESO") && bio.getNombreBiometrico().equals("GARITA") && x.getIdentificacion() != null)
+                    if ( (bio== null ? "" :bio.getTipoBiometrinco()).equals("INGRESO") && (bio == null ? "" :bio.getNombreBiometrico()).equals("GARITA") && x.getIdentificacion() != null)
                     {
 
                        Date horaGrupo = (obtenerhoraGrupo(regActual.getIdentificacion()));
@@ -171,7 +179,7 @@ public class DataBaseServices {
                        }
                     }
                 }
-                if( bio.getNombreBiometrico().equals("PLANTA"))
+                if( (bio== null ? "" :bio.getNombreBiometrico()).equals("PLANTA") )
                 {
                     HorasProduccionTemp horasTemp= new HorasProduccionTemp();
                     horasTemp.setId(regActual.getId());
@@ -236,7 +244,7 @@ public class DataBaseServices {
                     });  
                     
                 }
-                if(bio.getNombreBiometrico().equals("GARITA") && bio.getTipoBiometrinco().equals("SALIDA"))
+                if( (bio== null ? "" :bio.getNombreBiometrico()).equals("GARITA") &&  (bio== null ? "" :bio.getTipoBiometrinco()).equals("SALIDA"))
              {
                  calculoHorasSuplementariasPersonalProduccionFija(regActual);
              }
@@ -558,9 +566,12 @@ public class DataBaseServices {
         return exit;
     }
 
-    public Date obtenerhoraGrupo(String identificacion){
-        ScheduleDTO horaGupo= restServices.getSchedulePerson(identificacion);
-        Date horaGrupo = horaGupo == null ? null : horaGupo.getDesde();
+    public Date obtenerhoraGrupo(String identificacion)
+    {
+      //  ScheduleDTO horaGupo= restServices.getSchedulePerson(identificacion);
+      //  Date horaGrupo = horaGupo == null ? null : horaGupo.getDesde();
+        ShedulePersonDto horaGupo= restServices.getSchedulePerson(identificacion);
+        Date horaGrupo = horaGupo.getGroupsScheduleDtoList() == null ? null : horaGupo.getGroupsScheduleDtoList().get(0).getSchedule().getDesde();
         //Date horaGrupo= horaGupo.getDesde();
         return  horaGrupo;
     }
@@ -891,18 +902,18 @@ public class DataBaseServices {
             String horasMinutosSegundosEntradaNocturno;
             PersonResponseS  personResponseS=   restServices.consultarPersonaTipoBiometricoCalculo(asistNow.getIdentificacion());
 
-
-
+            List<ScheduleDTO>  scheduleDTOListFilter= personResponseS.getScheduleDTOList()==null? new ArrayList<>() :personResponseS.getScheduleDTOList().stream().filter(x->(x.getTurns().getNameTurns().equalsIgnoreCase("NOCTURNO"))).collect(Collectors.toList());
             if (personResponseS!=null && lsPoliticas.size()>0 )
             {
-                if (personResponseS.getPersonalCorpDTOS().getSchedule().getTurns().getNameTurns().equalsIgnoreCase("Nocturno"))
+                if (!scheduleDTOListFilter.isEmpty())
                 {
+                    System.out.println("TINE HORARIO NOCTURNO");
                     //consulto la marcacion de entrada con la configurtacion de biometrico asignado a cada empleado
                     //la fecha consultada se le resta -1 dia por que la jornada Nocturno
                     String fechaActual=utily.obtenerFechaActual(asistNow.getId().getAsisIng());
                     String fechaActualMenosDias=utily.obtenerFechaMenosDias(1, asistNow.getId().getAsisIng());
-                    List<AsistNow> lsMarcacionesEntrada=postGresRepository.findByElementByFechasEmpresaEntrada(fechaActualMenosDias,fechaActual,asistNow.getIdentificacion(),personResponseS.getPersonCabeceraDTOC().getTipoBiometricoCalculo().getNombreBiometrico(), "INGRESO", asistNow.getEmpresa(),Sort.by(Sort.Direction.ASC,"asisFecha"));
-                    List<AsistNow> lsMarcacionesSalida=postGresRepository.findByElementByFechasEmpresaEntrada(fechaActual,fechaActual,asistNow.getIdentificacion(),personResponseS.getPersonCabeceraDTOC().getTipoBiometricoCalculo().getNombreBiometrico(), "SALIDA", asistNow.getEmpresa(),Sort.by(Sort.Direction.ASC,"asisFecha"));
+                    List<AsistNow> lsMarcacionesEntrada=postGresRepository.findByElementByFechasEmpresaEntrada(fechaActualMenosDias,fechaActual,asistNow.getIdentificacion(),personResponseS.getTipoBiometricoCalculoDto().getNombreBiometrico(), "INGRESO", asistNow.getEmpresa(),Sort.by(Sort.Direction.ASC,"asisFecha"));
+                    List<AsistNow> lsMarcacionesSalida=postGresRepository.findByElementByFechasEmpresaEntrada(fechaActual,fechaActual,asistNow.getIdentificacion(),personResponseS.getTipoBiometricoCalculoDto().getNombreBiometrico(), "SALIDA", asistNow.getEmpresa(),Sort.by(Sort.Direction.ASC,"asisFecha"));
 
                     if (!lsMarcacionesEntrada.isEmpty() && !lsMarcacionesSalida.isEmpty() )
                     {
@@ -938,7 +949,7 @@ public class DataBaseServices {
                         String fechaSinHhMnSs= utily.convertirDateStringSinHhMnSs(lsMarcacionesSalida.get(0).getId().getAsisIng());
                         System.out.println(fechaSinHhMnSs+" "+totalHorasTrabajadas);
                         String horasTrabajadas =fechaSinHhMnSs+" "+totalHorasTrabajadas;
-                        String horasHaTrabajadas =fechaSinHhMnSs+" "+personResponseS.getPersonCabeceraDTOC().getTipoBiometricoCalculo().getHoraTrabajada();
+                        String horasHaTrabajadas =fechaSinHhMnSs+" "+personResponseS.getTipoBiometricoCalculoDto().getHoraTrabajada();
                         String diferenciaHorasTrabajadas =utily.calculaDiferencia(horasTrabajadas,horasHaTrabajadas);
                         // me queda 2:0:0 horas despues de haber cumpñidos mis 9.5 horas traabajadas
                         //tomo la hora de salida de la marcacion 07:00:00 y le restro las  2:00:00 para saber ah que hora culmino sus 9.5 poder calcular
@@ -1005,23 +1016,9 @@ public class DataBaseServices {
                         }
 
                     }
-
-
-
-
-
-
                 }
-
-
             }
-
-
-
                 return response;
-
-
-
         }catch (Exception e)
         {
             // TODO: handle exception

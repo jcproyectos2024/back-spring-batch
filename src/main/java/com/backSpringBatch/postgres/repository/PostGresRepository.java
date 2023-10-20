@@ -2,6 +2,7 @@ package com.backSpringBatch.postgres.repository;
 
 
 import com.backSpringBatch.postgres.entity.AsistNow;
+import com.backSpringBatch.postgres.entity.AsistnowPK;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -10,7 +11,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PostGresRepository extends JpaRepository<AsistNow, String> {
@@ -94,5 +97,7 @@ public interface PostGresRepository extends JpaRepository<AsistNow, String> {
             + " and   an.empresa=:empresa and an.biometrico.nombreBiometrico=:nombreBiometrico   and an.biometrico.tipoBiometrinco=:tipoBiometrinco   ORDER BY an.id.asisIng ASC ")
     List<AsistNow> listaDiaAsistenciasBiometrico(String fechaIni, String fechaFin,String nominaCod, String nombreBiometrico ,String tipoBiometrinco , String empresa  );
 
+
+    Optional<AsistNow> findById_AsisIdAndId_AsisIngAndId_AsisZona(String asisId, Date asisIng, String asisZona );
 }
 
