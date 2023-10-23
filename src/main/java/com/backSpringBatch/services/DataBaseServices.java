@@ -243,7 +243,7 @@ public class DataBaseServices {
                     List<HorasProduccionTemp> temp= horaTempRepository.findAll();
                     temp.forEach(t->{
                        if( t.getStatus()){
-                          // horaTempRepository.delete(t);
+                          horaTempRepository.delete(t);
                        }
                     });  
                     
@@ -373,7 +373,7 @@ public class DataBaseServices {
 //					}
 //                }
 
-        //   sqlRepository.delete(x);
+           sqlRepository.delete(x);
             });
 
         }catch (Exception ex)
