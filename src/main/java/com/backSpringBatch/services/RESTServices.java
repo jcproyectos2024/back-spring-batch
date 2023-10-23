@@ -48,8 +48,8 @@ public class RESTServices {
 
             String json = response.getBody().asString();
             Gson gson = new Gson();
-            System.out.println("json"+response.getStatusLine());
-            System.out.println("json"+response.getStatusCode());
+         //   System.out.println("json"+response.getStatusLine());
+          //  System.out.println("json"+response.getStatusCode());
             rootc = gson.fromJson(json, new TypeToken<ShedulePersonDto>() {
             }.getType());
         } catch (Exception e) {

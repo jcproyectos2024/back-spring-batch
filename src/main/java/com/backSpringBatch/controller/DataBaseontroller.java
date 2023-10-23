@@ -27,7 +27,6 @@ public class DataBaseontroller {
 	@Scheduled (cron = "0/3 * * ? * *")
 	public void insertSqlToPostgres() {
 		dataBaseServices.insertSqlToPostgres();
-		System.out.println("Mensaje de cron:"+System.currentTimeMillis());
 	}
 
 	/*metodo anterior, ahora estara el refactorizado

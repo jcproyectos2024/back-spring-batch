@@ -14,6 +14,8 @@ import com.backSpringBatch.sqlserver.models.MarcacionesMongo;
 import com.backSpringBatch.sqlserver.models.ResponseMarcacionesMongo;
 import com.backSpringBatch.sqlserver.models.ResponsesEntradaSalidaMarcacionDias;
 import com.backSpringBatch.sqlserver.repository.SQLRepository;
+import com.diosmar.LogProducer;
+import com.diosmar.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
@@ -88,6 +90,8 @@ public class DataBaseServices {
     RegistroMarcacionesMapper registroMarcacionesMapper;
     @Autowired
     private Environment ev;
+    @Autowired
+    LogProducer logProducer;
     @Transactional(rollbackFor = { Exception.class })
     public void insertSqlToPostgres(){
 
@@ -99,14 +103,14 @@ public class DataBaseServices {
                 AsistNow regActual=asisRegistroMapper.asistNowRegistroToAsistNow(x);
                 Biometrico biometricoGuarado  = biometricoRepository.findByIpBiometrico(regActual.getId().getAsisZona());
                 regActual.setBiometrico(biometricoGuarado);
-
-                postGresRepository.findById_AsisIdAndId_AsisIngAndId_AsisZona(regActual.getId().getAsisId(),regActual.getId().getAsisIng(),regActual.getId().getAsisZona()).ifPresentOrElse(asistNow ->
+                postGresRepository.save(regActual);
+               /* postGresRepository.findById_AsisIdAndId_AsisIngAndId_AsisZona(regActual.getId().getAsisId(),regActual.getId().getAsisIng(),regActual.getId().getAsisZona()).ifPresentOrElse(asistNow ->
                 {
                     System.out.println("YA ESTA GUARDADO");
                 }, () -> {
                     System.out.println("NUEVO.");
                     postGresRepository.save(regActual);
-                });
+                });*/
 
               //  guardadoHistorialMarcaciones(regActual);
                 //aqui se inserta el refactorizado 
@@ -151,7 +155,7 @@ public class DataBaseServices {
                 
 
 
-                System.out.println("regActual.getId().getAsisZona()"+regActual.getId().getAsisZona());
+             //   System.out.println("regActual.getId().getAsisZona()"+regActual.getId().getAsisZona());
                 Biometrico bio = biometricoRepository.findByIpBiometrico(regActual.getId().getAsisZona());
                 //Validar si existe un atraso
                 Atrasos atra= atrasosRepository.findByIdentificacionAndAndFecha(regActual.getIdentificacion(), regActual.getAsisFecha());
@@ -160,7 +164,7 @@ public class DataBaseServices {
                     {
 
                        Date horaGrupo = (obtenerhoraGrupo(regActual.getIdentificacion()));
-                       System.out.println("horaGrupo"+horaGrupo);
+                     //   System.out.println("horaGrupo"+horaGrupo);
                        if (horaGrupo!=null)
                        {
                         //Validar hora ingreso
@@ -197,9 +201,9 @@ public class DataBaseServices {
 
                         HorasProduccion horasProduccion = new HorasProduccion();
                         HorasProduccionTemp ingreso = horas.get(0);
-                        System.out.println("HorasProduccionTemp++ingreso"+ingreso.getId().getAsisIng());
+                       // System.out.println("HorasProduccionTemp++ingreso"+ingreso.getId().getAsisIng());
                         HorasProduccionTemp salida = horas.get(1);
-                        System.out.println("HorasProduccionTemp++salida"+salida.getId().getAsisIng());
+                     //   System.out.println("HorasProduccionTemp++salida"+salida.getId().getAsisIng());
                         //horas producidas
                         Date calHora = utily.getDifferenceBetwenDates(ingreso.getId().getAsisIng(), salida.getId().getAsisIng());
                         ingreso.setStatus(Boolean.TRUE);
@@ -212,7 +216,7 @@ public class DataBaseServices {
                             horasProduccion.setIdentificacion(regActual.getIdentificacion());
                             horasProduccion.setFecha(regActual.getAsisFecha());
                            // try {
-                                System.out.println("-----calHora----"+calHora);
+                              //  System.out.println("-----calHora----"+calHora);
                                 //Date date = format.parse(String.valueOf(calHora));
                                 Date date = calHora;
                                 horasProduccion.setCalHorasProd(date);
@@ -227,8 +231,8 @@ public class DataBaseServices {
                             horasProduccionRepository.save(horasProduccion);
                         }
                         else {
-                            System.out.println("getCalHorasProd"+horasProd.getCalHorasProd());
-                            System.out.println("getHorasProduccion"+horasProd.getHorasProduccion());
+                          //  System.out.println("getCalHorasProd"+horasProd.getCalHorasProd());
+                          //  System.out.println("getHorasProduccion"+horasProd.getHorasProduccion());
                              Date calPro= utily.getSumBetwenDates(horasProd.getCalHorasProd(),calHora);
                                 horasProd.setCalHorasProd(calPro);
                                 String hora= sdfResult.format(calPro);
@@ -239,7 +243,7 @@ public class DataBaseServices {
                     List<HorasProduccionTemp> temp= horaTempRepository.findAll();
                     temp.forEach(t->{
                        if( t.getStatus()){
-                         //  horaTempRepository.delete(t);
+                          // horaTempRepository.delete(t);
                        }
                     });  
                     
@@ -369,10 +373,22 @@ public class DataBaseServices {
 //					}
 //                }
 
-              //  sqlRepository.delete(x);
+        //   sqlRepository.delete(x);
             });
 
-        }catch (Exception ex){
+        }catch (Exception ex)
+        {
+
+            logProducer.commit(
+                    Utils
+                            .LogProducerDefault()
+                            .methodName(Utils.currentMethodName())
+                            .className(Utils.currentClassName())
+                            .errorLine(Utils.errorLineNumber(ex,Utils.currentClassName()))
+                            .errorCode(ex.hashCode())
+                            .errorDescription(ex.getMessage())
+                            .toJson()
+            );
             ex.printStackTrace();
         }
     }
@@ -403,36 +419,56 @@ public class DataBaseServices {
     public ResponseAsistNowPagination obtenerMarcacionesRefactorizado (SearchMarcaDTO searchMarcaDTO) throws ParseException {
 
         ResponseAsistNowPagination exit = new ResponseAsistNowPagination();
-        int totalReg = asistNowRefactorRepository.getIdAsistfiltro(searchMarcaDTO.getIdentificacion()).size();
-        SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        List<AsistNowDTO> lsAsistencia= new ArrayList<>();
-        if (totalReg > 0) {
-            int page = searchMarcaDTO.getPage() > 0 ? (searchMarcaDTO.getPage() - 1) : 0;
-            PageRequest pgRq = PageRequest.of(page, searchMarcaDTO.getReg_por_pag());
-            exit.setTotalRegister(totalReg);
-            
-            Page<AsistNowRefactor> lsRefactor=asistNowRefactorRepository.getIdAsistfiltroPagin(searchMarcaDTO.getIdentificacion(), pgRq);
-            for(AsistNowRefactor ref:lsRefactor) {
-            	AsistNowDTO asist=new AsistNowDTO();
-                asist.setAsisId(ref.getId().getAsisId());
-                Biometrico bio = biometricoRepository.findByIpBiometrico(ref.getId().getAsisZona());
-                asist.setAsisZona(bio.getNombreBiometrico());
-                asist.setAsisFecha(format.format(ref.getAsisFecha()));
-                asist.setAsisHora(ref.getAsisHora());
-                asist.setAsisTipo("");
-                asist.setAsisIng(ref.getId().getAsisIng());
-                asist.setHoraIngreso((ref.getHoraIngreso()!=null? ref.getHoraIngreso():""));
-                asist.setHoraAlmuerzo((ref.getHoraAlmuerzo()!=null?ref.getHoraAlmuerzo():""));
-                asist.setHoraSalida((ref.getHoraSalida()!=null?ref.getHoraSalida():""));
-                lsAsistencia.add(asist);
+        try
+        {
+            int totalReg = asistNowRefactorRepository.getIdAsistfiltro(searchMarcaDTO.getIdentificacion()).size();
+            SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            List<AsistNowDTO> lsAsistencia= new ArrayList<>();
+            if (totalReg > 0) {
+                int page = searchMarcaDTO.getPage() > 0 ? (searchMarcaDTO.getPage() - 1) : 0;
+                PageRequest pgRq = PageRequest.of(page, searchMarcaDTO.getReg_por_pag());
+                exit.setTotalRegister(totalReg);
+
+                Page<AsistNowRefactor> lsRefactor=asistNowRefactorRepository.getIdAsistfiltroPagin(searchMarcaDTO.getIdentificacion(), pgRq);
+                for(AsistNowRefactor ref:lsRefactor) {
+                    AsistNowDTO asist=new AsistNowDTO();
+                    asist.setAsisId(ref.getId().getAsisId());
+                    Biometrico bio = biometricoRepository.findByIpBiometrico(ref.getId().getAsisZona());
+                    asist.setAsisZona(bio.getNombreBiometrico());
+                    asist.setAsisFecha(format.format(ref.getAsisFecha()));
+                    asist.setAsisHora(ref.getAsisHora());
+                    asist.setAsisTipo("");
+                    asist.setAsisIng(ref.getId().getAsisIng());
+                    asist.setHoraIngreso((ref.getHoraIngreso()!=null? ref.getHoraIngreso():""));
+                    asist.setHoraAlmuerzo((ref.getHoraAlmuerzo()!=null?ref.getHoraAlmuerzo():""));
+                    asist.setHoraSalida((ref.getHoraSalida()!=null?ref.getHoraSalida():""));
+                    lsAsistencia.add(asist);
+                }
+                exit.setAsistNowDTOS(lsAsistencia);
+                exit.setMessage("OK");
+            }else {
+                exit.setAsistNowDTOS(null);
+                exit.setTotalRegister(0);
+                exit.setMessage("No existen datos");
             }
-            exit.setAsistNowDTOS(lsAsistencia);
-            exit.setMessage("OK");
-        }else {
-            exit.setAsistNowDTOS(null);
-            exit.setTotalRegister(0);
-            exit.setMessage("No existen datos");
+
+        } catch (Exception ex)
+        {
+
+            logProducer.commit(
+                    Utils
+                            .LogProducerDefault()
+                            .methodName(Utils.currentMethodName())
+                            .className(Utils.currentClassName())
+                            .errorLine(Utils.errorLineNumber(ex,Utils.currentClassName()))
+                            .data(Utils.toJson(searchMarcaDTO))
+                            .errorCode(ex.hashCode())
+                            .errorDescription(ex.getMessage())
+                            .toJson()
+            );
         }
+
+
         return exit;
     }
 
@@ -467,19 +503,37 @@ public class DataBaseServices {
     public ResponseAsistNowPagination obtenerAtrasos (SearchMarcaDTO searchMarcaDTO) throws ParseException {
 
         ResponseAsistNowPagination exit = new ResponseAsistNowPagination();
-        int totalReg = obtenerAtrasosGeneral(searchMarcaDTO).size();
-        if (totalReg > 0) {
-            int page = searchMarcaDTO.getPage() > 0 ? (searchMarcaDTO.getPage() - 1) : 0;
-            PageRequest pgRq = PageRequest.of(page, searchMarcaDTO.getReg_por_pag());
-            exit.setTotalRegister(totalReg);
-            exit.setAsistNowDTOS(obtenerAtrasosPag(pgRq, searchMarcaDTO));
-            exit.setMessage("OK");
-        }else {
-            exit.setAsistNowDTOS(null);
-            exit.setTotalRegister(0);
-            exit.setMessage("No existen datos");
+        try
+        {
+            int totalReg = obtenerAtrasosGeneral(searchMarcaDTO).size();
+            if (totalReg > 0) {
+                int page = searchMarcaDTO.getPage() > 0 ? (searchMarcaDTO.getPage() - 1) : 0;
+                PageRequest pgRq = PageRequest.of(page, searchMarcaDTO.getReg_por_pag());
+                exit.setTotalRegister(totalReg);
+                exit.setAsistNowDTOS(obtenerAtrasosPag(pgRq, searchMarcaDTO));
+                exit.setMessage("OK");
+            }else {
+                exit.setAsistNowDTOS(null);
+                exit.setTotalRegister(0);
+                exit.setMessage("No existen datos");
 
+            }
+
+        } catch (Exception ex)
+        {
+            logProducer.commit(
+                    Utils
+                            .LogProducerDefault()
+                            .methodName(Utils.currentMethodName())
+                            .className(Utils.currentClassName())
+                            .errorLine(Utils.errorLineNumber(ex,Utils.currentClassName()))
+                            .data(Utils.toJson(searchMarcaDTO))
+                            .errorCode(ex.hashCode())
+                            .errorDescription(ex.getMessage())
+                            .toJson()
+            );
         }
+
         return exit;
     }
 
@@ -513,19 +567,38 @@ public class DataBaseServices {
     //PAGINADO
     public ResponseHorasProduccionPagination obtenerHorasProd(SearchMarcaDTO searchMarcaDTO) throws ParseException {
         ResponseHorasProduccionPagination exit = new ResponseHorasProduccionPagination();
-        int totalReg = obtenerhorasProdGeneral(searchMarcaDTO).size();
-        if (totalReg > 0) {
-            int page = searchMarcaDTO.getPage() > 0 ? (searchMarcaDTO.getPage() - 1) : 0;
-            PageRequest pgRq = PageRequest.of(page, searchMarcaDTO.getReg_por_pag());
-            exit.setTotalRegister(totalReg);
-            exit.setHorasProduccionDTO(obtenerhorasProdPag(pgRq, searchMarcaDTO));
-            exit.setMessage("OK");
-        }else {
-            exit.setHorasProduccionDTO(null);
-            exit.setTotalRegister(0);
-            exit.setMessage("No existen datos");
+        try
+        {
+            int totalReg = obtenerhorasProdGeneral(searchMarcaDTO).size();
+            if (totalReg > 0) {
+                int page = searchMarcaDTO.getPage() > 0 ? (searchMarcaDTO.getPage() - 1) : 0;
+                PageRequest pgRq = PageRequest.of(page, searchMarcaDTO.getReg_por_pag());
+                exit.setTotalRegister(totalReg);
+                exit.setHorasProduccionDTO(obtenerhorasProdPag(pgRq, searchMarcaDTO));
+                exit.setMessage("OK");
+            }else {
+                exit.setHorasProduccionDTO(null);
+                exit.setTotalRegister(0);
+                exit.setMessage("No existen datos");
 
+            }
+        } catch (Exception ex)
+        {
+
+            logProducer.commit(
+                    Utils
+                            .LogProducerDefault()
+                            .methodName(Utils.currentMethodName())
+                            .className(Utils.currentClassName())
+                            .errorLine(Utils.errorLineNumber(ex,Utils.currentClassName()))
+                            .data(Utils.toJson(searchMarcaDTO))
+                            .errorCode(ex.hashCode())
+                            .errorDescription(ex.getMessage())
+                            .toJson()
+            );
         }
+
+
         return exit;
     }
 
@@ -554,15 +627,34 @@ public class DataBaseServices {
         
         SaveMantDTO exit = new SaveMantDTO();
 
-        Atrasos atrasos = atrasosRepository.findByIdentificacionAndAndId_AsisIng(justDTO.getIdentificacion(),justDTO.getFechaIng());
+        try
+        {
+            Atrasos atrasos = atrasosRepository.findByIdentificacionAndAndId_AsisIng(justDTO.getIdentificacion(),justDTO.getFechaIng());
 
-        if(atrasos.getJustificacion()){
-            exit.setMessage("Ya exite una justificacion");
-            return exit;
+            if(atrasos.getJustificacion()){
+                exit.setMessage("Ya exite una justificacion");
+                return exit;
+            }
+            atrasos.setJustificacion(justDTO.getJustificacion());
+            atrasosRepository.save(atrasos);
+            exit.setMessage("Atraso Justificado");
+
+        } catch (Exception ex)
+        {
+
+            logProducer.commit(
+                    Utils
+                            .LogProducerDefault()
+                            .methodName(Utils.currentMethodName())
+                            .className(Utils.currentClassName())
+                            .errorLine(Utils.errorLineNumber(ex,Utils.currentClassName()))
+                            .data(Utils.toJson(justDTO))
+                            .errorCode(ex.hashCode())
+                            .errorDescription(ex.getMessage())
+                            .toJson()
+            );
         }
-        atrasos.setJustificacion(justDTO.getJustificacion());
-        atrasosRepository.save(atrasos);
-        exit.setMessage("Atraso Justificado");
+
         return exit;
     }
 
@@ -622,8 +714,20 @@ public class DataBaseServices {
     		
 
             //fin will 10/05/23
-		} catch (Exception e) {
-			exito=e.getMessage();
+		} catch (Exception ex)
+        {
+
+            logProducer.commit(
+                    Utils
+                            .LogProducerDefault()
+                            .methodName(Utils.currentMethodName())
+                            .className(Utils.currentClassName())
+                            .errorLine(Utils.errorLineNumber(ex,Utils.currentClassName()))
+                            .errorCode(ex.hashCode())
+                            .errorDescription(ex.getMessage())
+                            .toJson()
+            );
+			exito=ex.getMessage();
 			// TODO: handle exception
 		}
 		return exito;
@@ -722,10 +826,22 @@ public class DataBaseServices {
             }
 
 
-        }catch (Exception e)
+        }catch (Exception ex)
         {
             // TODO: handle exception
-            response.setMensaje(e.getMessage());
+
+            logProducer.commit(
+                    Utils
+                            .LogProducerDefault()
+                            .methodName(Utils.currentMethodName())
+                            .className(Utils.currentClassName())
+                            .errorLine(Utils.errorLineNumber(ex,Utils.currentClassName()))
+                            .data(Utils.toJson(horasSuplementariasPersonalBody))
+                            .errorCode(ex.hashCode())
+                            .errorDescription(ex.getMessage())
+                            .toJson()
+            );
+            response.setMensaje(ex.getMessage());
             response.setSuccess(false);
             return response;
         }
@@ -807,7 +923,7 @@ public class DataBaseServices {
 
                                 Integer horaArrastrada=0;
                                 horaArrastrada=utily.horasMilisegundosGeneral(rangoMarcadoFin)-utily.horasMilisegundosGeneral(lsPoliticas.get(0).getRangoHoraFinal());
-                                System.out.println("horas arrastradas i:"+  horaArrastrada);
+                             //   System.out.println("horas arrastradas i:"+  horaArrastrada);
 
                                 for(int i=0;i<lsPoliticas.size();i++)
                                 {
@@ -830,20 +946,20 @@ public class DataBaseServices {
                                             horaPersonal.setHoras(horaPersonal.getHoras()+horasPaso);
                                             horaPersonal.setPorcentaje(polHoras.getPorcentaje());
                                             horasSuplementariasPersonalRepository.save(horaPersonal);
-                                            System.out.println("horas arrastradas i:"+i+"   "+  horasPaso+"_____________Porcentaje:"+polHoras.getPorcentaje());
+                                         //   System.out.println("horas arrastradas i:"+i+"   "+  horasPaso+"_____________Porcentaje:"+polHoras.getPorcentaje());
                                         }else{
                                             horaArrastrada=utily.horasMilisegundosGeneral(polHoras.getRangoHoraInicial())-horaArrastrada;
 
                                             horaPersonal.setHoras(horaPersonal.getHoras()+horaArrastrada);
                                             horaPersonal.setPorcentaje(polHoras.getPorcentaje());
                                             horasSuplementariasPersonalRepository.save(horaPersonal);
-                                            System.out.println("horas arrastradas i:"+i+"   "+  horaArrastrada+"_____________Porcentaje:"+polHoras.getPorcentaje());
+                                           // System.out.println("horas arrastradas i:"+i+"   "+  horaArrastrada+"_____________Porcentaje:"+polHoras.getPorcentaje());
                                             break;
                                         }
 
                                     }else if (i>0){
                                         Integer dif=utily.horasMilisegundosGeneral(polHoras.getRangoHoraFinal())-utily.horasMilisegundosGeneral(polHoras.getRangoHoraInicial());
-                                        System.out.println("diferencia:"+dif);
+                                        //System.out.println("diferencia:"+dif);
                                         if(horaArrastrada>0 && horaArrastrada>=dif)
                                         {
                                             horaArrastrada=horaArrastrada-dif;
@@ -851,7 +967,7 @@ public class DataBaseServices {
                                             horaPersonal.setHoras(horaPersonal.getHoras()+horaArrastrada);
                                             horaPersonal.setPorcentaje(polHoras.getPorcentaje());
                                             horasSuplementariasPersonalRepository.save(horaPersonal);
-                                            System.out.println("horas arrastradas i:"+i+"   "+  horaArrastrada+"_____________Porcentaje:"+polHoras.getPorcentaje());
+                                           // System.out.println("horas arrastradas i:"+i+"   "+  horaArrastrada+"_____________Porcentaje:"+polHoras.getPorcentaje());
                                         }
                                         else if(horaArrastrada<dif){
                                             horaArrastrada= (utily.horasMilisegundosGeneral(polHoras.getRangoHoraFinal())-horaArrastrada)-utily.horasMilisegundosGeneral(polHoras.getRangoHoraInicial());
@@ -859,7 +975,7 @@ public class DataBaseServices {
                                             horaPersonal.setHoras(horaPersonal.getHoras()+horaArrastrada);
                                             horaPersonal.setPorcentaje(polHoras.getPorcentaje());
                                             horasSuplementariasPersonalRepository.save(horaPersonal);
-                                            System.out.println("horas arrastradas i:"+i+"   "+  horaArrastrada+"_____________Porcentaje:"+polHoras.getPorcentaje());
+                                           // System.out.println("horas arrastradas i:"+i+"   "+  horaArrastrada+"_____________Porcentaje:"+polHoras.getPorcentaje());
                                             break;
                                         }
                                         //  horasSuplementariasPersonalRepository.save(horaPersonal);
@@ -907,7 +1023,7 @@ public class DataBaseServices {
             {
                 if (!scheduleDTOListFilter.isEmpty())
                 {
-                    System.out.println("TINE HORARIO NOCTURNO");
+                    //System.out.println("TINE HORARIO NOCTURNO");
                     //consulto la marcacion de entrada con la configurtacion de biometrico asignado a cada empleado
                     //la fecha consultada se le resta -1 dia por que la jornada Nocturno
                     String fechaActual=utily.obtenerFechaActual(asistNow.getId().getAsisIng());
@@ -927,7 +1043,7 @@ public class DataBaseServices {
                       if ( Integer.valueOf(horasTrabajadasSplit) > 8 )
                       {
                           List<PoliticasHorasSuple>  lsPoliticasFilter25=lsPoliticas.stream().filter(x->(x.getPorcentaje()==25)).collect(Collectors.toList());
-                          System.out.println("lsPoliticasFilter25"+lsPoliticasFilter25.get(0));
+                         // System.out.println("lsPoliticasFilter25"+lsPoliticasFilter25.get(0));
 
                           HorasSuplementariasPersonal horaPersonal=horasSuplementariasPersonalRepository.findByIdentificacionAndEstadoTrueAndPorcentaje(asistNow.getIdentificacion(),lsPoliticasFilter25.get(0).getPorcentaje());
                           if(horaPersonal==null)
@@ -941,13 +1057,13 @@ public class DataBaseServices {
                           horaPersonal.setHoras(horaPersonal.getHoras()+horasPaso);
                           horaPersonal.setPorcentaje(lsPoliticasFilter25.get(0).getPorcentaje());
                           horasSuplementariasPersonalRepository.save(horaPersonal);
-                          System.out.println("horas arrastradas "+  horasPaso+"_____________Porcentaje:"+lsPoliticasFilter25.get(0).getPorcentaje());
+                         // System.out.println("horas arrastradas "+  horasPaso+"_____________Porcentaje:"+lsPoliticasFilter25.get(0).getPorcentaje());
                       }
                       // calcular cuantas horas de diferencia me queda despues de mis 9.5 horas trabajadas
                         //        String hora1 = "09:30:00";
                         //        String hora2 = "11:30:00";
                         String fechaSinHhMnSs= utily.convertirDateStringSinHhMnSs(lsMarcacionesSalida.get(0).getId().getAsisIng());
-                        System.out.println(fechaSinHhMnSs+" "+totalHorasTrabajadas);
+                        //System.out.println(fechaSinHhMnSs+" "+totalHorasTrabajadas);
                         String horasTrabajadas =fechaSinHhMnSs+" "+totalHorasTrabajadas;
                         String horasHaTrabajadas =fechaSinHhMnSs+" "+personResponseS.getTipoBiometricoCalculoDto().getHoraTrabajada();
                         String diferenciaHorasTrabajadas =utily.calculaDiferencia(horasTrabajadas,horasHaTrabajadas);
@@ -960,7 +1076,7 @@ public class DataBaseServices {
                         String horasTrabajadas100Split = horaMinutosSegundo100Split[0];
                         String minutosTrabajadas100Split = horaMinutosSegundo100Split[1];
                         String segundosTrabajadas100Split = horaMinutosSegundo100Split[2];
-                        System.out.println("horasTrabajadas100Split"+horasTrabajadas100Split);
+                       // System.out.println("horasTrabajadas100Split"+horasTrabajadas100Split);
                         String horasGeneral100 = null;
                         if ( Integer.valueOf(horasTrabajadas100Split) ==5 )
                         {
@@ -975,13 +1091,13 @@ public class DataBaseServices {
 
                             String rangoHoraFinal100 =fechaSinHhMnSs+" "+lsPoliticasFilter100.get(0).getRangoHoraFinal();
                              horasGeneral100= utily.calculaDiferencia(rangoHoraFinal100,horaMinutosSegundo100);
-                            System.out.println("horasGeneral100"+horasGeneral100);
+                           // System.out.println("horasGeneral100"+horasGeneral100);
                             Integer horasPaso=utily.horasMilisegundosGeneral(horasGeneral100);
 
                             horaPersonal.setHoras(horaPersonal.getHoras()+horasPaso);
                             horaPersonal.setPorcentaje(lsPoliticasFilter100.get(0).getPorcentaje());
                             horasSuplementariasPersonalRepository.save(horaPersonal);
-                            System.out.println("horas arrastradas "+  horasPaso+"_____________Porcentaje:"+lsPoliticasFilter100.get(0).getPorcentaje());
+                            //System.out.println("horas arrastradas "+  horasPaso+"_____________Porcentaje:"+lsPoliticasFilter100.get(0).getPorcentaje());
 
                         }
 
@@ -992,7 +1108,7 @@ public class DataBaseServices {
                         String horasTrabajadas50Split = horaMinutosSegundo50Split[0];
                         String minutosTrabajadas50Split = horaMinutosSegundo50Split[1];
                         String segundosTrabajadas50Split = horaMinutosSegundo50Split[2];
-                        System.out.println("horasTrabajadas50Split"+horaMinutosSegundo50Split);
+                        //System.out.println("horasTrabajadas50Split"+horaMinutosSegundo50Split);
                         if ( Integer.valueOf(horasTrabajadas50Split) ==6 )
                         {
                             List<PoliticasHorasSuple>  lsPoliticasFilter50=lsPoliticas.stream().filter(x->(x.getPorcentaje()==50)).collect(Collectors.toList());
@@ -1011,7 +1127,7 @@ public class DataBaseServices {
                             horaPersonal.setHoras(horaPersonal.getHoras()+horasPaso);
                             horaPersonal.setPorcentaje(lsPoliticasFilter50.get(0).getPorcentaje());
                             horasSuplementariasPersonalRepository.save(horaPersonal);
-                            System.out.println("horas arrastradas "+  horasPaso+"_____________Porcentaje:"+lsPoliticasFilter50.get(0).getPorcentaje());
+                           // System.out.println("horas arrastradas "+  horasPaso+"_____________Porcentaje:"+lsPoliticasFilter50.get(0).getPorcentaje());
 
                         }
 
@@ -1086,10 +1202,23 @@ public class DataBaseServices {
             }
 
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
+
+            logProducer.commit(
+                    Utils
+                            .LogProducerDefault()
+                            .methodName(Utils.currentMethodName())
+                            .className(Utils.currentClassName())
+                            .errorLine(Utils.errorLineNumber(ex,Utils.currentClassName()))
+                            .data(Utils.toJson(consultarEntradaSalida))
+                            .errorCode(ex.hashCode())
+                            .errorDescription(ex.getMessage())
+                            .toJson()
+            );
+
             // TODO: handle exception
-            response.setMensaje(e.getMessage());
+            response.setMensaje(ex.getMessage());
             response.setSuccess(false);
             return response;
         }
@@ -1129,10 +1258,22 @@ public class DataBaseServices {
             }
 
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
+            logProducer.commit(
+                    Utils
+                            .LogProducerDefault()
+                            .methodName(Utils.currentMethodName())
+                            .className(Utils.currentClassName())
+                            .errorLine(Utils.errorLineNumber(ex,Utils.currentClassName()))
+                            .data(Utils.toJson(registroMarcacionesDTO))
+                            .errorCode(ex.hashCode())
+                            .errorDescription(ex.getMessage())
+                            .toJson()
+            );
+
             // TODO: handle exception
-            response.setMensaje(e.getMessage());
+            response.setMensaje(ex.getMessage());
             response.setSuccess(false);
             return response;
         }
@@ -1156,7 +1297,7 @@ public class DataBaseServices {
             MarcacionesMongo  marcacionesMongo = new MarcacionesMongo();
             List<AsistNowRegistroDTO>  asistNowRegistroDTOS= new ArrayList<>();
             //Datos de multi Tenant
-            System.out.println("tenant"+ev.getProperty("tenant"));
+           // System.out.println("tenant"+ev.getProperty("tenant"));
             marcacionesMongo.setTenant(ev.getProperty("tenant"));
             marcacionesMongo.setDatabase(ev.getProperty("database"));
             marcacionesMongo.setCollection(ev.getProperty("collectionAsistencias"));
@@ -1208,10 +1349,23 @@ public class DataBaseServices {
             response.setMensaje("Consulta Existosa");
             response.setSuccess(true);
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
+            logProducer.commit(
+                    Utils
+                            .LogProducerDefault()
+                            .methodName(Utils.currentMethodName())
+                            .className(Utils.currentClassName())
+                            .errorLine(Utils.errorLineNumber(ex,Utils.currentClassName()))
+                            .data(Utils.toJson(consultarAsistenciasDias))
+                            .errorCode(ex.hashCode())
+                            .errorDescription(ex.getMessage())
+                            .toJson()
+            );
+
+
             // TODO: handle exception
-            response.setMensaje(e.getMessage());
+            response.setMensaje(ex.getMessage());
             response.setSuccess(false);
             return response;
         }

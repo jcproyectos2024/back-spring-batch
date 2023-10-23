@@ -155,7 +155,7 @@ public class Utily {
            long min=((l/(60*1000))-day*24*60-hour*60);
            long s=(l/1000-day*24*60*60-hour*60*60-min*60);
            horasMinutosSegundos= hour+":"+min+":"+s;
-           System.out.println ("  DIAS:" +day + "   HORAS:" +hour + "  MINUTOS:" + min + "   SEGUNDOS:" + s + "");
+          // System.out.println ("  DIAS:" +day + "   HORAS:" +hour + "  MINUTOS:" + min + "   SEGUNDOS:" + s + "");
        }
        catch (Exception e)
        {
@@ -232,7 +232,7 @@ public class Utily {
     {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String fechaComoCadena = sdf.format(date);
-        System.out.println(fechaComoCadena);
+       // System.out.println(fechaComoCadena);
         return   fechaComoCadena;
     }
 
@@ -240,7 +240,7 @@ public class Utily {
     {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String fechaComoCadena = sdf.format(date);
-        System.out.println(fechaComoCadena);
+       // System.out.println(fechaComoCadena);
         return   fechaComoCadena;
     }
 
