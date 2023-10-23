@@ -2,12 +2,10 @@ package com.backSpringBatch.controller;
 
 
 import com.backSpringBatch.Util.SaveMantDTO;
-import com.backSpringBatch.dto.ConsultarEntradaSalida;
-import com.backSpringBatch.dto.ConsultarEntradaSalidaMarcacionResponses;
-import com.backSpringBatch.dto.RegistroMarcacionesDTO;
-import com.backSpringBatch.dto.RegistroMarcacionesResponses;
+import com.backSpringBatch.dto.*;
 import com.backSpringBatch.postgres.models.*;
 import com.backSpringBatch.services.DataBaseServices;
+import com.backSpringBatch.sqlserver.models.ResponsesEntradaSalidaMarcacionDias;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
@@ -29,7 +27,6 @@ public class DataBaseontroller {
 	@Scheduled (cron = "0/3 * * ? * *")
 	public void insertSqlToPostgres() {
 		dataBaseServices.insertSqlToPostgres();
-		System.out.println("Mensaje de cron:"+System.currentTimeMillis());
 	}
 
 	/*metodo anterior, ahora estara el refactorizado
@@ -106,6 +103,12 @@ public class DataBaseontroller {
 	{
 
 		return dataBaseServices.guardadoEntradaSalidaMarcacion(registroMarcacionesDTO);
+	}
+
+	@PostMapping("consultarEntradaSalidaMarcacionPorDia/")
+	public ResponsesEntradaSalidaMarcacionDias consultarEntradaSalidaMarcacionPorDia(@RequestBody @Validated ConsultarAsistenciasDias body)
+	{
+		return dataBaseServices.consultarEntradaSalidaMarcacionPorDia(body);
 	}
 }
 	

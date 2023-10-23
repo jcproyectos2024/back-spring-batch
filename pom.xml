@@ -185,7 +185,11 @@
             <version>11.8</version>
         </dependency>
 
-
+        <dependency>
+            <groupId>com.diosmar</groupId>
+            <artifactId>log-producer</artifactId>
+            <version>1.0</version>
+        </dependency>
 
 
         <!-- _____________________________________________________________________________________________ -->
