@@ -103,14 +103,14 @@ public class DataBaseServices {
                 AsistNow regActual=asisRegistroMapper.asistNowRegistroToAsistNow(x);
                 Biometrico biometricoGuarado  = biometricoRepository.findByIpBiometrico(regActual.getId().getAsisZona());
                 regActual.setBiometrico(biometricoGuarado);
-                postGresRepository.save(regActual);
-               /* postGresRepository.findById_AsisIdAndId_AsisIngAndId_AsisZona(regActual.getId().getAsisId(),regActual.getId().getAsisIng(),regActual.getId().getAsisZona()).ifPresentOrElse(asistNow ->
+              //  postGresRepository.save(regActual);
+               postGresRepository.findById_AsisIdAndId_AsisIngAndId_AsisZona(regActual.getId().getAsisId(),regActual.getId().getAsisIng(),regActual.getId().getAsisZona()).ifPresentOrElse(asistNow ->
                 {
                     System.out.println("YA ESTA GUARDADO");
                 }, () -> {
                     System.out.println("NUEVO.");
                     postGresRepository.save(regActual);
-                });*/
+                });
 
               //  guardadoHistorialMarcaciones(regActual);
                 //aqui se inserta el refactorizado 
@@ -243,7 +243,7 @@ public class DataBaseServices {
                     List<HorasProduccionTemp> temp= horaTempRepository.findAll();
                     temp.forEach(t->{
                        if( t.getStatus()){
-                          horaTempRepository.delete(t);
+                      //    horaTempRepository.delete(t);
                        }
                     });  
                     
@@ -373,7 +373,7 @@ public class DataBaseServices {
 //					}
 //                }
 
-           sqlRepository.delete(x);
+         //  sqlRepository.delete(x);
             });
 
         }catch (Exception ex)

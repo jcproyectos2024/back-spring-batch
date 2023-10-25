@@ -14,7 +14,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication(exclude =  {DataSourceAutoConfiguration.class })
 @EnableEurekaClient
 @EnableScheduling
-@ComponentScan({"com.backSpringBatch.*", "com.diosmar.*"})
+@ComponentScan({"com.*", "com.diosmar.*"})
 public class SpringBatchApplication extends SpringBootServletInitializer{
 
     public static void main(String[] args) {
