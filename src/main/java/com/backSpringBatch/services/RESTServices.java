@@ -31,6 +31,7 @@ public class RESTServices {
     public ShedulePersonDto getSchedulePerson(String identificacion)
     {
 
+        //System.out.println("getSchedulePerson"+identificacion);
         String ruta = env.getProperty("url_get_schedule");
         ShedulePersonDto rootc = null;
         String rutahistory=ruta;
@@ -62,6 +63,7 @@ public class RESTServices {
     public PersonResponseS consultarPersonaTipoBiometricoCalculo(String identificacion)
     {
 
+        //System.out.println("consultarPersonaTipoBiometricoCalculo"+identificacion);
         String ruta = env.getProperty("urlConsultarPersonaTipoBiometricoCalculo");
         PersonResponseS rootc = null;
         String rutahistory=ruta;
