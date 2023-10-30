@@ -12,11 +12,4 @@ public interface SQLRepository extends JpaRepository<AsistNowRegistro, String> {
 
 
  List<AsistNowRegistro> findAllByEstadoAsistnowRegistroTrue();
-
-
-
-
-
-
-
 }
