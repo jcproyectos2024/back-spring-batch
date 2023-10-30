@@ -27,10 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -97,161 +94,156 @@ public class DataBaseServices {
 
         try{
             SimpleDateFormat sdfResult = new SimpleDateFormat("HH:mm:ss");
-            SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            List<AsistNowRegistro> lsRegistros=sqlRepository.findAll();
-            lsRegistros.forEach(x->{
-                AsistNow regActual=asisRegistroMapper.asistNowRegistroToAsistNow(x);
-                Biometrico biometricoGuarado  = biometricoRepository.findByIpBiometrico(regActual.getId().getAsisZona());
-                regActual.setBiometrico(biometricoGuarado);
-              //  postGresRepository.save(regActual);
-               postGresRepository.findById_AsisIdAndId_AsisIngAndId_AsisZona(regActual.getId().getAsisId(),regActual.getId().getAsisIng(),regActual.getId().getAsisZona()).ifPresentOrElse(asistNow ->
-                {
-                   // System.out.println("YA ESTA GUARDADO");
-                }, () -> {
-                //    System.out.println("NUEVO.");
-                    postGresRepository.save(regActual);
-                });
-
-              //  guardadoHistorialMarcaciones(regActual);
-                //aqui se inserta el refactorizado 
-                //ini will 10/05/23
-                AsistNowRefactor busquedaRef=asistNowRefactorRepository.findByAsisFechaAndIdentificacion(x.getAsisFecha(), x.getIdentificacion());
-                if(busquedaRef!=null)
-                {
-                	if(x.getAsisTipo().equals("SALIDA")) {
-                		busquedaRef.setHoraSalida((busquedaRef.getHoraSalida()!=null?busquedaRef.getHoraSalida()+"\n"+x.getAsisHora():x.getAsisHora()));
-                	}else if(x.getAsisTipo().equals("BREAK-OUT")) {
-                		busquedaRef.setHoraAlmuerzo((busquedaRef.getHoraAlmuerzo()!=null?busquedaRef.getHoraAlmuerzo()+"\n"+x.getAsisHora():x.getAsisHora()));
-                	}else if(x.getAsisTipo().equals("INGRESO")) {
-                		busquedaRef.setHoraIngreso((busquedaRef.getHoraIngreso()!=null?busquedaRef.getHoraIngreso()+"\n"+x.getAsisHora():x.getAsisHora()));
-                	}
-                	asistNowRefactorRepository.save(busquedaRef);
-                }else
-                {
-                	
-                	AsistnowPK pkAsist=new AsistnowPK();
-                	pkAsist.setAsisId(x.getId().getAsisId());
-                	pkAsist.setAsisIng(x.getId().getAsisIng());
-                	pkAsist.setAsisZona(x.getId().getAsisZona());                	
-                	busquedaRef=new AsistNowRefactor(pkAsist, 
-                			x.getAsisFecha(), 
-                			x.getAsisHora(),
-                			x.getAsisTipo(), 
-                			x.getAsisRes(), 
-                			x.getIdentificacion(), 
-                			null, 
-                			null, 
-                			null);
-                	if(x.getAsisTipo().equals("SALIDA")) {
-                		busquedaRef.setHoraSalida(x.getAsisHora());
-                	}else if(x.getAsisTipo().equals("BREAK-OUT")) {
-                		busquedaRef.setHoraAlmuerzo(x.getAsisHora());
-                	}else if(x.getAsisTipo().equals("INGRESO")) {
-                		busquedaRef.setHoraIngreso(x.getAsisHora());
-                	}
-                	asistNowRefactorRepository.save(busquedaRef);
-                }
-                //fin will 10/05/23
-                
-
-
-             //   System.out.println("regActual.getId().getAsisZona()"+regActual.getId().getAsisZona());
-                Biometrico bio = biometricoRepository.findByIpBiometrico(regActual.getId().getAsisZona());
-                //Validar si existe un atraso
-                Atrasos atra= atrasosRepository.findByIdentificacionAndAndFecha(regActual.getIdentificacion(), regActual.getAsisFecha());
-                if(atra==null) {
-                    if ( (bio== null ? "" :bio.getTipoBiometrinco()).equals("INGRESO") && (bio == null ? "" :bio.getNombreBiometrico()).equals("GARITA") && x.getIdentificacion() != null)
-                    {
-
-                       Date horaGrupo = (obtenerhoraGrupo(regActual.getIdentificacion()));
-                     //   System.out.println("horaGrupo"+horaGrupo);
-                       if (horaGrupo!=null)
-                       {
-                        //Validar hora ingreso
-                        Date difference = utily.getDifferenceBetwenDates(horaGrupo, regActual.getId().getAsisIng());
-                        String horaVerificacion = sdfResult.format(difference);
-                        if(!horaVerificacion.equals("00:00:00") ) {
-                            Atrasos atrasos = new Atrasos();
-                            atrasos.setId(regActual.getId());
-                            atrasos.setIdentificacion(regActual.getIdentificacion() != null ? regActual.getIdentificacion() : "");
-                            atrasos.setFecha(regActual.getAsisFecha());
-                            atrasos.setJustificacion(Boolean.FALSE);
-                            atrasos.setTiempoAtraso(horaVerificacion);
-                            atrasosRepository.save(atrasos);
+           // SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            //List<AsistNowRegistro> lsRegistros=sqlRepository.findAll();
+            List<AsistNowRegistro>   lsRegistros = sqlRepository.findAllByEstadoAsistnowRegistroTrue();
+                if ( !(lsRegistros ==null ? new ArrayList<>():lsRegistros).isEmpty()) {
+                 //   System.out.println("lsRegistros Cantidad" + lsRegistros.size());
+                    //   lsRegistros.forEach(x->{
+                    lsRegistros.forEach(x -> {
+                        AsistNow regActual = asisRegistroMapper.asistNowRegistroToAsistNow(x);
+                        Biometrico biometricoGuarado = biometricoRepository.findByIpBiometrico(regActual.getId().getAsisZona());
+                        regActual.setBiometrico(biometricoGuarado);
+                        //  postGresRepository.save(regActual);
+                        postGresRepository.findById_AsisIdAndId_AsisIngAndId_AsisZona(regActual.getId().getAsisId(), regActual.getId().getAsisIng(), regActual.getId().getAsisZona()).ifPresentOrElse(asistNow ->
+                        {
+                           // System.out.println("YA ESTA GUARDADO");
+                        }, () -> {
+                            //System.out.println("NUEVO.");
                             postGresRepository.save(regActual);
+                        });
+
+                        //  guardadoHistorialMarcaciones(regActual);
+                        //aqui se inserta el refactorizado
+                        //ini will 10/05/23
+                        AsistNowRefactor busquedaRef = asistNowRefactorRepository.findByAsisFechaAndIdentificacion(x.getAsisFecha(), x.getIdentificacion());
+                        if (busquedaRef != null) {
+                            if (x.getAsisTipo().equals("SALIDA")) {
+                                busquedaRef.setHoraSalida((busquedaRef.getHoraSalida() != null ? busquedaRef.getHoraSalida() + "\n" + x.getAsisHora() : x.getAsisHora()));
+                            } else if (x.getAsisTipo().equals("BREAK-OUT")) {
+                                busquedaRef.setHoraAlmuerzo((busquedaRef.getHoraAlmuerzo() != null ? busquedaRef.getHoraAlmuerzo() + "\n" + x.getAsisHora() : x.getAsisHora()));
+                            } else if (x.getAsisTipo().equals("INGRESO")) {
+                                busquedaRef.setHoraIngreso((busquedaRef.getHoraIngreso() != null ? busquedaRef.getHoraIngreso() + "\n" + x.getAsisHora() : x.getAsisHora()));
+                            }
+                            asistNowRefactorRepository.save(busquedaRef);
+                        } else {
+
+                            AsistnowPK pkAsist = new AsistnowPK();
+                            pkAsist.setAsisId(x.getId().getAsisId());
+                            pkAsist.setAsisIng(x.getId().getAsisIng());
+                            pkAsist.setAsisZona(x.getId().getAsisZona());
+                            busquedaRef = new AsistNowRefactor(pkAsist,
+                                    x.getAsisFecha(),
+                                    x.getAsisHora(),
+                                    x.getAsisTipo(),
+                                    x.getAsisRes(),
+                                    x.getIdentificacion(),
+                                    null,
+                                    null,
+                                    null);
+                            if (x.getAsisTipo().equals("SALIDA")) {
+                                busquedaRef.setHoraSalida(x.getAsisHora());
+                            } else if (x.getAsisTipo().equals("BREAK-OUT")) {
+                                busquedaRef.setHoraAlmuerzo(x.getAsisHora());
+                            } else if (x.getAsisTipo().equals("INGRESO")) {
+                                busquedaRef.setHoraIngreso(x.getAsisHora());
+                            }
+                            asistNowRefactorRepository.save(busquedaRef);
                         }
-                       }
-                    }
-                }
-                if( (bio== null ? "" :bio.getNombreBiometrico()).equals("PLANTA") )
-                {
-                    HorasProduccionTemp horasTemp= new HorasProduccionTemp();
-                    horasTemp.setId(regActual.getId());
-                    horasTemp.setIdentificacion(regActual.getIdentificacion());
-                    horasTemp.setTipo(regActual.getAsisTipo());
-                    horasTemp.setStatus(Boolean.FALSE);
-                    horaTempRepository.save(horasTemp);
-
-                    List<HorasProduccionTemp> horas= horaTempRepository.findByIdentificacion(regActual.getIdentificacion());
-                    HorasProduccion horasProd = horasProduccionRepository.findByIdentificacionAndFecha(regActual.getIdentificacion(), regActual.getAsisFecha());
-
-                    if(horas.size()>1)
-                    {
+                        //fin will 10/05/23
 
 
-                        HorasProduccion horasProduccion = new HorasProduccion();
-                        HorasProduccionTemp ingreso = horas.get(0);
-                       // System.out.println("HorasProduccionTemp++ingreso"+ingreso.getId().getAsisIng());
-                        HorasProduccionTemp salida = horas.get(1);
-                     //   System.out.println("HorasProduccionTemp++salida"+salida.getId().getAsisIng());
-                        //horas producidas
-                        Date calHora = utily.getDifferenceBetwenDates(ingreso.getId().getAsisIng(), salida.getId().getAsisIng());
-                        ingreso.setStatus(Boolean.TRUE);
-                        salida.setStatus(Boolean.TRUE);
-                        horaTempRepository.save(ingreso);
-                        horaTempRepository.save(salida);
-                        if(horasProd ==null){
+                        //   System.out.println("regActual.getId().getAsisZona()"+regActual.getId().getAsisZona());
+                        Biometrico bio = biometricoRepository.findByIpBiometrico(regActual.getId().getAsisZona());
+                        //Validar si existe un atraso
+                        Atrasos atra = atrasosRepository.findByIdentificacionAndAndFecha(regActual.getIdentificacion(), regActual.getAsisFecha());
+                        if (atra == null) {
+                            if ((bio == null ? "" : bio.getTipoBiometrinco()).equals("INGRESO") && (bio == null ? "" : bio.getNombreBiometrico()).equals("GARITA") && x.getIdentificacion() != null) {
 
-                            horasProduccion.setId(regActual.getId());
-                            horasProduccion.setIdentificacion(regActual.getIdentificacion());
-                            horasProduccion.setFecha(regActual.getAsisFecha());
-                           // try {
-                              //  System.out.println("-----calHora----"+calHora);
-                                //Date date = format.parse(String.valueOf(calHora));
-                                Date date = calHora;
-                                horasProduccion.setCalHorasProd(date);
+                                Date horaGrupo = (obtenerhoraGrupo(regActual.getIdentificacion()));
+                                //   System.out.println("horaGrupo"+horaGrupo);
+                                if (horaGrupo != null) {
+                                    //Validar hora ingreso
+                                    Date difference = utily.getDifferenceBetwenDates(horaGrupo, regActual.getId().getAsisIng());
+                                    String horaVerificacion = sdfResult.format(difference);
+                                    if (!horaVerificacion.equals("00:00:00")) {
+                                        Atrasos atrasos = new Atrasos();
+                                        atrasos.setId(regActual.getId());
+                                        atrasos.setIdentificacion(regActual.getIdentificacion() != null ? regActual.getIdentificacion() : "");
+                                        atrasos.setFecha(regActual.getAsisFecha());
+                                        atrasos.setJustificacion(Boolean.FALSE);
+                                        atrasos.setTiempoAtraso(horaVerificacion);
+                                        atrasosRepository.save(atrasos);
+                                        postGresRepository.save(regActual);
+                                    }
+                                }
+                            }
+                        }
+                        if ((bio == null ? "" : bio.getNombreBiometrico()).equals("PLANTA")) {
+                            HorasProduccionTemp horasTemp = new HorasProduccionTemp();
+                            horasTemp.setId(regActual.getId());
+                            horasTemp.setIdentificacion(regActual.getIdentificacion());
+                            horasTemp.setTipo(regActual.getAsisTipo());
+                            horasTemp.setStatus(Boolean.FALSE);
+                            horaTempRepository.save(horasTemp);
+
+                            List<HorasProduccionTemp> horas = horaTempRepository.findByIdentificacion(regActual.getIdentificacion());
+                            HorasProduccion horasProd = horasProduccionRepository.findByIdentificacionAndFecha(regActual.getIdentificacion(), regActual.getAsisFecha());
+
+                            if (horas.size() > 1) {
+
+
+                                HorasProduccion horasProduccion = new HorasProduccion();
+                                HorasProduccionTemp ingreso = horas.get(0);
+                                // System.out.println("HorasProduccionTemp++ingreso"+ingreso.getId().getAsisIng());
+                                HorasProduccionTemp salida = horas.get(1);
+                                //   System.out.println("HorasProduccionTemp++salida"+salida.getId().getAsisIng());
+                                //horas producidas
+                                Date calHora = utily.getDifferenceBetwenDates(ingreso.getId().getAsisIng(), salida.getId().getAsisIng());
+                                ingreso.setStatus(Boolean.TRUE);
+                                salida.setStatus(Boolean.TRUE);
+                                horaTempRepository.save(ingreso);
+                                horaTempRepository.save(salida);
+                                if (horasProd == null) {
+
+                                    horasProduccion.setId(regActual.getId());
+                                    horasProduccion.setIdentificacion(regActual.getIdentificacion());
+                                    horasProduccion.setFecha(regActual.getAsisFecha());
+                                    // try {
+                                    //  System.out.println("-----calHora----"+calHora);
+                                    //Date date = format.parse(String.valueOf(calHora));
+                                    Date date = calHora;
+                                    horasProduccion.setCalHorasProd(date);
                          /*   } catch (ParseException e)
                             {
                                 e.printStackTrace();
                             }*/
 
-                            horasProduccion.setCalHorasProd(calHora);
-                            String hora = sdfResult.format(calHora);
-                            horasProduccion.setHorasProduccion(hora);
-                            horasProduccionRepository.save(horasProduccion);
+                                    horasProduccion.setCalHorasProd(calHora);
+                                    String hora = sdfResult.format(calHora);
+                                    horasProduccion.setHorasProduccion(hora);
+                                    horasProduccionRepository.save(horasProduccion);
+                                } else {
+                                    //  System.out.println("getCalHorasProd"+horasProd.getCalHorasProd());
+                                    //  System.out.println("getHorasProduccion"+horasProd.getHorasProduccion());
+                                    Date calPro = utily.getSumBetwenDates(horasProd.getCalHorasProd(), calHora);
+                                    horasProd.setCalHorasProd(calPro);
+                                    String hora = sdfResult.format(calPro);
+                                    horasProd.setHorasProduccion(hora);
+                                    horasProduccionRepository.save(horasProd);
+                                }
+                            }
+                            List<HorasProduccionTemp> temp = horaTempRepository.findAll();
+                            temp.forEach(t -> {
+                                if (t.getStatus()) {
+                                      horaTempRepository.delete(t);
+                                }
+                            });
+
                         }
-                        else {
-                          //  System.out.println("getCalHorasProd"+horasProd.getCalHorasProd());
-                          //  System.out.println("getHorasProduccion"+horasProd.getHorasProduccion());
-                             Date calPro= utily.getSumBetwenDates(horasProd.getCalHorasProd(),calHora);
-                                horasProd.setCalHorasProd(calPro);
-                                String hora= sdfResult.format(calPro);
-                                horasProd.setHorasProduccion(hora);
-                            horasProduccionRepository.save(horasProd);
+                        if ((bio == null ? "" : bio.getNombreBiometrico()).equals("GARITA") && (bio == null ? "" : bio.getTipoBiometrinco()).equals("SALIDA")) {
+                            calculoHorasSuplementariasPersonalProduccionFija(regActual);
                         }
-                    }
-                    List<HorasProduccionTemp> temp= horaTempRepository.findAll();
-                    temp.forEach(t->{
-                       if( t.getStatus()){
-                         horaTempRepository.delete(t);
-                       }
-                    });  
-                    
-                }
-                if( (bio== null ? "" :bio.getNombreBiometrico()).equals("GARITA") &&  (bio== null ? "" :bio.getTipoBiometrinco()).equals("SALIDA"))
-             {
-                 calculoHorasSuplementariasPersonalProduccionFija(regActual);
-             }
 
 //                //logica para el calculo de las horas suplementarias de producción
 //                if(bio.getNombreBiometñrico().equals("GARITA") && bio.getTipoBiometrinco().equals("SALIDA"))
@@ -373,8 +365,14 @@ public class DataBaseServices {
 //					}
 //                }
 
-           sqlRepository.delete(x);
-            });
+                        sqlRepository.delete(x);
+                    });
+                }else
+                {
+                    //System.out.println("NO HAY REGISTRO  CON EL ESTADO ");
+                }
+
+
 
         }catch (Exception ex)
         {
