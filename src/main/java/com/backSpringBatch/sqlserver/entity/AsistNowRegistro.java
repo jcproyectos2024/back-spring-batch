@@ -35,6 +35,8 @@ public class AsistNowRegistro {
     @Column (name = "nomina_ape")
     private String apellidos;
 
+    @Column (name = "estado_asistnow_registro")
+    private Boolean estadoAsistnowRegistro;
 
     public AsistnowRegistroPK getId() {
         return id;
@@ -106,5 +108,13 @@ public class AsistNowRegistro {
 
     public void setApellidos(String apellidos) {
         this.apellidos = apellidos;
+    }
+
+    public Boolean getEstadoAsistnowRegistro() {
+        return estadoAsistnowRegistro;
+    }
+
+    public void setEstadoAsistnowRegistro(Boolean estadoAsistnowRegistro) {
+        this.estadoAsistnowRegistro = estadoAsistnowRegistro;
     }
 }
