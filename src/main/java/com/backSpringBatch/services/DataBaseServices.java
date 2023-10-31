@@ -11,7 +11,6 @@ import com.backSpringBatch.sqlserver.entity.AsistNowRegistro;
 import com.backSpringBatch.sqlserver.mapper.AsisRegistroMapper;
 import com.backSpringBatch.sqlserver.models.AsistNowRegistroDTO;
 import com.backSpringBatch.sqlserver.models.MarcacionesMongo;
-import com.backSpringBatch.sqlserver.models.ResponseMarcacionesMongo;
 import com.backSpringBatch.sqlserver.models.ResponsesEntradaSalidaMarcacionDias;
 import com.backSpringBatch.sqlserver.repository.SQLRepository;
 import com.diosmar.LogProducer;
@@ -28,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 
@@ -92,24 +91,26 @@ public class DataBaseServices {
     @Transactional(rollbackFor = { Exception.class })
     public void insertSqlToPostgres(){
 
+        final Object[] asistNowRegistroError = {null};
         try{
             SimpleDateFormat sdfResult = new SimpleDateFormat("HH:mm:ss");
            // SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             //List<AsistNowRegistro> lsRegistros=sqlRepository.findAll();
             List<AsistNowRegistro>   lsRegistros = sqlRepository.findAllByEstadoAsistnowRegistroTrue();
                 if ( !(lsRegistros ==null ? new ArrayList<>():lsRegistros).isEmpty()) {
-                 //   System.out.println("lsRegistros Cantidad" + lsRegistros.size());
+                  // System.out.println("lsRegistros Cantidad" + lsRegistros.size());
                     //   lsRegistros.forEach(x->{
                     lsRegistros.forEach(x -> {
+                        asistNowRegistroError[0] =Utils.toJson(x);
                         AsistNow regActual = asisRegistroMapper.asistNowRegistroToAsistNow(x);
                         Biometrico biometricoGuarado = biometricoRepository.findByIpBiometrico(regActual.getId().getAsisZona());
                         regActual.setBiometrico(biometricoGuarado);
                         //  postGresRepository.save(regActual);
                         postGresRepository.findById_AsisIdAndId_AsisIngAndId_AsisZona(regActual.getId().getAsisId(), regActual.getId().getAsisIng(), regActual.getId().getAsisZona()).ifPresentOrElse(asistNow ->
                         {
-                           // System.out.println("YA ESTA GUARDADO");
+                          // System.out.println("YA ESTA GUARDADO");
                         }, () -> {
-                            //System.out.println("NUEVO.");
+                          //  System.out.println("NUEVO.");
                             postGresRepository.save(regActual);
                         });
 
@@ -236,7 +237,7 @@ public class DataBaseServices {
                             List<HorasProduccionTemp> temp = horaTempRepository.findAll();
                             temp.forEach(t -> {
                                 if (t.getStatus()) {
-                                      horaTempRepository.delete(t);
+                                    horaTempRepository.delete(t);
                                 }
                             });
 
@@ -365,11 +366,10 @@ public class DataBaseServices {
 //					}
 //                }
 
-                        sqlRepository.delete(x);
+                     sqlRepository.delete(x);
+
+
                     });
-                }else
-                {
-                    //System.out.println("NO HAY REGISTRO  CON EL ESTADO ");
                 }
 
 
@@ -385,9 +385,9 @@ public class DataBaseServices {
                             .errorLine(Utils.errorLineNumber(ex,Utils.currentClassName()))
                             .errorCode(ex.hashCode())
                             .errorDescription(ex.getMessage())
+                            .data(asistNowRegistroError[0])
                             .toJson()
             );
-            ex.printStackTrace();
         }
     }
     
@@ -658,12 +658,32 @@ public class DataBaseServices {
 
     public Date obtenerhoraGrupo(String identificacion)
     {
-      //  ScheduleDTO horaGupo= restServices.getSchedulePerson(identificacion);
-      //  Date horaGrupo = horaGupo == null ? null : horaGupo.getDesde();
-        ShedulePersonDto horaGupo= restServices.getSchedulePerson(identificacion);
-        Date horaGrupo = horaGupo.getGroupsScheduleDtoList() == null ? null : horaGupo.getGroupsScheduleDtoList().get(0).getSchedule().getDesde();
-        //Date horaGrupo= horaGupo.getDesde();
-        return  horaGrupo;
+        try
+        {
+
+            //  ScheduleDTO horaGupo= restServices.getSchedulePerson(identificacion);
+            //  Date horaGrupo = horaGupo == null ? null : horaGupo.getDesde();
+            ShedulePersonDto horaGupo= restServices.getSchedulePerson(identificacion);
+            Date horaGrupo = horaGupo.getGroupsScheduleDtoList() == null ||  horaGupo.getGroupsScheduleDtoList().isEmpty()? null : horaGupo.getGroupsScheduleDtoList().get(0).getSchedule().getDesde();
+            //Date horaGrupo= horaGupo.getDesde();
+
+            return  horaGrupo;
+    } catch (Exception ex)
+    {
+
+        logProducer.commit(
+                Utils
+                        .LogProducerDefault()
+                        .methodName(Utils.currentMethodName())
+                        .className(Utils.currentClassName())
+                        .errorLine(Utils.errorLineNumber(ex,Utils.currentClassName()))
+                        .data(Utils.toJson(identificacion))
+                        .errorCode(ex.hashCode())
+                        .errorDescription(ex.getMessage())
+                        .toJson()
+        );
+    }
+        return  null;
     }
 
 
@@ -1248,7 +1268,7 @@ public class DataBaseServices {
                 registroMarcaciones.setAsisFecha(registroMarcacionesDTO.getAsisFecha());
                 AsistNow registroMarcacionesSave = postGresRepository.save(registroMarcaciones);
                 RegistroMarcacionesDTO marcacionesDTO = registroMarcacionesMapper.asistNowToRegistroMarcacionesDTO(registroMarcacionesSave);
-                response.setMensaje("GUARDADO CON EXISTO");
+                response.setMessage("GUARDADO CON EXISTO");
                 response.setSuccess(true);
                 response.setRegistroMarcacionesDTO(marcacionesDTO);
                 guardadoHistorialMarcaciones(registroMarcacionesSave);
@@ -1271,7 +1291,7 @@ public class DataBaseServices {
             );
 
             // TODO: handle exception
-            response.setMensaje(ex.getMessage());
+            response.setMessage(ex.getMessage());
             response.setSuccess(false);
             return response;
         }
@@ -1322,7 +1342,7 @@ public class DataBaseServices {
         catch (Exception e)
         {
             // TODO: handle exception
-            response.setMensaje(e.getMessage());
+            response.setMessage(e.getMessage());
             response.setSuccess(false);
             return response;
         }
