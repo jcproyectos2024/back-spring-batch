@@ -5,7 +5,7 @@ public class RegistroMarcacionesResponses
 
     RegistroMarcacionesDTO registroMarcacionesDTO;
 
-    private String mensaje;
+    private String message;
     private   boolean  success;
 
     public RegistroMarcacionesResponses() {
@@ -19,12 +19,12 @@ public class RegistroMarcacionesResponses
         this.registroMarcacionesDTO = registroMarcacionesDTO;
     }
 
-    public String getMensaje() {
-        return mensaje;
+    public String getMessage() {
+        return message;
     }
 
-    public void setMensaje(String mensaje) {
-        this.mensaje = mensaje;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     public boolean isSuccess() {
