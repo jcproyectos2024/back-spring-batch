@@ -24,10 +24,10 @@ public class DataBaseontroller {
 	private DataBaseServices dataBaseServices;
 
 
-	@Scheduled (cron = "0/3 * * ? * *")
+	/*@Scheduled (cron = "0/3 * * ? * *")
 	public void insertSqlToPostgres() {
 		dataBaseServices.insertSqlToPostgres();
-	}
+	}*/
 
 	/*metodo anterior, ahora estara el refactorizado
 	@PostMapping("obtenerMarcaciones/")
@@ -109,6 +109,12 @@ public class DataBaseontroller {
 	public ResponsesEntradaSalidaMarcacionDias consultarEntradaSalidaMarcacionPorDia(@RequestBody @Validated ConsultarAsistenciasDias body)
 	{
 		return dataBaseServices.consultarEntradaSalidaMarcacionPorDia(body);
+	}
+
+	@GetMapping("calculoHorasSuplementariasProduccionXPersona/")
+	public HorasSuplementariasPersonalResponses calculoHorasSuplementariasProduccionXPersona(@RequestParam String identificacion,@RequestParam  String empresa  )
+	{
+		return dataBaseServices.calculoHorasSuplementariasProduccionXPersona(identificacion,empresa);
 	}
 }
 	

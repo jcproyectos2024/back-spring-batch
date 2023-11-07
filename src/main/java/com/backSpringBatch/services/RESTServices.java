@@ -2,9 +2,12 @@ package com.backSpringBatch.services;
 
 import com.backSpringBatch.Util.ScheduleDTO;
 import com.backSpringBatch.postgres.models.PersonResponseS;
+import com.backSpringBatch.postgres.models.ResponsePeriodoActual;
 import com.backSpringBatch.postgres.models.ShedulePersonDto;
 import com.backSpringBatch.sqlserver.models.MarcacionesMongo;
 import com.backSpringBatch.sqlserver.models.ResponseMarcacionesMongo;
+import com.diosmar.LogProducer;
+import com.diosmar.Utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -18,6 +21,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 @Service
 public class RESTServices {
@@ -26,6 +30,9 @@ public class RESTServices {
 
     @Autowired
     Environment env;
+
+    @Autowired
+    LogProducer logProducer;
 
 
     public ShedulePersonDto getSchedulePerson(String identificacion)
@@ -114,5 +121,35 @@ public class RESTServices {
         return rootc;
     }
 
+    public ResponsePeriodoActual consultarPeriodoActual()
+    {
+        String ruta = env.getProperty("urlConsultarPeriodoActual");
+        ResponsePeriodoActual rootc=null;
+        try {
+            Response response = RestAssured.given()
+                    .headers(
+                            "Content-Type", ContentType.JSON, "Accept", ContentType.JSON)
+                    .contentType("application/json;charset=utf-8").when()
+                    .get(ruta)
+                    .then().extract().response();
+            rootc = response.getBody().as(ResponsePeriodoActual.class);
+        } catch (Exception ex)
+        {
+            logProducer.commit(
+                    Utils
+                            .LogProducerDefault()
+                            .methodName(Utils.currentMethodName())
+                            .className(Utils.currentClassName())
+                            .errorLine(Utils.errorLineNumber(ex,Utils.currentClassName()))
+                            .errorCode(ex.hashCode())
+                            .errorDescription(ex.getMessage())
+                            .toJson()
+            );
+            // TODO: handle exception
+            ex.printStackTrace();
+        }
+        return rootc;
+
+    }
 
 }

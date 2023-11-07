@@ -768,52 +768,6 @@ public class DataBaseServices {
 
 
 
-//*/public void simulatorMarcaciones (Boolean inicio) throws InterruptedException {
-//
-//if(inicio){
-//            String [] maracaciones = new String[5];
-//            maracaciones[0] ="002864";
-//            maracaciones[1] ="002865";
-//            maracaciones[2] ="002866";
-//            maracaciones[3] ="002867";
-//            maracaciones[4] ="002868";
-//
-//            String[] biometrico = new String[2];
-//            biometrico[0] = "192.168.9.102";
-//            biometrico[1]= "192.168.9.101";
-//
-//            String[] tipo = new String[2];
-//            tipo[0]= "INGRESO";
-//            tipo[1]= "SALIDA";
-//
-//
-//            while(1==1) {
-//                AsistNowSql sql = new AsistNowSql();
-//                String id = maracaciones[(1 + new Random().nextInt(4))];
-//                String zona = biometrico[(1 + new Random().nextInt(1))];
-//                String tip = tipo[(1 + new Random().nextInt(1))];
-//
-//                AsistnowRegistroPK asispk = new AsistnowRegistroPK();
-//                asispk.setAsisId(id);
-//                asispk.setAsisIng(obtenergetdateNow());
-//                asispk.setAsisZona(zona);
-//
-//                sql.setId(asispk);
-//                sql.setAsisTipo(tip);
-//                sql.setAsisFecha(obtenergetdateNow());
-//                sql.setAsisHora(getHourNow());
-//                sql.setAsisRes("OK");
-//
-//                asistNowSqlRepository.save(sql);
-//                System.out.println("Resultado"+" "+sql);
-//
-//                Thread.sleep(3000);
-//                ;
-//            }
-//
-//
-//        }
-//}
 
 
 
@@ -873,7 +827,7 @@ public class DataBaseServices {
         HorasSuplementariasPersonalResponses response = new HorasSuplementariasPersonalResponses();
 
 
-       List<AsistNow>  asistNowList =postGresRepository.findByElementByFechasEmpresa(fechaIni,fechaFin,identificacion,empresa,Sort.by(Sort.Direction.ASC,"id.asisIng"));
+       List<AsistNow>  asistNowList =postGresRepository.findByElementByFechasEmpresa(fechaIni,fechaFin,identificacion,empresa,"GARITA" ,Sort.by(Sort.Direction.ASC,"id.asisIng"));
 
 
 
@@ -1376,6 +1330,59 @@ public class DataBaseServices {
                             .className(Utils.currentClassName())
                             .errorLine(Utils.errorLineNumber(ex,Utils.currentClassName()))
                             .data(Utils.toJson(consultarAsistenciasDias))
+                            .errorCode(ex.hashCode())
+                            .errorDescription(ex.getMessage())
+                            .toJson()
+            );
+
+
+            // TODO: handle exception
+            response.setMensaje(ex.getMessage());
+            response.setSuccess(false);
+            return response;
+        }
+
+        return response;
+    }
+
+
+    public HorasSuplementariasPersonalResponses calculoHorasSuplementariasProduccionXPersona(String identificacion, String empresa )
+    {
+
+        HorasSuplementariasPersonalResponses response = new HorasSuplementariasPersonalResponses();
+        try
+        {
+            ResponsePeriodoActual periodoActual =restServices.consultarPeriodoActual();
+            String[] fechaPeriodo= utily.fechaPeriodoSplit(periodoActual.getPeriodoAsistencia());
+            PersonResponseS  personResponseS=   restServices.consultarPersonaTipoBiometricoCalculo(identificacion);
+            if (personResponseS.isSuccess())
+            {
+            Utils.console("personResponseS",Utils.toJson(personResponseS));
+            List<AsistNow>  asistNowList =postGresRepository.findByElementByFechasEmpresa(fechaPeriodo[0], fechaPeriodo[1],identificacion,utily.empresa(empresa),personResponseS.getTipoBiometricoCalculoDto()==null?"": personResponseS.getTipoBiometricoCalculoDto().getNombreBiometrico(), Sort.by(Sort.Direction.ASC,"id.asisIng"));
+            Utils.console("asistNowList",Utils.toJson(asistNowList));
+            if (!(personResponseS.getScheduleDTOList() ==null ?new ArrayList<>():personResponseS.getScheduleDTOList()).isEmpty())
+            {
+                List<ScheduleDTO>  scheduleDTOListFilter= personResponseS.getScheduleDTOList()==null? new ArrayList<>() :personResponseS.getScheduleDTOList().stream().filter(x->(x.getTurns().getNameTurns().equalsIgnoreCase("NOCTURNO"))).collect(Collectors.toList());
+                if (!scheduleDTOListFilter.isEmpty())
+                {
+                asistNowList.stream().forEach(regActual ->
+                {
+                    System.out.println("regActual"+regActual.getAsisHora());
+                });
+
+                }
+            }
+            }
+        }
+        catch (Exception ex)
+        {
+            logProducer.commit(
+                    Utils
+                            .LogProducerDefault()
+                            .methodName(Utils.currentMethodName())
+                            .className(Utils.currentClassName())
+                            .errorLine(Utils.errorLineNumber(ex,Utils.currentClassName()))
+                            .data(Utils.toJson(identificacion+"-"+empresa))
                             .errorCode(ex.hashCode())
                             .errorDescription(ex.getMessage())
                             .toJson()

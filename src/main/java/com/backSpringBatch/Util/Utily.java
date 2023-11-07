@@ -197,20 +197,7 @@ public class Utily {
         return empresa;
     }
 
-    public int randomSeisCifra ()
-    {
-        try
-        {
-            Random r = new Random();
-            int cantidad = r.nextInt(900000) + 100000;
-            return cantidad;
-        }
-        catch (Exception e)
-        {
-        }
 
-        return 0;
-    }
 
     public  Date convertirStringDate(String fecha)
     {
@@ -254,23 +241,14 @@ public class Utily {
 
     }
 
-
-
-    public  List<Date> recorrerDosRangosFechas(Date fechaInicio, Date fechaFin)
-    {
-        Calendar c1 = Calendar.getInstance();
-        c1.setTime(fechaInicio);
-        Calendar c2 = Calendar.getInstance();
-        c2.setTime(fechaFin);
-        List<Date> listaFechas = new ArrayList<>();
-        while (!c1.after(c2)) {
-            listaFechas.add(c1.getTime());
-            c1.add(Calendar.DAY_OF_MONTH, 1);
+    public String[] fechaPeriodoSplit(String periodo) {
+        try {
+            String[] horasMinutosSegundosSplit = periodo.split("_");
+            return horasMinutosSegundosSplit;
+        } catch (Exception e) {
+            return null;
         }
-        return listaFechas;
     }
-
-
 
 
 }
