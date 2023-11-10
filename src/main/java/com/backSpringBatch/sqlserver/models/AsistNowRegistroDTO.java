@@ -42,6 +42,7 @@ public class AsistNowRegistroDTO {
 
     private String fechaAccion;
 
+    private String usuario;
 
     public AsistNowRegistroDTO() {
     }
@@ -148,6 +149,14 @@ public class AsistNowRegistroDTO {
 
     public void setFechaAccion(String fechaAccion) {
         this.fechaAccion = fechaAccion;
+    }
+
+    public String getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(String usuario) {
+        this.usuario = usuario;
     }
 }
 

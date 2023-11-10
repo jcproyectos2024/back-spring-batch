@@ -13,6 +13,7 @@ import com.backSpringBatch.sqlserver.models.AsistNowRegistroDTO;
 import com.backSpringBatch.sqlserver.models.MarcacionesMongo;
 import com.backSpringBatch.sqlserver.models.ResponsesEntradaSalidaMarcacionDias;
 import com.backSpringBatch.sqlserver.repository.SQLRepository;
+import com.diosmar.GenericExceptionUtils;
 import com.diosmar.LogProducer;
 import com.diosmar.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -377,17 +378,7 @@ public class DataBaseServices {
         }catch (Exception ex)
         {
 
-            logProducer.commit(
-                    Utils
-                            .LogProducerDefault()
-                            .methodName(Utils.currentMethodName())
-                            .className(Utils.currentClassName())
-                            .errorLine(Utils.errorLineNumber(ex,Utils.currentClassName()))
-                            .errorCode(ex.hashCode())
-                            .errorDescription(ex.getMessage())
-                            .data(asistNowRegistroError[0])
-                            .toJson()
-            );
+            throw new GenericExceptionUtils(ex);
         }
     }
     
@@ -453,17 +444,7 @@ public class DataBaseServices {
         } catch (Exception ex)
         {
 
-            logProducer.commit(
-                    Utils
-                            .LogProducerDefault()
-                            .methodName(Utils.currentMethodName())
-                            .className(Utils.currentClassName())
-                            .errorLine(Utils.errorLineNumber(ex,Utils.currentClassName()))
-                            .data(Utils.toJson(searchMarcaDTO))
-                            .errorCode(ex.hashCode())
-                            .errorDescription(ex.getMessage())
-                            .toJson()
-            );
+            throw new GenericExceptionUtils(ex);
         }
 
 
@@ -519,17 +500,7 @@ public class DataBaseServices {
 
         } catch (Exception ex)
         {
-            logProducer.commit(
-                    Utils
-                            .LogProducerDefault()
-                            .methodName(Utils.currentMethodName())
-                            .className(Utils.currentClassName())
-                            .errorLine(Utils.errorLineNumber(ex,Utils.currentClassName()))
-                            .data(Utils.toJson(searchMarcaDTO))
-                            .errorCode(ex.hashCode())
-                            .errorDescription(ex.getMessage())
-                            .toJson()
-            );
+            throw new GenericExceptionUtils(ex);
         }
 
         return exit;
@@ -582,18 +553,7 @@ public class DataBaseServices {
             }
         } catch (Exception ex)
         {
-
-            logProducer.commit(
-                    Utils
-                            .LogProducerDefault()
-                            .methodName(Utils.currentMethodName())
-                            .className(Utils.currentClassName())
-                            .errorLine(Utils.errorLineNumber(ex,Utils.currentClassName()))
-                            .data(Utils.toJson(searchMarcaDTO))
-                            .errorCode(ex.hashCode())
-                            .errorDescription(ex.getMessage())
-                            .toJson()
-            );
+            throw new GenericExceptionUtils(ex);
         }
 
 
@@ -624,7 +584,6 @@ public class DataBaseServices {
     public SaveMantDTO justificacion(JustificacionDTO justDTO){
         
         SaveMantDTO exit = new SaveMantDTO();
-
         try
         {
             Atrasos atrasos = atrasosRepository.findByIdentificacionAndAndId_AsisIng(justDTO.getIdentificacion(),justDTO.getFechaIng());
@@ -640,17 +599,7 @@ public class DataBaseServices {
         } catch (Exception ex)
         {
 
-            logProducer.commit(
-                    Utils
-                            .LogProducerDefault()
-                            .methodName(Utils.currentMethodName())
-                            .className(Utils.currentClassName())
-                            .errorLine(Utils.errorLineNumber(ex,Utils.currentClassName()))
-                            .data(Utils.toJson(justDTO))
-                            .errorCode(ex.hashCode())
-                            .errorDescription(ex.getMessage())
-                            .toJson()
-            );
+            throw new GenericExceptionUtils(ex);
         }
 
         return exit;
@@ -670,20 +619,9 @@ public class DataBaseServices {
             return  horaGrupo;
     } catch (Exception ex)
     {
-
-        logProducer.commit(
-                Utils
-                        .LogProducerDefault()
-                        .methodName(Utils.currentMethodName())
-                        .className(Utils.currentClassName())
-                        .errorLine(Utils.errorLineNumber(ex,Utils.currentClassName()))
-                        .data(Utils.toJson(identificacion))
-                        .errorCode(ex.hashCode())
-                        .errorDescription(ex.getMessage())
-                        .toJson()
-        );
+        throw new GenericExceptionUtils(ex);
     }
-        return  null;
+        //return  null;
     }
 
 
@@ -735,40 +673,12 @@ public class DataBaseServices {
 		} catch (Exception ex)
         {
 
-            logProducer.commit(
-                    Utils
-                            .LogProducerDefault()
-                            .methodName(Utils.currentMethodName())
-                            .className(Utils.currentClassName())
-                            .errorLine(Utils.errorLineNumber(ex,Utils.currentClassName()))
-                            .errorCode(ex.hashCode())
-                            .errorDescription(ex.getMessage())
-                            .toJson()
-            );
 			exito=ex.getMessage();
 			// TODO: handle exception
+            throw new GenericExceptionUtils(ex);
 		}
 		return exito;
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     @Transactional
@@ -801,21 +711,10 @@ public class DataBaseServices {
         }catch (Exception ex)
         {
             // TODO: handle exception
-
-            logProducer.commit(
-                    Utils
-                            .LogProducerDefault()
-                            .methodName(Utils.currentMethodName())
-                            .className(Utils.currentClassName())
-                            .errorLine(Utils.errorLineNumber(ex,Utils.currentClassName()))
-                            .data(Utils.toJson(horasSuplementariasPersonalBody))
-                            .errorCode(ex.hashCode())
-                            .errorDescription(ex.getMessage())
-                            .toJson()
-            );
             response.setMensaje(ex.getMessage());
             response.setSuccess(false);
-            return response;
+           // return response;
+            throw new GenericExceptionUtils(ex);
         }
 
     }
@@ -1172,30 +1071,26 @@ public class DataBaseServices {
                 response.setSuccess(true);
                 return response;
             }
+            else {
+                response.setLsMarcacionesEntradaSalida(new ArrayList<>());
+                response.setTotalRegistrosEntradaSalidad(0);
+                response.setMensaje("No se encontro resultados");
+                response.setSuccess(false);
+                return response;
+
+            }
 
         }
         catch (Exception ex)
         {
-
-            logProducer.commit(
-                    Utils
-                            .LogProducerDefault()
-                            .methodName(Utils.currentMethodName())
-                            .className(Utils.currentClassName())
-                            .errorLine(Utils.errorLineNumber(ex,Utils.currentClassName()))
-                            .data(Utils.toJson(consultarEntradaSalida))
-                            .errorCode(ex.hashCode())
-                            .errorDescription(ex.getMessage())
-                            .toJson()
-            );
-
             // TODO: handle exception
             response.setMensaje(ex.getMessage());
             response.setSuccess(false);
-            return response;
+           // return response;
+            throw new GenericExceptionUtils(ex);
         }
 
-        return response;
+
     }
 
 
@@ -1225,29 +1120,19 @@ public class DataBaseServices {
                 response.setMessage("GUARDADO CON EXISTO");
                 response.setSuccess(true);
                 response.setRegistroMarcacionesDTO(marcacionesDTO);
-                guardadoHistorialMarcaciones(registroMarcacionesSave);
+                guardadoHistorialMarcaciones(registroMarcacionesDTO.getUsuario(),registroMarcacionesSave);
                 return response;
             }
 
         }
         catch (Exception ex)
         {
-            logProducer.commit(
-                    Utils
-                            .LogProducerDefault()
-                            .methodName(Utils.currentMethodName())
-                            .className(Utils.currentClassName())
-                            .errorLine(Utils.errorLineNumber(ex,Utils.currentClassName()))
-                            .data(Utils.toJson(registroMarcacionesDTO))
-                            .errorCode(ex.hashCode())
-                            .errorDescription(ex.getMessage())
-                            .toJson()
-            );
 
             // TODO: handle exception
             response.setMessage(ex.getMessage());
             response.setSuccess(false);
-            return response;
+          //  return response;
+            throw new GenericExceptionUtils(ex);
         }
 
 
@@ -1257,7 +1142,7 @@ public class DataBaseServices {
 
 
 
-    public RegistroMarcacionesResponses guardadoHistorialMarcaciones(AsistNow asistNow)
+    public RegistroMarcacionesResponses guardadoHistorialMarcaciones( String usuario ,AsistNow asistNow)
     {
         RegistroMarcacionesResponses response = new RegistroMarcacionesResponses();
 
@@ -1287,18 +1172,20 @@ public class DataBaseServices {
             historyAsistNowRDTO.setApellidos(asistNow.getApellidos());
             historyAsistNowRDTO.setFechaAccion(utily.convertirDateString(new Date()));
             historyAsistNowRDTO.setAccion("GUARDADO");
+            historyAsistNowRDTO.setUsuario(usuario);
             historyAsistNowRDTO.setFechaAccion(utily.convertirDateString(new Date()));
             asistNowRegistroDTOS.add(historyAsistNowRDTO);
             marcacionesMongo.setPayload(asistNowRegistroDTOS);
             restServices.saveMarcacionesMongo(marcacionesMongo);
 
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
             // TODO: handle exception
-            response.setMessage(e.getMessage());
+            response.setMessage(ex.getMessage());
             response.setSuccess(false);
-            return response;
+            //return response;
+            throw new GenericExceptionUtils(ex);
         }
 
 
@@ -1323,23 +1210,13 @@ public class DataBaseServices {
         }
         catch (Exception ex)
         {
-            logProducer.commit(
-                    Utils
-                            .LogProducerDefault()
-                            .methodName(Utils.currentMethodName())
-                            .className(Utils.currentClassName())
-                            .errorLine(Utils.errorLineNumber(ex,Utils.currentClassName()))
-                            .data(Utils.toJson(consultarAsistenciasDias))
-                            .errorCode(ex.hashCode())
-                            .errorDescription(ex.getMessage())
-                            .toJson()
-            );
 
 
             // TODO: handle exception
             response.setMensaje(ex.getMessage());
             response.setSuccess(false);
-            return response;
+           // return response;
+            throw new GenericExceptionUtils(ex);
         }
 
         return response;
@@ -1352,50 +1229,63 @@ public class DataBaseServices {
         HorasSuplementariasPersonalResponses response = new HorasSuplementariasPersonalResponses();
         try
         {
-            ResponsePeriodoActual periodoActual =restServices.consultarPeriodoActual();
+            List<PoliticasHorasSuple> lsPoliticas=politicasHorasSupleRepository.findByEstadoTrue();
+            ResponsePeriodoActual periodoActual=null;// =restServices.consultarPeriodoActual();
             String[] fechaPeriodo= utily.fechaPeriodoSplit(periodoActual.getPeriodoAsistencia());
             PersonResponseS  personResponseS=   restServices.consultarPersonaTipoBiometricoCalculo(identificacion);
             if (personResponseS.isSuccess())
             {
-            Utils.console("personResponseS",Utils.toJson(personResponseS));
-            List<AsistNow>  asistNowList =postGresRepository.findByElementByFechasEmpresa(fechaPeriodo[0], fechaPeriodo[1],identificacion,utily.empresa(empresa),personResponseS.getTipoBiometricoCalculoDto()==null?"": personResponseS.getTipoBiometricoCalculoDto().getNombreBiometrico(), Sort.by(Sort.Direction.ASC,"id.asisIng"));
-            Utils.console("asistNowList",Utils.toJson(asistNowList));
-            if (!(personResponseS.getScheduleDTOList() ==null ?new ArrayList<>():personResponseS.getScheduleDTOList()).isEmpty())
-            {
-                List<ScheduleDTO>  scheduleDTOListFilter= personResponseS.getScheduleDTOList()==null? new ArrayList<>() :personResponseS.getScheduleDTOList().stream().filter(x->(x.getTurns().getNameTurns().equalsIgnoreCase("NOCTURNO"))).collect(Collectors.toList());
-                if (!scheduleDTOListFilter.isEmpty())
+                Utils.console("personResponseS",Utils.toJson(personResponseS));
+                List<AsistNow>  asistNowList =postGresRepository.findByElementByFechasEmpresa(fechaPeriodo[0], fechaPeriodo[1],identificacion,utily.empresa(empresa),personResponseS.getTipoBiometricoCalculoDto()==null?"": personResponseS.getTipoBiometricoCalculoDto().getNombreBiometrico(), Sort.by(Sort.Direction.ASC,"id.asisIng"));
+                Utils.console("asistNowList",Utils.toJson(asistNowList));
+                ///Verificamos que tenga Horarios
+                if (!(personResponseS.getScheduleDTOList() ==null ?new ArrayList<>():personResponseS.getScheduleDTOList()).isEmpty())
                 {
-                asistNowList.stream().forEach(regActual ->
-                {
-                    System.out.println("regActual"+regActual.getAsisHora());
-                });
+                    ///Verificamos que tenga Horarios en un Turno NOCTURNO
+                    List<ScheduleDTO>  scheduleDTOListFilter= personResponseS.getScheduleDTOList()==null? new ArrayList<>() :personResponseS.getScheduleDTOList().stream().filter(x->(x.getTurns().getNameTurns().equalsIgnoreCase("NOCTURNO"))).collect(Collectors.toList());
+                    if (!scheduleDTOListFilter.isEmpty())
+                    {
+                        System.out.println("TIENE TURNO NOCTURNO--***--");
+                        asistNowList.stream().forEach(regActual ->
+                        {
+                            System.out.println("regActual--***--"+regActual.getAsisHora());
+                        });
 
+                    }
                 }
-            }
             }
         }
         catch (Exception ex)
         {
-            logProducer.commit(
-                    Utils
-                            .LogProducerDefault()
-                            .methodName(Utils.currentMethodName())
-                            .className(Utils.currentClassName())
-                            .errorLine(Utils.errorLineNumber(ex,Utils.currentClassName()))
-                            .data(Utils.toJson(identificacion+"-"+empresa))
-                            .errorCode(ex.hashCode())
-                            .errorDescription(ex.getMessage())
-                            .toJson()
-            );
-
-
+           // System.out.println("Exception"+ex.getMessage());
             // TODO: handle exception
             response.setMensaje(ex.getMessage());
             response.setSuccess(false);
-            return response;
+            //ex.getStackTrace();
+            // return response;
+            throw new GenericExceptionUtils(ex);
         }
 
         return response;
     }
 
+
+    public HorasSuplementariasPersonalResponses calculoHorasSuplementariasProduccion25Porciento(AsistNow asistNow,List<PoliticasHorasSuple> lsPoliticas)
+    {
+        HorasSuplementariasPersonalResponses response = new HorasSuplementariasPersonalResponses();
+        try
+        {
+
+        }
+        catch (Exception ex)
+        {
+            // TODO: handle exception
+            response.setMensaje(ex.getMessage());
+            response.setSuccess(false);
+           // return response;
+            throw new GenericExceptionUtils(ex);
+        }
+
+        return response;
+    }
 }

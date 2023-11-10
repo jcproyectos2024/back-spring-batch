@@ -6,6 +6,7 @@ import com.backSpringBatch.postgres.models.ResponsePeriodoActual;
 import com.backSpringBatch.postgres.models.ShedulePersonDto;
 import com.backSpringBatch.sqlserver.models.MarcacionesMongo;
 import com.backSpringBatch.sqlserver.models.ResponseMarcacionesMongo;
+import com.diosmar.GenericExceptionUtils;
 import com.diosmar.LogProducer;
 import com.diosmar.Utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -60,9 +61,10 @@ public class RESTServices {
           //  System.out.println("json"+response.getStatusCode());
             rootc = gson.fromJson(json, new TypeToken<ShedulePersonDto>() {
             }.getType());
-        } catch (Exception e) {
+        } catch (Exception ex) {
             // TODO: handle exception
-            e.printStackTrace();
+            ex.printStackTrace();
+            throw new GenericExceptionUtils(ex);
         }
         return rootc;
     }
@@ -88,9 +90,10 @@ public class RESTServices {
             Gson gson = new Gson();
             rootc = gson.fromJson(json, new TypeToken<PersonResponseS>() {
             }.getType());
-        } catch (Exception e) {
+        } catch (Exception ex) {
             // TODO: handle exception
-            e.printStackTrace();
+            ex.printStackTrace();
+            throw new GenericExceptionUtils(ex);
         }
         return rootc;
     }
@@ -114,9 +117,10 @@ public class RESTServices {
             String json = response.getBody().asString();
             ObjectMapper om = new ObjectMapper();
           //  rootc = om.readValue(json, ResponseMarcacionesMongo.class);
-        } catch (Exception e) {
+        } catch (Exception ex) {
             // TODO: handle exception
-            e.printStackTrace();
+            ex.printStackTrace();
+            throw new GenericExceptionUtils(ex);
         }
         return rootc;
     }
@@ -135,18 +139,9 @@ public class RESTServices {
             rootc = response.getBody().as(ResponsePeriodoActual.class);
         } catch (Exception ex)
         {
-            logProducer.commit(
-                    Utils
-                            .LogProducerDefault()
-                            .methodName(Utils.currentMethodName())
-                            .className(Utils.currentClassName())
-                            .errorLine(Utils.errorLineNumber(ex,Utils.currentClassName()))
-                            .errorCode(ex.hashCode())
-                            .errorDescription(ex.getMessage())
-                            .toJson()
-            );
             // TODO: handle exception
             ex.printStackTrace();
+            throw new GenericExceptionUtils(ex);
         }
         return rootc;
 

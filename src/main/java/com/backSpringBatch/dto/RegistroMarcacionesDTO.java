@@ -29,6 +29,8 @@ public class RegistroMarcacionesDTO implements Serializable
 
     private BiometricoDto biometrico;
 
+    private String usuario;
+
     public RegistroMarcacionesDTO() {
     }
 
@@ -89,5 +91,11 @@ public class RegistroMarcacionesDTO implements Serializable
         this.biometrico = biometrico;
     }
 
+    public String getUsuario() {
+        return usuario;
+    }
 
+    public void setUsuario(String usuario) {
+        this.usuario = usuario;
+    }
 }
