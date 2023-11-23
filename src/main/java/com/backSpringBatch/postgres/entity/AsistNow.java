@@ -8,7 +8,7 @@ import java.util.Date;
 
 @Entity
 @Table(name ="asistnow", schema = "marcaciones")
-public class AsistNow implements Serializable  {
+public class AsistNow implements Serializable {
 
 
     @EmbeddedId
@@ -26,22 +26,25 @@ public class AsistNow implements Serializable  {
     @Column(name = "asis_res")
     private String asisRes;
 
-    @Column (name = "nomina_cod")
+    @Column(name = "nomina_cod")
     private String identificacion;
 
 
-    @Column (name = "empresa")
+    @Column(name = "empresa")
     private String empresa;
 
-    @Column (name = "nomina_nom")
+    @Column(name = "nomina_nom")
     private String nombres;
 
-    @Column (name = "nomina_ape")
+    @Column(name = "nomina_ape")
     private String apellidos;
 
-   @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "asis_zona", referencedColumnName="ip_biometrico",  insertable = false, updatable = false)
-    private  Biometrico  biometrico;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "asis_zona", referencedColumnName = "ip_biometrico", insertable = false, updatable = false)
+    private Biometrico biometrico;
+
+    @Column (name = "asis_horas_suplementaria")
+    private Boolean asisHorasSuplementaria;
 
     public AsistnowPK getId() {
         return id;
@@ -121,6 +124,14 @@ public class AsistNow implements Serializable  {
 
     public void setApellidos(String apellidos) {
         this.apellidos = apellidos;
+    }
+
+    public Boolean getAsisHorasSuplementaria() {
+        return asisHorasSuplementaria;
+    }
+
+    public void setAsisHorasSuplementaria(Boolean asisHorasSuplementaria) {
+        this.asisHorasSuplementaria = asisHorasSuplementaria;
     }
 }
 

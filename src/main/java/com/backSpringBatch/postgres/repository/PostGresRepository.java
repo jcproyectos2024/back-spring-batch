@@ -2,14 +2,15 @@ package com.backSpringBatch.postgres.repository;
 
 
 import com.backSpringBatch.postgres.entity.AsistNow;
-import com.backSpringBatch.postgres.entity.AsistnowPK;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -76,15 +77,17 @@ public interface PostGresRepository extends JpaRepository<AsistNow, String> {
 
     @Query(nativeQuery=false, value="select an from AsistNow an  "
             + " where to_char(an.asisFecha,'yyyy-MM-dd') between :fechaIni  and :fechaFin "
-            + " and an.identificacion=:nominaCod "
-            + " and   an.empresa=:empresa and an.biometrico.nombreBiometrico=:nombreBiometrico   ORDER BY an.id.asisIng ASC ")
+          //  + " and an.identificacion=:nominaCod "
+            + " AND (:nominaCod IS NULL OR an.identificacion=:nominaCod)"
+            + " and   an.empresa=:empresa and an.biometrico.nombreBiometrico=:nombreBiometrico   ORDER BY an.identificacion ASC ,an.id.asisIng ASC ")
     List<AsistNow> listahoraEntradaBiometrico(String fechaIni, String fechaFin,String nominaCod, String nombreBiometrico , String empresa  );
 
 
 
     @Query(nativeQuery=false, value="select an from AsistNow an  "
             + " where to_char(an.asisFecha,'yyyy-MM-dd') between :fechaIni  and :fechaFin "
-            + " and an.identificacion=:nominaCod "
+           // + " and an.identificacion=:nominaCod " +
+           + " AND (:nominaCod IS NULL OR an.identificacion=:nominaCod)"
             + " and   an.empresa=:empresa and an.biometrico.nombreBiometrico=:nombreBiometrico and an.biometrico.tipoBiometrinco=:tipoBiometrinco ")
     List<AsistNow> listahoraSalidadBiometrico(String fechaIni, String fechaFin,String nominaCod, String nombreBiometrico, String tipoBiometrinco , String empresa  ,Sort sort);
 
@@ -99,5 +102,27 @@ public interface PostGresRepository extends JpaRepository<AsistNow, String> {
 
 
     Optional<AsistNow> findById_AsisIdAndId_AsisIngAndId_AsisZona(String asisId, Date asisIng, String asisZona );
+
+    @Query(nativeQuery=false, value="select an from AsistNow an  "
+            + " where to_char(an.asisFecha,'yyyy-MM-dd') between :fechaIni  and :fechaFin "
+            + " and an.identificacion=:nominaCod" +
+            "  AND an.asisHorasSuplementaria =:asisHorasSuplementaria"
+            + " and   an.empresa=:empresa and an.biometrico.nombreBiometrico=:nombreBiometrico and an.biometrico.tipoBiometrinco=:tipoBiometrinco ")
+    List<AsistNow> findAllByIdentificacionEntada(String fechaIni, String fechaFin, String nominaCod,String empresa, String nombreBiometrico , String tipoBiometrinco , boolean asisHorasSuplementaria, Sort sort);
+
+    @Query(nativeQuery=false, value="select an from AsistNow an  "
+            + " where to_char(an.asisFecha,'yyyy-MM-dd') between :fechaIni  and :fechaFin "
+            + " and an.identificacion=:nominaCod" +
+            "  AND an.asisHorasSuplementaria =:asisHorasSuplementaria"
+            + " and   an.empresa=:empresa and an.biometrico.nombreBiometrico=:nombreBiometrico and an.biometrico.tipoBiometrinco=:tipoBiometrinco ")
+    List<AsistNow> findAllByIdentificacionSalida(String fechaIni, String fechaFin, String nominaCod,String empresa, String nombreBiometrico , String tipoBiometrinco , boolean asisHorasSuplementaria, Sort sort);
+
+
+    @Modifying
+    @Query(nativeQuery = false, value = "update AsistNow asn set asn.asisHorasSuplementaria =:asisHorasSuplementaria" +
+            " where asn.identificacion=:identificacion AND asn.id.asisIng=:asisIng AND asn.asisTipo=:asisTipo ")
+    @Transactional
+    void updateHorasSuplementaria(@Param("identificacion") String identificacion,  @Param("asisIng") Date asisIng  , @Param("asisTipo") String asisTipo  , @Param("asisHorasSuplementaria") boolean asisHorasSuplementaria);
+
 }
 

@@ -1,10 +1,13 @@
 package com.backSpringBatch.Util;
 
+import com.diosmar.GenericExceptionUtils;
 import org.springframework.stereotype.Component;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Component
@@ -250,5 +253,35 @@ public class Utily {
         }
     }
 
+    public  Integer horasSplit(String horasMinutosSegundosEntradaNocturno)
+    {
+        try
+        {
+            String[] horasMinutosSegundosSplit = horasMinutosSegundosEntradaNocturno.split(":");
+            return  Integer.parseInt(horasMinutosSegundosSplit[0]);
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+    }
 
+    public String  sumarUnDia( String fechaOriginal)
+    {
+        String resultado="";
+        try
+        {
+            // Convertir la cadena de fecha a LocalDate
+            LocalDate fecha = LocalDate.parse(fechaOriginal);
+            // Restar un día
+            LocalDate fechaMenosUnDia = fecha.plusDays(1);
+            // Opción 2: Convertir a cadena con formato específico
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            return resultado = fechaMenosUnDia.format(formatter);
+        } catch (Exception ex)
+        {
+            throw new GenericExceptionUtils(ex);
+        }
+
+    }
 }

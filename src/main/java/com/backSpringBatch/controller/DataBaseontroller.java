@@ -112,7 +112,7 @@ public class DataBaseontroller {
 	}
 
 	@GetMapping("calculoHorasSuplementariasProduccionXPersona/")
-	public HorasSuplementariasPersonalResponses calculoHorasSuplementariasProduccionXPersona(@RequestParam String identificacion,@RequestParam  String empresa  )
+	public HorasSuplementariasPersonalResponses calculoHorasSuplementariasProduccionXPersona(@RequestParam String identificacion,@RequestParam  String empresa  ) throws Exception
 	{
 		return dataBaseServices.calculoHorasSuplementariasProduccionXPersona(identificacion,empresa);
 	}

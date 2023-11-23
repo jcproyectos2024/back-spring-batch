@@ -24,11 +24,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 
@@ -1026,7 +1024,8 @@ public class DataBaseServices {
         int cont = 0;
         try
         {
-
+           /* EmpresaResponse empresaResponse =restServices.findByEstadoEmpCodigoEmpresa(consultarEntradaSalida.getEmpresa());
+            consultarEntradaSalida.setEmpresa(empresaResponse.getSuccess()?empresaResponse.getEmpresaDTO().getEmpNombre():"");*/
             consultarEntradaSalida.setEmpresa(utily.empresa(consultarEntradaSalida.getEmpresa()));
 
             List<AsistNow> lsMarcacionesEntrada=postGresRepository.listahoraEntradaBiometrico(consultarEntradaSalida.getFechaInicio(),consultarEntradaSalida.getFechaFin(),consultarEntradaSalida.getIdentificacion(),consultarEntradaSalida.getBiometrico(),  consultarEntradaSalida.getEmpresa());
@@ -1115,6 +1114,7 @@ public class DataBaseServices {
                 registroMarcaciones.setAsisRes("OK");
                 registroMarcaciones.setAsisTipo(biometrico.getTipoBiometrinco());
                 registroMarcaciones.setAsisFecha(registroMarcacionesDTO.getAsisFecha());
+                registroMarcaciones.setAsisHorasSuplementaria(false);
                 AsistNow registroMarcacionesSave = postGresRepository.save(registroMarcaciones);
                 RegistroMarcacionesDTO marcacionesDTO = registroMarcacionesMapper.asistNowToRegistroMarcacionesDTO(registroMarcacionesSave);
                 response.setMessage("GUARDADO CON EXISTO");
@@ -1200,6 +1200,8 @@ public class DataBaseServices {
         ResponsesEntradaSalidaMarcacionDias response = new ResponsesEntradaSalidaMarcacionDias();
         try
         {
+           /* EmpresaResponse empresaResponse =restServices.findByEstadoEmpCodigoEmpresa(consultarAsistenciasDias.getEmpresa());
+            consultarAsistenciasDias.setEmpresa(empresaResponse.getSuccess()?empresaResponse.getEmpresaDTO().getEmpNombre():"");*/
             consultarAsistenciasDias.setEmpresa(utily.empresa(consultarAsistenciasDias.getEmpresa()));
             List<AsistNow> lsMarcacionesEntrada=postGresRepository.listaDiaAsistenciasBiometrico(consultarAsistenciasDias.getFechaInicio(),consultarAsistenciasDias.getFechaFin(),consultarAsistenciasDias.getIdentificacion(),"GARITA","INGRESO", consultarAsistenciasDias.getEmpresa());
             List<AsistNow> lsMarcacionesSalida=postGresRepository.listaDiaAsistenciasBiometrico(consultarAsistenciasDias.getFechaInicio(),consultarAsistenciasDias.getFechaFin(),consultarAsistenciasDias.getIdentificacion(),"GARITA","SALIDA", consultarAsistenciasDias.getEmpresa());
@@ -1222,21 +1224,24 @@ public class DataBaseServices {
         return response;
     }
 
-
-    public HorasSuplementariasPersonalResponses calculoHorasSuplementariasProduccionXPersona(String identificacion, String empresa )
+    @Transactional(rollbackFor = {RuntimeException.class})
+    public HorasSuplementariasPersonalResponses calculoHorasSuplementariasProduccionXPersona(String identificacion, String empresa ) throws Exception
     {
 
         HorasSuplementariasPersonalResponses response = new HorasSuplementariasPersonalResponses();
         try
         {
+          /*  EmpresaResponse empresaResponse =restServices.findByEstadoEmpCodigoEmpresa(empresa);*/
+
             List<PoliticasHorasSuple> lsPoliticas=politicasHorasSupleRepository.findByEstadoTrue();
-            ResponsePeriodoActual periodoActual=null;// =restServices.consultarPeriodoActual();
+            ResponsePeriodoActual periodoActual =restServices.consultarPeriodoActual();
+            Utils.console("periodoActual",Utils.toJson(periodoActual));
             String[] fechaPeriodo= utily.fechaPeriodoSplit(periodoActual.getPeriodoAsistencia());
             PersonResponseS  personResponseS=   restServices.consultarPersonaTipoBiometricoCalculo(identificacion);
             if (personResponseS.isSuccess())
             {
                 Utils.console("personResponseS",Utils.toJson(personResponseS));
-                List<AsistNow>  asistNowList =postGresRepository.findByElementByFechasEmpresa(fechaPeriodo[0], fechaPeriodo[1],identificacion,utily.empresa(empresa),personResponseS.getTipoBiometricoCalculoDto()==null?"": personResponseS.getTipoBiometricoCalculoDto().getNombreBiometrico(), Sort.by(Sort.Direction.ASC,"id.asisIng"));
+                List<AsistNow>  asistNowList =postGresRepository.findAllByIdentificacionEntada(fechaPeriodo[0],fechaPeriodo[1],identificacion,/*empresaResponse.getSuccess()?empresaResponse.getEmpresaDTO().getEmpNombre():""*/utily.empresa(empresa),personResponseS.getTipoBiometricoCalculoDto()==null?"": personResponseS.getTipoBiometricoCalculoDto().getNombreBiometrico(),"INGRESO",false, Sort.by(Sort.Direction.ASC,"id.asisIng"));
                 Utils.console("asistNowList",Utils.toJson(asistNowList));
                 ///Verificamos que tenga Horarios
                 if (!(personResponseS.getScheduleDTOList() ==null ?new ArrayList<>():personResponseS.getScheduleDTOList()).isEmpty())
@@ -1245,10 +1250,15 @@ public class DataBaseServices {
                     List<ScheduleDTO>  scheduleDTOListFilter= personResponseS.getScheduleDTOList()==null? new ArrayList<>() :personResponseS.getScheduleDTOList().stream().filter(x->(x.getTurns().getNameTurns().equalsIgnoreCase("NOCTURNO"))).collect(Collectors.toList());
                     if (!scheduleDTOListFilter.isEmpty())
                     {
-                        System.out.println("TIENE TURNO NOCTURNO--***--");
-                        asistNowList.stream().forEach(regActual ->
+                        System.out.println("TIENE TURNO NOCTURNO--**........**--");
+                        //Filtramos las Horas de Salidad que sea en Jornada Nocturna >=16
+                        List<AsistNow>  asistNowListFilter= asistNowList==null? new ArrayList<>() :asistNowList.stream().filter(c->((utily.horasSplit(c.getAsisHora()))>=16)).collect(Collectors.toList());
+                        Utils.console("asistNowListFilter",Utils.toJson(asistNowListFilter));
+                        asistNowListFilter.stream().forEach(regActual ->
                         {
-                            System.out.println("regActual--***--"+regActual.getAsisHora());
+                            System.out.println("regActual--***-ENTRADA-"+regActual.getAsisFecha()  +"-----"+regActual.getAsisHora());
+                            calculoHorasSuplementariasProduccion25Porciento(regActual,lsPoliticas,utily.empresa(empresa)/*empresaResponse.getSuccess()?empresaResponse.getEmpresaDTO().getEmpNombre():""*/,personResponseS.getTipoBiometricoCalculoDto()==null?"": personResponseS.getTipoBiometricoCalculoDto().getNombreBiometrico());
+                           // postGresRepository.updateHorasSuplementaria(regActual.getIdentificacion(),regActual.getId().getAsisIng(),regActual.getAsisTipo(),true);
                         });
 
                     }
@@ -1257,11 +1267,11 @@ public class DataBaseServices {
         }
         catch (Exception ex)
         {
-           // System.out.println("Exception"+ex.getMessage());
+            System.out.println("Exception"+ex.getMessage());
             // TODO: handle exception
             response.setMensaje(ex.getMessage());
             response.setSuccess(false);
-            //ex.getStackTrace();
+            ex.getStackTrace();
             // return response;
             throw new GenericExceptionUtils(ex);
         }
@@ -1270,11 +1280,20 @@ public class DataBaseServices {
     }
 
 
-    public HorasSuplementariasPersonalResponses calculoHorasSuplementariasProduccion25Porciento(AsistNow asistNow,List<PoliticasHorasSuple> lsPoliticas)
+    public HorasSuplementariasPersonalResponses calculoHorasSuplementariasProduccion25Porciento(AsistNow asistNow,List<PoliticasHorasSuple> lsPoliticas,String empresa ,String  nombreBiometrico)
     {
         HorasSuplementariasPersonalResponses response = new HorasSuplementariasPersonalResponses();
         try
         {
+
+           String fechaMasUnDias=utily.sumarUnDia(utily.convertirDateStringSinHhMnSs(asistNow.getId().getAsisIng()));
+          //  String fechaMasUnDias=utily.sumarUnDia("2023-10-31");
+            System.out.println("fechaMasUnDias"+fechaMasUnDias);
+            List<AsistNow>  asistNowList =postGresRepository.findAllByIdentificacionSalida(fechaMasUnDias,fechaMasUnDias,asistNow.getIdentificacion(),empresa,nombreBiometrico,"SALIDA",false, Sort.by(Sort.Direction.ASC,"id.asisIng"));
+            if (!(asistNowList==null?new ArrayList<>():asistNowList).isEmpty())
+            {
+                Utils.console("asistNowList +regActual--***-SALIDAD-", Utils.toJson(asistNowList));
+            }
 
         }
         catch (Exception ex)

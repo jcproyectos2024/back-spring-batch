@@ -1,6 +1,6 @@
 package com.backSpringBatch.services;
 
-import com.backSpringBatch.Util.ScheduleDTO;
+import com.backSpringBatch.postgres.models.EmpresaResponse;
 import com.backSpringBatch.postgres.models.PersonResponseS;
 import com.backSpringBatch.postgres.models.ResponsePeriodoActual;
 import com.backSpringBatch.postgres.models.ShedulePersonDto;
@@ -18,11 +18,6 @@ import io.restassured.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Map;
 
 @Service
 public class RESTServices {
@@ -137,6 +132,30 @@ public class RESTServices {
                     .get(ruta)
                     .then().extract().response();
             rootc = response.getBody().as(ResponsePeriodoActual.class);
+        } catch (Exception ex)
+        {
+            // TODO: handle exception
+            ex.printStackTrace();
+            throw new GenericExceptionUtils(ex);
+        }
+        return rootc;
+
+    }
+
+    public EmpresaResponse findByEstadoEmpCodigoEmpresa(String empCodigo)
+    {
+        String ruta = env.getProperty("urlFindByEstadoEmpCodigoEmpresa");
+        ruta+="?empCodigo="+empCodigo;
+        EmpresaResponse rootc=null;
+        try {
+            Response response = RestAssured.given()
+                    .headers(
+                            "Content-Type", ContentType.JSON, "Accept", ContentType.JSON)
+                    .contentType("application/json;charset=utf-8").when()
+                    .get(ruta)
+                    .then().extract().response();
+            rootc = response.getBody().as(EmpresaResponse.class);
+            Utils.console("findByEstadoEmpCodigoEmpresa",Utils.toJson(rootc));
         } catch (Exception ex)
         {
             // TODO: handle exception
