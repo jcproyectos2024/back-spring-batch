@@ -903,7 +903,7 @@ public class DataBaseServices {
                     if (!lsMarcacionesEntrada.isEmpty() && !lsMarcacionesSalida.isEmpty() )
                     {
                         //calcular total de horas trabajadas
-                        String  totalHorasTrabajadas= utily.calculaDiferencia(utily.convertirDateString(lsMarcacionesSalida.get(0).getId().getAsisIng()) ,utily.convertirDateString(lsMarcacionesEntrada.get(0).getId().getAsisIng()));
+                        String  totalHorasTrabajadas= utily.horasTrabajadas(utily.convertirDateString(lsMarcacionesSalida.get(0).getId().getAsisIng()) ,utily.convertirDateString(lsMarcacionesEntrada.get(0).getId().getAsisIng()));
                         String[]  totalHorasTrabajadasSplit= utily.horasMinutosSegundosSplit(totalHorasTrabajadas);
                         String horasTrabajadasSplit = totalHorasTrabajadasSplit[0];
                         String minutosTrabajadasSplit = totalHorasTrabajadasSplit[1];
@@ -935,12 +935,12 @@ public class DataBaseServices {
                         //System.out.println(fechaSinHhMnSs+" "+totalHorasTrabajadas);
                         String horasTrabajadas =fechaSinHhMnSs+" "+totalHorasTrabajadas;
                         String horasHaTrabajadas =fechaSinHhMnSs+" "+personResponseS.getTipoBiometricoCalculoDto().getHoraTrabajada();
-                        String diferenciaHorasTrabajadas =utily.calculaDiferencia(horasTrabajadas,horasHaTrabajadas);
+                        String diferenciaHorasTrabajadas =utily.horasTrabajadas(horasTrabajadas,horasHaTrabajadas);
                         // me queda 2:0:0 horas despues de haber cumpñidos mis 9.5 horas traabajadas
                         //tomo la hora de salida de la marcacion 07:00:00 y le restro las  2:00:00 para saber ah que hora culmino sus 9.5 poder calcular
                         //las horas suplemetarias
                         String diferenciaHorasTrabajadasHhMmSS =fechaSinHhMnSs+" "+diferenciaHorasTrabajadas;
-                       String horaMinutosSegundo100= utily.calculaDiferencia(utily.convertirDateString(lsMarcacionesSalida.get(0).getId().getAsisIng()),diferenciaHorasTrabajadasHhMmSS);
+                       String horaMinutosSegundo100= utily.horasTrabajadas(utily.convertirDateString(lsMarcacionesSalida.get(0).getId().getAsisIng()),diferenciaHorasTrabajadasHhMmSS);
                         String[]  horaMinutosSegundo100Split= utily.horasMinutosSegundosSplit(horaMinutosSegundo100);
                         String horasTrabajadas100Split = horaMinutosSegundo100Split[0];
                         String minutosTrabajadas100Split = horaMinutosSegundo100Split[1];
@@ -959,7 +959,7 @@ public class DataBaseServices {
                             }
 
                             String rangoHoraFinal100 =fechaSinHhMnSs+" "+lsPoliticasFilter100.get(0).getRangoHoraFinal();
-                             horasGeneral100= utily.calculaDiferencia(rangoHoraFinal100,horaMinutosSegundo100);
+                             horasGeneral100= utily.horasTrabajadas(rangoHoraFinal100,horaMinutosSegundo100);
                            // System.out.println("horasGeneral100"+horasGeneral100);
                             Integer horasPaso=utily.horasMilisegundosGeneral(horasGeneral100);
 
@@ -972,7 +972,7 @@ public class DataBaseServices {
 
 
                         String diferenciaHorasTrabajadasHhMmS50 =fechaSinHhMnSs+" "+horasGeneral100;
-                        String horaMinutosSegundo50= utily.calculaDiferencia(utily.convertirDateString(lsMarcacionesSalida.get(0).getId().getAsisIng()),diferenciaHorasTrabajadasHhMmS50);
+                        String horaMinutosSegundo50= utily.horasTrabajadas(utily.convertirDateString(lsMarcacionesSalida.get(0).getId().getAsisIng()),diferenciaHorasTrabajadasHhMmS50);
                         String[]  horaMinutosSegundo50Split= utily.horasMinutosSegundosSplit(horaMinutosSegundo50);
                         String horasTrabajadas50Split = horaMinutosSegundo50Split[0];
                         String minutosTrabajadas50Split = horaMinutosSegundo50Split[1];
@@ -990,7 +990,7 @@ public class DataBaseServices {
                             }
 
                             String rangoHoraFinal50 =fechaSinHhMnSs+" "+lsPoliticasFilter50.get(0).getRangoHoraFinal();
-                            String horasGeneral50= utily.calculaDiferencia(rangoHoraFinal50,horaMinutosSegundo50);
+                            String horasGeneral50= utily.horasTrabajadas(rangoHoraFinal50,horaMinutosSegundo50);
                             Integer horasPaso=utily.horasMilisegundosGeneral(horasGeneral50);
 
                             horaPersonal.setHoras(horaPersonal.getHoras()+horasPaso);
@@ -1257,7 +1257,7 @@ public class DataBaseServices {
                         asistNowListFilter.stream().forEach(regActual ->
                         {
                             System.out.println("regActual--***-ENTRADA-"+regActual.getAsisFecha()  +"-----"+regActual.getAsisHora());
-                            calculoHorasSuplementariasProduccion25Porciento(regActual,lsPoliticas,utily.empresa(empresa)/*empresaResponse.getSuccess()?empresaResponse.getEmpresaDTO().getEmpNombre():""*/,personResponseS.getTipoBiometricoCalculoDto()==null?"": personResponseS.getTipoBiometricoCalculoDto().getNombreBiometrico());
+                            calculoHorasSuplementariasProduccion25Porciento(scheduleDTOListFilter ,regActual,lsPoliticas,utily.empresa(empresa)/*empresaResponse.getSuccess()?empresaResponse.getEmpresaDTO().getEmpNombre():""*/,personResponseS.getTipoBiometricoCalculoDto()==null?"": personResponseS.getTipoBiometricoCalculoDto().getNombreBiometrico());
                            // postGresRepository.updateHorasSuplementaria(regActual.getIdentificacion(),regActual.getId().getAsisIng(),regActual.getAsisTipo(),true);
                         });
 
@@ -1280,18 +1280,40 @@ public class DataBaseServices {
     }
 
 
-    public HorasSuplementariasPersonalResponses calculoHorasSuplementariasProduccion25Porciento(AsistNow asistNow,List<PoliticasHorasSuple> lsPoliticas,String empresa ,String  nombreBiometrico)
+    public HorasSuplementariasPersonalResponses calculoHorasSuplementariasProduccion25Porciento( List<ScheduleDTO>  scheduleDTOListFilter ,AsistNow asistNow,List<PoliticasHorasSuple> lsPoliticas,String empresa ,String  nombreBiometrico)
     {
         HorasSuplementariasPersonalResponses response = new HorasSuplementariasPersonalResponses();
         try
         {
 
+            //HORARIO
+            Utils.console("scheduleDTOListFilter", Utils.toJson(scheduleDTOListFilter));
+            Utils.console("stringSplit", Utils.toJson(utily.stringSplit(scheduleDTOListFilter.get(0).getNameSchedule().replaceAll(" ",""),"-")));
+            String[] horarioNocturno=utily.stringSplit(scheduleDTOListFilter.get(0).getNameSchedule().replaceAll(" ",""),"-");
            String fechaMasUnDias=utily.sumarUnDia(utily.convertirDateStringSinHhMnSs(asistNow.getId().getAsisIng()));
           //  String fechaMasUnDias=utily.sumarUnDia("2023-10-31");
             System.out.println("fechaMasUnDias"+fechaMasUnDias);
             List<AsistNow>  asistNowList =postGresRepository.findAllByIdentificacionSalida(fechaMasUnDias,fechaMasUnDias,asistNow.getIdentificacion(),empresa,nombreBiometrico,"SALIDA",false, Sort.by(Sort.Direction.ASC,"id.asisIng"));
             if (!(asistNowList==null?new ArrayList<>():asistNowList).isEmpty())
             {
+                System.out.println("horarioNocturno[0]"+horarioNocturno[0]);
+                System.out.println("horarioNocturno[1]"+horarioNocturno[1]);
+                System.out.println("asistNowList.get(0).getAsisHora()"+asistNow.getAsisHora());
+                boolean marcacionAtiempo =utily.validarEntradaAtrasada(horarioNocturno[0],horarioNocturno[1],asistNow.getAsisHora());
+                if (marcacionAtiempo)
+                {
+                    System.out.println("marcacionAtiempo");
+                    // 1) Si la marcacion de entrada esta atiempo significa que vamos a tomar el inicio de su
+                    // jornada desde el horario-turno (la hora de entrada) 19:30:00 y su hora de salida para saber cuantas hora trabajo
+                    String totalHorasTrabajadas=utily.horasTrabajadas(utily.convertirDateStringSinHhMnSs(asistNow.getAsisFecha())+" "+horarioNocturno[0],utily.convertirDateStringSinHhMnSs(asistNowList.get(0).getAsisFecha())+" "+horarioNocturno[1]);
+                    String[]  totalHorasTrabajadasSplit= utily.horasMinutosSegundosSplit(totalHorasTrabajadas);
+                    String horasTrabajadasSplit = totalHorasTrabajadasSplit[0];
+                    String minutosTrabajadasSplit = totalHorasTrabajadasSplit[1];
+                    String segundosTrabajadasSplit = totalHorasTrabajadasSplit[2];
+                    int horasTrabajadas =Integer.valueOf(horasTrabajadasSplit)-1;
+                    System.out.println("horasTrabajadas"+horasTrabajadas);
+
+                }
                 Utils.console("asistNowList +regActual--***-SALIDAD-", Utils.toJson(asistNowList));
             }
 

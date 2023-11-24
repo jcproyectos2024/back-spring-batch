@@ -9,7 +9,8 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-
+import java.time.LocalTime;
+import java.time.Duration;
 @Component
 public class Utily {
 
@@ -142,23 +143,24 @@ public class Utily {
    }
     
 
-   public String calculaDiferencia(String fechaMayor, String fechaMenor){
+   public String horasTrabajadas(String fechaMayor, String fechaMenor){
 
-
+        System.out.println("fechaMayor"+fechaMayor);
+       System.out.println("fechaMenor"+fechaMenor);
        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
        String horasMinutosSegundos = null;
        try
        {
-           java.util.Date now = df.parse(fechaMayor);
-           java.util.Date date=df.parse( fechaMenor);/*NO ME ANDE HACKEANDO*/
+           java.util.Date now = df.parse(fechaMenor);
+           java.util.Date date=df.parse( fechaMayor);/*NO ME ANDE HACKEANDO*/
            long l=now.getTime()-date.getTime();
            long day=l/(24*60*60*1000);
            long hour=(l/(60*60*1000)-day*24);
            long min=((l/(60*1000))-day*24*60-hour*60);
            long s=(l/1000-day*24*60*60-hour*60*60-min*60);
            horasMinutosSegundos= hour+":"+min+":"+s;
-          // System.out.println ("  DIAS:" +day + "   HORAS:" +hour + "  MINUTOS:" + min + "   SEGUNDOS:" + s + "");
+          System.out.println ("  DIAS:" +day + "   HORAS:" +hour + "  MINUTOS:" + min + "   SEGUNDOS:" + s + "");
        }
        catch (Exception e)
        {
@@ -282,6 +284,52 @@ public class Utily {
         {
             throw new GenericExceptionUtils(ex);
         }
-
     }
+    public boolean validarEntradaAtrasada(String horarioEntrada ,String horarioSalida ,String marcaEntrada)
+    {
+        boolean marcacionAtiempo=false;
+       // String horarioEntrada = "19:30:00";
+        //String horarioSalida = "05:00:00";
+        // Ejemplo de marca de entrada
+        //String marcaEntrada = "17:30:00";
+        // Puedes cambiar la marca de entrada para probar diferentes escenarios
+        // String marcaEntrada = "20:30:00";
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+
+        try {
+            Date horaEntrada = sdf.parse(horarioEntrada);
+           // Date horaSalida = sdf.parse(horarioSalida);
+            Date marca = sdf.parse(marcaEntrada);
+
+            if (marca.before(horaEntrada))
+            {
+                System.out.println("El empleado está marcando antes de su horario de entrada.");
+                marcacionAtiempo=true;
+            } else if
+                //(marca.after(horaEntrada) && marca.before(horaSalida)) {
+            (marca.equals(horaEntrada)) {
+                System.out.println("El empleado está marcando en el horario correcto.");
+                marcacionAtiempo=true;
+            } else {
+                System.out.println("El empleado está marcando después de su horario de entrada.");
+                marcacionAtiempo=false;
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return  marcacionAtiempo;
+    }
+    public  String[] stringSplit(String string ,String split)
+    {
+        try
+        {
+            String[] stringSplit = string.split(split);
+            return  stringSplit;
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+    }
+
 }
