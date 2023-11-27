@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
@@ -679,14 +680,16 @@ public class DataBaseServices {
 	}
 
 
-    @Transactional
+    @Transactional(rollbackFor = {RuntimeException.class})
     public HorasSuplementariasPersonalResponses findAllByHorasSuplementariasPersonal(HorasSuplementariasPersonalBody  horasSuplementariasPersonalBody )
     {
         HorasSuplementariasPersonalResponses response = new HorasSuplementariasPersonalResponses();
         //Comienza a calcular las horas suplementariasProduccion Fijas
-        //calculoHorasSuplementariasProduccion(horasSuplementariasPersonalBody.getFechaIni(),horasSuplementariasPersonalBody.getFechaFin(),horasSuplementariasPersonalBody.getIdentificacion(),horasSuplementariasPersonalBody.getEmpresa());
+       // calculoHorasSuplementariasProduccion(horasSuplementariasPersonalBody.getFechaIni(),horasSuplementariasPersonalBody.getFechaFin(),horasSuplementariasPersonalBody.getIdentificacion(),horasSuplementariasPersonalBody.getEmpresa());
+        System.out.println("findAllByHorasSuplementariasPersonal ---- horasSuplementariasPersonalBody.getEmpresa()"+horasSuplementariasPersonalBody.getEmpresa());
+        EmpresaResponse empresaResponse =restServices.findByEstadoEmpCodigoEmpresa(horasSuplementariasPersonalBody.getEmpresa());
         try {
-
+            calculoHorasSuplementariasProduccionXPersona(horasSuplementariasPersonalBody.getIdentificacion(),empresaResponse.getSuccess()?empresaResponse.getEmpresaDTO().getEmpNombre():"");
             List<HorasSuplementariasPersonal> horasSuplementariasPersonalList = horasSuplementariasPersonalRepository.findAllByEstadoTrueAndIdentificacion(horasSuplementariasPersonalBody.getIdentificacion());
             List<HorasSuplementariasPersonalDto>  horasSuplementariasPersonalDtoList = horasSuplementariasPersonalMapper.toHorasSuplementariasPersonalDtoList(horasSuplementariasPersonalList);
             if (horasSuplementariasPersonalDtoList.isEmpty())
@@ -798,7 +801,7 @@ public class DataBaseServices {
                                 {
                                     PoliticasHorasSuple polHoras=lsPoliticas.get(i);
 
-                                    HorasSuplementariasPersonal horaPersonal=horasSuplementariasPersonalRepository.findByIdentificacionAndEstadoTrueAndPorcentaje(regActual.getIdentificacion(),polHoras.getPorcentaje());
+                                    HorasSuplementariasPersonal horaPersonal=horasSuplementariasPersonalRepository.findByIdentificacionAndEstadoTrueAndPorcentajeAndPeriodo(regActual.getIdentificacion(),polHoras.getPorcentaje(),"");
                                     if(horaPersonal==null)
                                     {
                                         horaPersonal=new HorasSuplementariasPersonal();
@@ -914,7 +917,7 @@ public class DataBaseServices {
                           List<PoliticasHorasSuple>  lsPoliticasFilter25=lsPoliticas.stream().filter(x->(x.getPorcentaje()==25)).collect(Collectors.toList());
                          // System.out.println("lsPoliticasFilter25"+lsPoliticasFilter25.get(0));
 
-                          HorasSuplementariasPersonal horaPersonal=horasSuplementariasPersonalRepository.findByIdentificacionAndEstadoTrueAndPorcentaje(asistNow.getIdentificacion(),lsPoliticasFilter25.get(0).getPorcentaje());
+                          HorasSuplementariasPersonal horaPersonal=horasSuplementariasPersonalRepository.findByIdentificacionAndEstadoTrueAndPorcentajeAndPeriodo(asistNow.getIdentificacion(),lsPoliticasFilter25.get(0).getPorcentaje(),"");
                           if(horaPersonal==null)
                           {
                               horaPersonal=new HorasSuplementariasPersonal();
@@ -951,7 +954,7 @@ public class DataBaseServices {
                         {
                             List<PoliticasHorasSuple>  lsPoliticasFilter100=lsPoliticas.stream().filter(x->(x.getPorcentaje()==100)).collect(Collectors.toList());
 
-                            HorasSuplementariasPersonal horaPersonal=horasSuplementariasPersonalRepository.findByIdentificacionAndEstadoTrueAndPorcentaje(asistNow.getIdentificacion(),lsPoliticasFilter100.get(0).getPorcentaje());
+                            HorasSuplementariasPersonal horaPersonal=horasSuplementariasPersonalRepository.findByIdentificacionAndEstadoTrueAndPorcentajeAndPeriodo(asistNow.getIdentificacion(),lsPoliticasFilter100.get(0).getPorcentaje(),"");
                             if(horaPersonal==null)
                             {
                                 horaPersonal=new HorasSuplementariasPersonal();
@@ -982,7 +985,7 @@ public class DataBaseServices {
                         {
                             List<PoliticasHorasSuple>  lsPoliticasFilter50=lsPoliticas.stream().filter(x->(x.getPorcentaje()==50)).collect(Collectors.toList());
 
-                            HorasSuplementariasPersonal horaPersonal=horasSuplementariasPersonalRepository.findByIdentificacionAndEstadoTrueAndPorcentaje(asistNow.getIdentificacion(),lsPoliticasFilter50.get(0).getPorcentaje());
+                            HorasSuplementariasPersonal horaPersonal=horasSuplementariasPersonalRepository.findByIdentificacionAndEstadoTrueAndPorcentajeAndPeriodo(asistNow.getIdentificacion(),lsPoliticasFilter50.get(0).getPorcentaje(),"");
                             if(horaPersonal==null)
                             {
                                 horaPersonal=new HorasSuplementariasPersonal();
@@ -1024,9 +1027,9 @@ public class DataBaseServices {
         int cont = 0;
         try
         {
-           /* EmpresaResponse empresaResponse =restServices.findByEstadoEmpCodigoEmpresa(consultarEntradaSalida.getEmpresa());
-            consultarEntradaSalida.setEmpresa(empresaResponse.getSuccess()?empresaResponse.getEmpresaDTO().getEmpNombre():"");*/
-            consultarEntradaSalida.setEmpresa(utily.empresa(consultarEntradaSalida.getEmpresa()));
+            EmpresaResponse empresaResponse =restServices.findByEstadoEmpCodigoEmpresa(consultarEntradaSalida.getEmpresa());
+            consultarEntradaSalida.setEmpresa(empresaResponse.getSuccess()?empresaResponse.getEmpresaDTO().getEmpNombre():"");
+            //consultarEntradaSalida.setEmpresa(utily.empresa(consultarEntradaSalida.getEmpresa()));
 
             List<AsistNow> lsMarcacionesEntrada=postGresRepository.listahoraEntradaBiometrico(consultarEntradaSalida.getFechaInicio(),consultarEntradaSalida.getFechaFin(),consultarEntradaSalida.getIdentificacion(),consultarEntradaSalida.getBiometrico(),  consultarEntradaSalida.getEmpresa());
             if (!lsMarcacionesEntrada.isEmpty() )
@@ -1200,9 +1203,9 @@ public class DataBaseServices {
         ResponsesEntradaSalidaMarcacionDias response = new ResponsesEntradaSalidaMarcacionDias();
         try
         {
-           /* EmpresaResponse empresaResponse =restServices.findByEstadoEmpCodigoEmpresa(consultarAsistenciasDias.getEmpresa());
-            consultarAsistenciasDias.setEmpresa(empresaResponse.getSuccess()?empresaResponse.getEmpresaDTO().getEmpNombre():"");*/
-            consultarAsistenciasDias.setEmpresa(utily.empresa(consultarAsistenciasDias.getEmpresa()));
+            EmpresaResponse empresaResponse =restServices.findByEstadoEmpCodigoEmpresa(consultarAsistenciasDias.getEmpresa());
+            consultarAsistenciasDias.setEmpresa(empresaResponse.getSuccess()?empresaResponse.getEmpresaDTO().getEmpNombre():"");
+           // consultarAsistenciasDias.setEmpresa(utily.empresa(consultarAsistenciasDias.getEmpresa()));
             List<AsistNow> lsMarcacionesEntrada=postGresRepository.listaDiaAsistenciasBiometrico(consultarAsistenciasDias.getFechaInicio(),consultarAsistenciasDias.getFechaFin(),consultarAsistenciasDias.getIdentificacion(),"GARITA","INGRESO", consultarAsistenciasDias.getEmpresa());
             List<AsistNow> lsMarcacionesSalida=postGresRepository.listaDiaAsistenciasBiometrico(consultarAsistenciasDias.getFechaInicio(),consultarAsistenciasDias.getFechaFin(),consultarAsistenciasDias.getIdentificacion(),"GARITA","SALIDA", consultarAsistenciasDias.getEmpresa());
             response.setLsMarcacionesEntrada(lsMarcacionesEntrada);
@@ -1231,8 +1234,6 @@ public class DataBaseServices {
         HorasSuplementariasPersonalResponses response = new HorasSuplementariasPersonalResponses();
         try
         {
-          /*  EmpresaResponse empresaResponse =restServices.findByEstadoEmpCodigoEmpresa(empresa);*/
-
             List<PoliticasHorasSuple> lsPoliticas=politicasHorasSupleRepository.findByEstadoTrue();
             ResponsePeriodoActual periodoActual =restServices.consultarPeriodoActual();
             Utils.console("periodoActual",Utils.toJson(periodoActual));
@@ -1241,7 +1242,20 @@ public class DataBaseServices {
             if (personResponseS.isSuccess())
             {
                 Utils.console("personResponseS",Utils.toJson(personResponseS));
-                List<AsistNow>  asistNowList =postGresRepository.findAllByIdentificacionEntada(fechaPeriodo[0],fechaPeriodo[1],identificacion,/*empresaResponse.getSuccess()?empresaResponse.getEmpresaDTO().getEmpNombre():""*/utily.empresa(empresa),personResponseS.getTipoBiometricoCalculoDto()==null?"": personResponseS.getTipoBiometricoCalculoDto().getNombreBiometrico(),"INGRESO",false, Sort.by(Sort.Direction.ASC,"id.asisIng"));
+                List<AsistNow>  listaSinDuplicados =postGresRepository.findAllByIdentificacionEntada(fechaPeriodo[0],fechaPeriodo[1],identificacion,empresa,personResponseS.getTipoBiometricoCalculoDto()==null?"": personResponseS.getTipoBiometricoCalculoDto().getNombreBiometrico(),"INGRESO",false, Sort.by(Sort.Direction.ASC,"id.asisIng"));
+                //asistNowList.stream().distinct();
+                //List<AsistNow>  asistNowListfilterd =asistNowList.stream().filter(x->(x.getAsisFecha()==x.getAsisFecha())).collect(Collectors.toList());
+               /// asistNowList.stream().distinct().collect(Collectors.toList());
+                //asistNowListfilterd.removeIf(x->x.getAsisFecha()==x.getAsisFecha());
+                List<AsistNow> asistNowList = listaSinDuplicados.stream()
+                        .collect(Collectors.toMap(
+                                AsistNow::getAsisFecha,  // Clave: asisFecha
+                                Function.identity(),
+                                (existente, reemplazo) -> existente
+                        ))
+                        .values()
+                        .stream()
+                        .collect(Collectors.toList());
                 Utils.console("asistNowList",Utils.toJson(asistNowList));
                 ///Verificamos que tenga Horarios
                 if (!(personResponseS.getScheduleDTOList() ==null ?new ArrayList<>():personResponseS.getScheduleDTOList()).isEmpty())
@@ -1257,8 +1271,8 @@ public class DataBaseServices {
                         asistNowListFilter.stream().forEach(regActual ->
                         {
                             System.out.println("regActual--***-ENTRADA-"+regActual.getAsisFecha()  +"-----"+regActual.getAsisHora());
-                            calculoHorasSuplementariasProduccion25Porciento(scheduleDTOListFilter ,regActual,lsPoliticas,utily.empresa(empresa)/*empresaResponse.getSuccess()?empresaResponse.getEmpresaDTO().getEmpNombre():""*/,personResponseS.getTipoBiometricoCalculoDto()==null?"": personResponseS.getTipoBiometricoCalculoDto().getNombreBiometrico());
-                           // postGresRepository.updateHorasSuplementaria(regActual.getIdentificacion(),regActual.getId().getAsisIng(),regActual.getAsisTipo(),true);
+                            calculoHorasSuplementariasProduccion25Porciento( periodoActual.getPeriodoAsistencia() ,scheduleDTOListFilter ,regActual,lsPoliticas,empresa,personResponseS.getTipoBiometricoCalculoDto()==null?"": personResponseS.getTipoBiometricoCalculoDto().getNombreBiometrico());
+                            postGresRepository.updateHorasSuplementaria(regActual.getIdentificacion(),regActual.getId().getAsisIng(),regActual.getAsisTipo(),true);
                         });
 
                     }
@@ -1279,8 +1293,8 @@ public class DataBaseServices {
         return response;
     }
 
-
-    public HorasSuplementariasPersonalResponses calculoHorasSuplementariasProduccion25Porciento( List<ScheduleDTO>  scheduleDTOListFilter ,AsistNow asistNow,List<PoliticasHorasSuple> lsPoliticas,String empresa ,String  nombreBiometrico)
+    @Transactional(rollbackFor = {RuntimeException.class})
+    public HorasSuplementariasPersonalResponses calculoHorasSuplementariasProduccion25Porciento( String periodoActual,List<ScheduleDTO>  scheduleDTOListFilter ,AsistNow asistNow,List<PoliticasHorasSuple> lsPoliticas,String empresa ,String  nombreBiometrico)
     {
         HorasSuplementariasPersonalResponses response = new HorasSuplementariasPersonalResponses();
         try
@@ -1297,24 +1311,97 @@ public class DataBaseServices {
             if (!(asistNowList==null?new ArrayList<>():asistNowList).isEmpty())
             {
                 System.out.println("horarioNocturno[0]"+horarioNocturno[0]);
+                System.out.println("entrada"+asistNow.getAsisHora());
+                boolean marcacionAtiempo =utily.validarEntradaAtrasada(horarioNocturno[0],asistNow.getAsisHora());
                 System.out.println("horarioNocturno[1]"+horarioNocturno[1]);
-                System.out.println("asistNowList.get(0).getAsisHora()"+asistNow.getAsisHora());
-                boolean marcacionAtiempo =utily.validarEntradaAtrasada(horarioNocturno[0],horarioNocturno[1],asistNow.getAsisHora());
-                if (marcacionAtiempo)
-                {
-                    System.out.println("marcacionAtiempo");
-                    // 1) Si la marcacion de entrada esta atiempo significa que vamos a tomar el inicio de su
+                System.out.println("salida "+asistNowList.get(0).getAsisHora());
+                boolean marcacionSalida = utily.validarSalidaAnteDelHorario(horarioNocturno[1],asistNowList.get(0).getAsisHora());
+               // if (marcacionAtiempo && marcacionSalida)
+               // {
+                    List<PoliticasHorasSuple>  lsPoliticasFilter25=lsPoliticas.stream().filter(x->(x.getTipo().equalsIgnoreCase("horas suplementarias 25"))).collect(Collectors.toList());
+                   List<PoliticasHorasSuple>  lsPoliticasFilter100=lsPoliticas.stream().filter(x->(x.getTipo().equalsIgnoreCase("horas suplementarias 100"))).collect(Collectors.toList());
+                List<PoliticasHorasSuple>  lsPoliticasFilter50=lsPoliticas.stream().filter(x->(x.getTipo().equalsIgnoreCase("horas suplementarias 50"))).collect(Collectors.toList());
+
+                // 1) Si la marcacion de entrada esta atiempo significa que vamos a tomar el inicio de su
                     // jornada desde el horario-turno (la hora de entrada) 19:30:00 y su hora de salida para saber cuantas hora trabajo
-                    String totalHorasTrabajadas=utily.horasTrabajadas(utily.convertirDateStringSinHhMnSs(asistNow.getAsisFecha())+" "+horarioNocturno[0],utily.convertirDateStringSinHhMnSs(asistNowList.get(0).getAsisFecha())+" "+horarioNocturno[1]);
-                    String[]  totalHorasTrabajadasSplit= utily.horasMinutosSegundosSplit(totalHorasTrabajadas);
-                    String horasTrabajadasSplit = totalHorasTrabajadasSplit[0];
-                    String minutosTrabajadasSplit = totalHorasTrabajadasSplit[1];
-                    String segundosTrabajadasSplit = totalHorasTrabajadasSplit[2];
-                    int horasTrabajadas =Integer.valueOf(horasTrabajadasSplit)-1;
-                    System.out.println("horasTrabajadas"+horasTrabajadas);
+                    //String totalHorasTrabajadas=utily.horasTrabajadas(utily.convertirDateStringSinHhMnSs(asistNow.getAsisFecha())+" "+horarioNocturno[0],utily.convertirDateStringSinHhMnSs(asistNowList.get(0).getAsisFecha())+" "+lsPoliticasFilter25.get(0).getRangoHoraFinal());
+                    //String totalHorasTrabajadas=utily.horasTrabajadas(utily.convertirDateString(asistNow.getId().getAsisIng()),utily.convertirDateStringSinHhMnSs(asistNowList.get(0).getAsisFecha())+" "+lsPoliticasFilter25.get(0).getRangoHoraFinal());
+                    //String totalHorasTrabajadas=utily.horasTrabajadas(marcacionAtiempo?utily.convertirDateStringSinHhMnSs(asistNow.getAsisFecha())+" "+horarioNocturno[0]:utily.convertirDateString(asistNow.getId().getAsisIng()),utily.convertirDateString(asistNowList.get(0).getId().getAsisIng()));
+
+
+                  //  Object[] salida= utily.nuevesHorasMediaTrabajadas(marcacionAtiempo?utily.convertirDateStringSinHhMnSs(asistNow.getAsisFecha())+" "+horarioNocturno[0]:utily.convertirDateString(asistNow.getId().getAsisIng()),utily.convertirDateString(asistNowList.get(0).getId().getAsisIng()));
+               //Object[] salida= utily.nuevesHorasMediaTrabajadas(utily.convertirDateStringSinHhMnSs(asistNow.getAsisFecha())+" "+horarioNocturno[0],utily.convertirDateString(asistNowList.get(0).getId().getAsisIng()));
+                    Object[] salida= utily.nuevesHorasMediaTrabajadas(utily.convertirDateStringSinHhMnSs(asistNow.getAsisFecha())+" "+lsPoliticasFilter25.get(0).getRangoHoraInicial(),utily.convertirDateStringSinHhMnSs(asistNowList.get(0).getAsisFecha())+" "+lsPoliticasFilter25.get(0).getRangoHoraFinal());
+                Utils.console("salida --Object", Utils.toJson(salida));
+                   // System.out.println("totalHorasTrabajadas"+totalHorasTrabajadas);
+                    //String totalHorasTrabajadasReales= utily.restarHoras(totalHorasTrabajadas,"01:30:00");
+                boolean nuevesHorasMediaTrabajadas = Boolean.valueOf(salida[1].toString());
+               // String nuevesHorasMediaTraba = salida[0].toString();
+                String nuevesHorasMediaTraba = utily.convertirDateStringSinHhMnSs(asistNowList.get(0).getAsisFecha())+" "+lsPoliticasFilter25.get(0).getRangoHoraFinal();
+                if (nuevesHorasMediaTrabajadas)
+                {
+                    HorasSuplementariasPersonal horaPersonal=horasSuplementariasPersonalRepository.findByIdentificacionAndEstadoTrueAndTipoAndPeriodo(asistNow.getIdentificacion(),lsPoliticasFilter25.get(0).getTipo(),periodoActual);
+                    if(horaPersonal==null)
+                    {
+                        horaPersonal=new HorasSuplementariasPersonal();
+                        horaPersonal.setIdentificacion(asistNow.getIdentificacion());
+                        horaPersonal.setPeriodo(periodoActual);
+                        horaPersonal.setTipo(lsPoliticasFilter25.get(0).getTipo());
+                    }
+                    Integer horasPaso= (int) utily.convertirHorasAMilisegundos("08:00:00");
+                    horaPersonal.setHoras(horaPersonal.getHoras()+horasPaso);
+                    horaPersonal.setPorcentaje(lsPoliticasFilter25.get(0).getPorcentaje());
+                    horasSuplementariasPersonalRepository.save(horaPersonal);
+                    String[] hora5 =utily.convertirStringFechaHMS(nuevesHorasMediaTraba);
+                    Utils.console("hora5 --Object", Utils.toJson(hora5));
+                    String[] hora05 =utily.stringSplit(lsPoliticasFilter100.get(0).getRangoHoraInicial(),":");
+                    Utils.console("hora05 --Object", Utils.toJson(hora05));
+                    String horasMinutosSegundos="";
+                    if (hora5[0].equalsIgnoreCase(hora05[0]))
+                    {
+                         horasMinutosSegundos =utily.horasTrabajadas(nuevesHorasMediaTraba,utily.convertirDateStringSinHhMnSs(asistNowList.get(0).getAsisFecha())+" "+lsPoliticasFilter100.get(0).getRangoHoraFinal());
+                        System.out.println("horasMinutosSegundos"+horasMinutosSegundos);
+                        HorasSuplementariasPersonal horaPersonal100=horasSuplementariasPersonalRepository.findByIdentificacionAndEstadoTrueAndTipoAndPeriodo(asistNow.getIdentificacion(),lsPoliticasFilter100.get(0).getTipo(),periodoActual);
+                        if(horaPersonal100==null)
+                        {
+                            horaPersonal100=new HorasSuplementariasPersonal();
+                            horaPersonal100.setIdentificacion(asistNow.getIdentificacion());
+                            horaPersonal100.setPeriodo(periodoActual);
+                            horaPersonal100.setTipo(lsPoliticasFilter100.get(0).getTipo());
+                        }
+                        Integer horasPaso100= (int) utily.convertirHorasAMilisegundos(horasMinutosSegundos);
+                        horaPersonal100.setHoras(horaPersonal100.getHoras()+horasPaso100);
+                        horaPersonal100.setPorcentaje(lsPoliticasFilter100.get(0).getPorcentaje());
+                        horasSuplementariasPersonalRepository.save(horaPersonal100);
+                    }
+                   String sumarHoras6= utily.sumarHoras(nuevesHorasMediaTraba,horasMinutosSegundos);
+                    String[] hora6 =utily.convertirStringFechaHMS(sumarHoras6);
+                    String[] hora06 =utily.stringSplit(lsPoliticasFilter50.get(0).getRangoHoraInicial(),":");
+
+                    if (hora6[0].equalsIgnoreCase(hora06[0]))
+                    {
+                       String horasMinutosSegundos6 =utily.horasTrabajadas(sumarHoras6,utily.convertirDateStringSinHhMnSs(asistNowList.get(0).getAsisFecha())+" "+lsPoliticasFilter50.get(0).getRangoHoraFinal());
+                        System.out.println("horasMinutosSegundos"+horasMinutosSegundos6);
+                        HorasSuplementariasPersonal horaPersonal50=horasSuplementariasPersonalRepository.findByIdentificacionAndEstadoTrueAndTipoAndPeriodo(asistNow.getIdentificacion(),lsPoliticasFilter50.get(0).getTipo(),periodoActual);
+                        if(horaPersonal50==null)
+                        {
+                            horaPersonal50=new HorasSuplementariasPersonal();
+                            horaPersonal50.setIdentificacion(asistNow.getIdentificacion());
+                            horaPersonal50.setPeriodo(periodoActual);
+                            horaPersonal50.setTipo(lsPoliticasFilter50.get(0).getTipo());
+                        }
+                        Integer horasPaso100= (int) utily.convertirHorasAMilisegundos(horasMinutosSegundos6);
+                        horaPersonal50.setHoras(horaPersonal50.getHoras()+horasPaso100);
+                        horaPersonal50.setPorcentaje(lsPoliticasFilter50.get(0).getPorcentaje());
+                        horasSuplementariasPersonalRepository.save(horaPersonal50);
+                    }
 
                 }
+
+
+               // }
                 Utils.console("asistNowList +regActual--***-SALIDAD-", Utils.toJson(asistNowList));
+                postGresRepository.updateHorasSuplementaria(asistNowList.get(0).getIdentificacion(),asistNowList.get(0).getId().getAsisIng(),asistNowList.get(0).getAsisTipo(),true);
             }
 
         }
@@ -1324,6 +1411,121 @@ public class DataBaseServices {
             response.setMensaje(ex.getMessage());
             response.setSuccess(false);
            // return response;
+            throw new GenericExceptionUtils(ex);
+        }
+
+        return response;
+    }
+
+
+
+    @Transactional(rollbackFor = {RuntimeException.class})
+    public HorasSuplementariasPersonalResponses calculoHorasSuplementariasProduccion25Porciento2( String periodoActual,List<ScheduleDTO>  scheduleDTOListFilter ,AsistNow asistNow,List<PoliticasHorasSuple> lsPoliticas,String empresa ,String  nombreBiometrico)
+    {
+        HorasSuplementariasPersonalResponses response = new HorasSuplementariasPersonalResponses();
+        try
+        {
+
+            //HORARIO
+            String[] horarioNocturno=utily.stringSplit(scheduleDTOListFilter.get(0).getNameSchedule().replaceAll(" ",""),"-");
+            String fechaMasUnDias=utily.sumarUnDia(utily.convertirDateStringSinHhMnSs(asistNow.getId().getAsisIng()));
+            System.out.println("fechaMasUnDias"+fechaMasUnDias);
+            List<AsistNow>  asistNowList =postGresRepository.findAllByIdentificacionSalida(fechaMasUnDias,fechaMasUnDias,asistNow.getIdentificacion(),empresa,nombreBiometrico,"SALIDA",false, Sort.by(Sort.Direction.ASC,"id.asisIng"));
+            if (!(asistNowList==null?new ArrayList<>():asistNowList).isEmpty())
+            {
+                System.out.println("horarioNocturno[0]"+horarioNocturno[0]);
+                System.out.println("entrada"+asistNow.getAsisHora());
+              //  boolean marcacionAtiempo =utily.validarEntradaAtrasada(horarioNocturno[0],asistNow.getAsisHora());
+                System.out.println("horarioNocturno[1]"+horarioNocturno[1]);
+                System.out.println("salida "+asistNowList.get(0).getAsisHora());
+              //  boolean marcacionSalida = utily.validarSalidaAnteDelHorario(horarioNocturno[1],asistNowList.get(0).getAsisHora());
+                List<PoliticasHorasSuple>  lsPoliticasFilter25=lsPoliticas.stream().filter(x->(x.getTipo().equalsIgnoreCase("horas suplementarias 25"))).collect(Collectors.toList());
+                List<PoliticasHorasSuple>  lsPoliticasFilter100=lsPoliticas.stream().filter(x->(x.getTipo().equalsIgnoreCase("horas suplementarias 100"))).collect(Collectors.toList());
+                List<PoliticasHorasSuple>  lsPoliticasFilter50=lsPoliticas.stream().filter(x->(x.getTipo().equalsIgnoreCase("horas suplementarias 50"))).collect(Collectors.toList());
+
+                // 1) Si la marcacion de entrada esta atiempo significa que vamos a tomar el inicio de su
+                // jornada desde el horario-turno (la hora de entrada) 19:30:00 y su hora de salida para saber cuantas hora trabajo
+                //String totalHorasTrabajadas=utily.horasTrabajadas(utily.convertirDateStringSinHhMnSs(asistNow.getAsisFecha())+" "+horarioNocturno[0],utily.convertirDateStringSinHhMnSs(asistNowList.get(0).getAsisFecha())+" "+lsPoliticasFilter25.get(0).getRangoHoraFinal());
+                //String totalHorasTrabajadas=utily.horasTrabajadas(utily.convertirDateString(asistNow.getId().getAsisIng()),utily.convertirDateStringSinHhMnSs(asistNowList.get(0).getAsisFecha())+" "+lsPoliticasFilter25.get(0).getRangoHoraFinal());
+                //String totalHorasTrabajadas=utily.horasTrabajadas(marcacionAtiempo?utily.convertirDateStringSinHhMnSs(asistNow.getAsisFecha())+" "+horarioNocturno[0]:utily.convertirDateString(asistNow.getId().getAsisIng()),utily.convertirDateString(asistNowList.get(0).getId().getAsisIng()));
+                //  Object[] salida= utily.nuevesHorasMediaTrabajadas(marcacionAtiempo?utily.convertirDateStringSinHhMnSs(asistNow.getAsisFecha())+" "+horarioNocturno[0]:utily.convertirDateString(asistNow.getId().getAsisIng()),utily.convertirDateString(asistNowList.get(0).getId().getAsisIng()));
+                //Object[] salida= utily.nuevesHorasMediaTrabajadas(utily.convertirDateStringSinHhMnSs(asistNow.getAsisFecha())+" "+horarioNocturno[0],utily.convertirDateString(asistNowList.get(0).getId().getAsisIng()));
+                Object[] salida= utily.nuevesHorasMediaTrabajadas(utily.convertirDateStringSinHhMnSs(asistNow.getAsisFecha())+" "+lsPoliticasFilter25.get(0).getRangoHoraInicial(),utily.convertirDateStringSinHhMnSs(asistNowList.get(0).getAsisFecha())+" "+lsPoliticasFilter25.get(0).getRangoHoraFinal());
+                Utils.console("salida --Object", Utils.toJson(salida));
+                // System.out.println("totalHorasTrabajadas"+totalHorasTrabajadas);
+                //String totalHorasTrabajadasReales= utily.restarHoras(totalHorasTrabajadas,"01:30:00");
+                boolean nuevesHorasMediaTrabajadas = Boolean.valueOf(salida[1].toString());
+                String nuevesHorasMediaTraba = utily.convertirDateStringSinHhMnSs(asistNowList.get(0).getAsisFecha())+" "+lsPoliticasFilter25.get(0).getRangoHoraFinal();
+                if (nuevesHorasMediaTrabajadas)
+                {
+                    HorasSuplementariasPersonal horaPersonal=horasSuplementariasPersonalRepository.findByIdentificacionAndEstadoTrueAndTipoAndPeriodo(asistNow.getIdentificacion(),lsPoliticasFilter25.get(0).getTipo(),periodoActual);
+                    if(horaPersonal==null)
+                    {
+                        horaPersonal=new HorasSuplementariasPersonal();
+                        horaPersonal.setIdentificacion(asistNow.getIdentificacion());
+                        horaPersonal.setPeriodo(periodoActual);
+                        horaPersonal.setTipo(lsPoliticasFilter25.get(0).getTipo());
+                    }
+                    Integer horasPaso= (int) utily.convertirHorasAMilisegundos("08:00:00");
+                    horaPersonal.setHoras(horaPersonal.getHoras()+horasPaso);
+                    horaPersonal.setPorcentaje(lsPoliticasFilter25.get(0).getPorcentaje());
+                    horasSuplementariasPersonalRepository.save(horaPersonal);
+                    String[] hora5 =utily.convertirStringFechaHMS(nuevesHorasMediaTraba);
+                    Utils.console("hora5 --Object", Utils.toJson(hora5));
+                    String[] hora05 =utily.stringSplit(lsPoliticasFilter100.get(0).getRangoHoraInicial(),":");
+                    Utils.console("hora05 --Object", Utils.toJson(hora05));
+                    String horasMinutosSegundos="";
+                    if (hora5[0].equalsIgnoreCase(hora05[0]))
+                    {
+                        horasMinutosSegundos =utily.horasTrabajadas(nuevesHorasMediaTraba,utily.convertirDateStringSinHhMnSs(asistNowList.get(0).getAsisFecha())+" "+lsPoliticasFilter100.get(0).getRangoHoraFinal());
+                        System.out.println("horasMinutosSegundos"+horasMinutosSegundos);
+                        HorasSuplementariasPersonal horaPersonal100=horasSuplementariasPersonalRepository.findByIdentificacionAndEstadoTrueAndTipoAndPeriodo(asistNow.getIdentificacion(),lsPoliticasFilter100.get(0).getTipo(),periodoActual);
+                        if(horaPersonal100==null)
+                        {
+                            horaPersonal100=new HorasSuplementariasPersonal();
+                            horaPersonal100.setIdentificacion(asistNow.getIdentificacion());
+                            horaPersonal100.setPeriodo(periodoActual);
+                            horaPersonal100.setTipo(lsPoliticasFilter100.get(0).getTipo());
+                        }
+                        Integer horasPaso100= (int) utily.convertirHorasAMilisegundos(horasMinutosSegundos);
+                        horaPersonal100.setHoras(horaPersonal100.getHoras()+horasPaso100);
+                        horaPersonal100.setPorcentaje(lsPoliticasFilter100.get(0).getPorcentaje());
+                        horasSuplementariasPersonalRepository.save(horaPersonal100);
+                    }
+                    String sumarHoras6= utily.sumarHoras(nuevesHorasMediaTraba,horasMinutosSegundos);
+                    String[] hora6 =utily.convertirStringFechaHMS(sumarHoras6);
+                    String[] hora06 =utily.stringSplit(lsPoliticasFilter50.get(0).getRangoHoraInicial(),":");
+
+                    if (hora6[0].equalsIgnoreCase(hora06[0]))
+                    {
+                        String horasMinutosSegundos6 =utily.horasTrabajadas(sumarHoras6,utily.convertirDateStringSinHhMnSs(asistNowList.get(0).getAsisFecha())+" "+lsPoliticasFilter50.get(0).getRangoHoraFinal());
+                        System.out.println("horasMinutosSegundos"+horasMinutosSegundos6);
+                        HorasSuplementariasPersonal horaPersonal50=horasSuplementariasPersonalRepository.findByIdentificacionAndEstadoTrueAndTipoAndPeriodo(asistNow.getIdentificacion(),lsPoliticasFilter50.get(0).getTipo(),periodoActual);
+                        if(horaPersonal50==null)
+                        {
+                            horaPersonal50=new HorasSuplementariasPersonal();
+                            horaPersonal50.setIdentificacion(asistNow.getIdentificacion());
+                            horaPersonal50.setPeriodo(periodoActual);
+                            horaPersonal50.setTipo(lsPoliticasFilter50.get(0).getTipo());
+                        }
+                        Integer horasPaso100= (int) utily.convertirHorasAMilisegundos(horasMinutosSegundos6);
+                        horaPersonal50.setHoras(horaPersonal50.getHoras()+horasPaso100);
+                        horaPersonal50.setPorcentaje(lsPoliticasFilter50.get(0).getPorcentaje());
+                        horasSuplementariasPersonalRepository.save(horaPersonal50);
+                    }
+
+                }
+                Utils.console("asistNowList +regActual--***-SALIDAD-", Utils.toJson(asistNowList));
+                postGresRepository.updateHorasSuplementaria(asistNowList.get(0).getIdentificacion(),asistNowList.get(0).getId().getAsisIng(),asistNowList.get(0).getAsisTipo(),true);
+            }
+
+        }
+        catch (Exception ex)
+        {
+            // TODO: handle exception
+            response.setMensaje(ex.getMessage());
+            response.setSuccess(false);
+            // return response;
             throw new GenericExceptionUtils(ex);
         }
 

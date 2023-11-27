@@ -10,12 +10,14 @@ import java.util.List;
 @Repository
 public interface HorasSuplementariasPersonalRepository extends JpaRepository <HorasSuplementariasPersonal, String> {
 
-	HorasSuplementariasPersonal findByIdentificacionAndEstadoTrueAndPorcentaje(String identificacion, Double porcentaje);
+	HorasSuplementariasPersonal findByIdentificacionAndEstadoTrueAndPorcentajeAndPeriodo(String identificacion, Double porcentaje,String periodo);
 
 
 	List<HorasSuplementariasPersonal> findAllByEstadoTrue();
 
 	List<HorasSuplementariasPersonal> findAllByEstadoTrueAndIdentificacion(String identificacion);
+
+	HorasSuplementariasPersonal findByIdentificacionAndEstadoTrueAndTipoAndPeriodo(String identificacion, String tipo,String periodo);
 
 
 }

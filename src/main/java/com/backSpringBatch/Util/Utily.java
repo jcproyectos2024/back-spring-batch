@@ -4,9 +4,11 @@ import com.diosmar.GenericExceptionUtils;
 import org.springframework.stereotype.Component;
 
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.time.LocalTime;
@@ -141,33 +143,28 @@ public class Utily {
         return fh;
 
    }
-    
 
-   public String horasTrabajadas(String fechaMayor, String fechaMenor){
 
-        System.out.println("fechaMayor"+fechaMayor);
-       System.out.println("fechaMenor"+fechaMenor);
-       DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-       String horasMinutosSegundos = null;
-       try
-       {
-           java.util.Date now = df.parse(fechaMenor);
-           java.util.Date date=df.parse( fechaMayor);/*NO ME ANDE HACKEANDO*/
-           long l=now.getTime()-date.getTime();
-           long day=l/(24*60*60*1000);
-           long hour=(l/(60*60*1000)-day*24);
-           long min=((l/(60*1000))-day*24*60-hour*60);
-           long s=(l/1000-day*24*60*60-hour*60*60-min*60);
-           horasMinutosSegundos= hour+":"+min+":"+s;
-          System.out.println ("  DIAS:" +day + "   HORAS:" +hour + "  MINUTOS:" + min + "   SEGUNDOS:" + s + "");
-       }
-       catch (Exception e)
-       {
-
-       }
-       return horasMinutosSegundos;
-   }
+    public  String horasTrabajadas(String fechaMayor, String fechaMenor) {
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String horasMinutosSegundos = "00:00:00";
+        try {
+            Date now = df.parse(fechaMenor);
+            Date date = df.parse(fechaMayor);
+            long l = now.getTime() - date.getTime();
+            long day = l / (24 * 60 * 60 * 1000);
+            long hour = (l / (60 * 60 * 1000) - day * 24);
+            long min = ((l / (60 * 1000)) - day * 24 * 60 - hour * 60);
+            long s = (l / 1000 - day * 24 * 60 * 60 - hour * 60 * 60 - min * 60);
+            DecimalFormat dfFormat = new DecimalFormat("00");
+            horasMinutosSegundos = dfFormat.format(hour) + ":" + dfFormat.format(min) + ":" + dfFormat.format(s);
+           // System.out.println("horasMinutosSegundos"+horasMinutosSegundos);
+           // System.out.println("  DIAS:" + day + "   HORAS:" + hour + "  MINUTOS:" + min + "   SEGUNDOS:" + s + "");
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return horasMinutosSegundos;
+    }
 
     public  String[] horasMinutosSegundosSplit(String horasMinutosSegundosEntradaNocturno)
     {
@@ -285,20 +282,13 @@ public class Utily {
             throw new GenericExceptionUtils(ex);
         }
     }
-    public boolean validarEntradaAtrasada(String horarioEntrada ,String horarioSalida ,String marcaEntrada)
+    public boolean validarEntradaAtrasada(String horarioEntrada,String marcaEntrada)
     {
         boolean marcacionAtiempo=false;
-       // String horarioEntrada = "19:30:00";
-        //String horarioSalida = "05:00:00";
-        // Ejemplo de marca de entrada
-        //String marcaEntrada = "17:30:00";
-        // Puedes cambiar la marca de entrada para probar diferentes escenarios
-        // String marcaEntrada = "20:30:00";
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 
         try {
             Date horaEntrada = sdf.parse(horarioEntrada);
-           // Date horaSalida = sdf.parse(horarioSalida);
             Date marca = sdf.parse(marcaEntrada);
 
             if (marca.before(horaEntrada))
@@ -325,6 +315,174 @@ public class Utily {
         {
             String[] stringSplit = string.split(split);
             return  stringSplit;
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+    }
+
+    public boolean validarSalidaAnteDelHorario(String horarioSalida ,String marcaSalida)
+    {
+        boolean marcacionSalida=false;
+        try
+        {
+           // String horarioSalida = "05:00:00";
+            //String marcaSalida = "05:30:00";
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+            Date salidaEsperada = sdf.parse(horarioSalida);
+            Date marcaSalidaTime = sdf.parse(marcaSalida);
+
+            if (marcaSalidaTime.after(salidaEsperada))
+            {
+                System.out.println("El empleado marcó la salida después del horario establecido.");
+                marcacionSalida=true;
+            } else if (marcaSalidaTime.before(salidaEsperada))
+            {
+                System.out.println("El empleado marcó la salida antes del horario establecido.");
+                marcacionSalida=false;
+            } else {
+                System.out.println("El empleado marcó la salida en el horario correcto.");
+                marcacionSalida=true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return  marcacionSalida;
+    }
+
+    public String  restarHoras(String horaOriginal , String tiempoARestar) {
+        try
+        {
+          // Parsear las cadenas de tiempo a objetos LocalTime
+            LocalTime horaOriginalTime = LocalTime.parse(horaOriginal, DateTimeFormatter.ofPattern("HH:mm:ss"));
+            LocalTime tiempoARestarTime = LocalTime.parse(tiempoARestar, DateTimeFormatter.ofPattern("HH:mm:ss"));
+
+            // Restar el tiempo
+            LocalTime resultado = horaOriginalTime.minusHours(tiempoARestarTime.getHour())
+                    .minusMinutes(tiempoARestarTime.getMinute())
+                    .minusSeconds(tiempoARestarTime.getSecond());
+
+            // Imprimir el resultado
+            System.out.println("El resultado es: " + resultado.format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+            return  resultado.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    public  long convertirHorasAMilisegundos(String horaMinutosSegundo)
+    {
+        long milisegundos=0L;
+        try
+        {
+            // Parsear la cadena de tiempo a un objeto LocalTime
+            LocalTime localTime = LocalTime.parse(horaMinutosSegundo);
+            // Calcular la cantidad de milisegundos
+            System.out.println(horaMinutosSegundo + " es igual a " + milisegundos + " milisegundos.");
+            return  milisegundos = localTime.toNanoOfDay() / 1000000;
+        }
+        catch (Exception e)
+        {
+            return 0L;
+        }
+    }
+
+    public Object[] nuevesHorasMediaTrabajadas(String fechaEntradaS ,String fechaSalidaS)
+    {
+        Object[] salida=new Object[2];
+        String nuevesHorasMediaTrabajadas="";
+        try
+        {
+            //String fechaEntradaStr = "2023-11-01 20:00:00";
+            //String fechaSalidaStr = "2023-11-02 08:22:58";
+            String tiempoPerdidoStr = "PT1H30M";
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            LocalDateTime fechaEntrada = LocalDateTime.parse(fechaEntradaS, formatter);
+            LocalDateTime fechaSalida = LocalDateTime.parse(fechaSalidaS, formatter);
+            Duration tiempoPerdido = Duration.parse(tiempoPerdidoStr);
+
+            Duration duracionTrabajo = Duration.between(fechaEntrada, fechaSalida).minus(tiempoPerdido);
+            Duration duracionTrabajoo = Duration.between(fechaEntrada, fechaSalida);
+
+            long horasTrabajadas = duracionTrabajo.toHours();
+            long minutosTrabajados = duracionTrabajo.toMinutes() % 60;
+            long horasTrabajadass = duracionTrabajoo.toHours();
+            long minutosTrabajadoss= duracionTrabajoo.toMinutes() % 60;
+            System.out.println("Horas trabajadas: " + horasTrabajadass + " horas y " + minutosTrabajadoss + " minutos.");
+
+            System.out.println("Horas trabajadas (descontando tiempo perdido): " + horasTrabajadas + " horas y " + minutosTrabajados + " minutos.");
+
+            // Verificar si se han cumplido 9 horas y 30 minutos
+            Duration duracionEsperada = Duration.ofHours(8).plusMinutes(00);
+
+            if (duracionTrabajo.compareTo(duracionEsperada) >= 0) {
+                // Calcular la fecha y hora en la que se cumplieron las 9 horas y 30 minutos
+                LocalDateTime fechaCumplimiento = fechaEntrada.plus(duracionEsperada);
+
+                System.out.println("Se han cumplido 8 horas y 00 minutos de trabajo (descontando tiempo perdido) en: " +
+                        fechaCumplimiento.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                 nuevesHorasMediaTrabajadas= fechaCumplimiento.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                salida[0]=nuevesHorasMediaTrabajadas;
+                salida[1]=true;
+            } else {
+                System.out.println("No se han cumplido 9 horas y 30 minutos de trabajo (descontando tiempo perdido).");
+                salida[0]=nuevesHorasMediaTrabajadas;
+                salida[1]=false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return  salida;
+    }
+
+    public   String[]  convertirStringFechaHMS(String fechaString )
+    {
+        try
+        {
+            ///String fechaString = "2023-11-10 05:30:00";
+            // Crear un DateTimeFormatter para el formato dado
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            // Parsear la cadena a LocalDateTime
+            LocalDateTime fecha = LocalDateTime.parse(fechaString, formatter);
+            // Formatear y mostrar solo la parte de la hora
+            DateTimeFormatter formatoHora = DateTimeFormatter.ofPattern("HH:mm:ss");
+             String horaMs = fecha.format(formatoHora);
+            System.out.println("Hora: " + horaMs);
+            return stringSplit(horaMs,":");
+
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+
+    }
+
+    public  String sumarHoras(String fechaStr ,String tiempoASumarStr)
+    {
+        try
+        {
+           // String fechaStr = "2023-11-09 05:30:00";
+            //String tiempoASumarStr = "01:09:00";
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            LocalDateTime fecha = LocalDateTime.parse(fechaStr, formatter);
+            // Analizar el tiempo a sumar
+            String[] partesTiempo = tiempoASumarStr.split(":");
+            int horasASumar = Integer.parseInt(partesTiempo[0]);
+            int minutosASumar = Integer.parseInt(partesTiempo[1]);
+            int segundosASumar = Integer.parseInt(partesTiempo[2]);
+
+            // Sumar el tiempo a la fecha
+            LocalDateTime nuevaFecha = fecha.plusHours(horasASumar)
+                    .plusMinutes(minutosASumar)
+                    .plusSeconds(segundosASumar);
+
+            System.out.println("La nueva fecha y hora después de sumar " + tiempoASumarStr + ": " + nuevaFecha.format(formatter));
+            return  nuevaFecha.format(formatter);
         }
         catch (Exception e)
         {

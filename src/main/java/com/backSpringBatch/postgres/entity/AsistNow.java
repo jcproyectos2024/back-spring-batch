@@ -1,6 +1,8 @@
 package com.backSpringBatch.postgres.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -13,7 +15,7 @@ public class AsistNow implements Serializable {
 
     @EmbeddedId
     private AsistnowPK id;
-
+    @JsonFormat(pattern="yyyy-MM-dd")
     @Column(name = "asis_fecha")
     private Date asisFecha;
 
@@ -132,6 +134,19 @@ public class AsistNow implements Serializable {
 
     public void setAsisHorasSuplementaria(Boolean asisHorasSuplementaria) {
         this.asisHorasSuplementaria = asisHorasSuplementaria;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AsistNow t = (AsistNow) o;
+        return asisFecha.equals(t.asisFecha);
+    }
+
+    @Override
+    public int hashCode() {
+        return asisFecha.hashCode();
     }
 }
 
