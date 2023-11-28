@@ -36,7 +36,7 @@ public class HorasSuplementariasPersonal {
     @Column(name = "porcentaje")
     private  Double porcentaje;
 
-	@Column(name = "periodo")//anticipo o mensual
+	@Column(name = "periodo")
 	private  String periodo;
 
 

@@ -690,7 +690,7 @@ public class DataBaseServices {
         EmpresaResponse empresaResponse =restServices.findByEstadoEmpCodigoEmpresa(horasSuplementariasPersonalBody.getEmpresa());
         try {
             calculoHorasSuplementariasProduccionXPersona(horasSuplementariasPersonalBody.getIdentificacion(),empresaResponse.getSuccess()?empresaResponse.getEmpresaDTO().getEmpNombre():"");
-            List<HorasSuplementariasPersonal> horasSuplementariasPersonalList = horasSuplementariasPersonalRepository.findAllByEstadoTrueAndIdentificacion(horasSuplementariasPersonalBody.getIdentificacion());
+            List<HorasSuplementariasPersonal> horasSuplementariasPersonalList = horasSuplementariasPersonalRepository.findAllByIdentificacionAndEstadoTrueAndPeriodo(horasSuplementariasPersonalBody.getIdentificacion(),horasSuplementariasPersonalBody.getPeriodo());
             List<HorasSuplementariasPersonalDto>  horasSuplementariasPersonalDtoList = horasSuplementariasPersonalMapper.toHorasSuplementariasPersonalDtoList(horasSuplementariasPersonalList);
             if (horasSuplementariasPersonalDtoList.isEmpty())
             {
@@ -1390,8 +1390,8 @@ public class DataBaseServices {
                             horaPersonal50.setPeriodo(periodoActual);
                             horaPersonal50.setTipo(lsPoliticasFilter50.get(0).getTipo());
                         }
-                        Integer horasPaso100= (int) utily.convertirHorasAMilisegundos(horasMinutosSegundos6);
-                        horaPersonal50.setHoras(horaPersonal50.getHoras()+horasPaso100);
+                        Integer horasPaso50= (int) utily.convertirHorasAMilisegundos(horasMinutosSegundos6);
+                        horaPersonal50.setHoras(horaPersonal50.getHoras()+horasPaso50);
                         horaPersonal50.setPorcentaje(lsPoliticasFilter50.get(0).getPorcentaje());
                         horasSuplementariasPersonalRepository.save(horaPersonal50);
                     }

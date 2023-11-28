@@ -18,6 +18,7 @@ public interface HorasSuplementariasPersonalRepository extends JpaRepository <Ho
 	List<HorasSuplementariasPersonal> findAllByEstadoTrueAndIdentificacion(String identificacion);
 
 	HorasSuplementariasPersonal findByIdentificacionAndEstadoTrueAndTipoAndPeriodo(String identificacion, String tipo,String periodo);
+	List<HorasSuplementariasPersonal> findAllByIdentificacionAndEstadoTrueAndPeriodo(String identificacion,String periodo);
 
 
 }
