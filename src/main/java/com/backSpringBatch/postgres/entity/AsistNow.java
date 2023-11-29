@@ -1,6 +1,8 @@
 package com.backSpringBatch.postgres.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -8,12 +10,12 @@ import java.util.Date;
 
 @Entity
 @Table(name ="asistnow", schema = "marcaciones")
-public class AsistNow implements Serializable  {
+public class AsistNow implements Serializable {
 
 
     @EmbeddedId
     private AsistnowPK id;
-
+    @JsonFormat(pattern="yyyy-MM-dd")
     @Column(name = "asis_fecha")
     private Date asisFecha;
 
@@ -26,22 +28,25 @@ public class AsistNow implements Serializable  {
     @Column(name = "asis_res")
     private String asisRes;
 
-    @Column (name = "nomina_cod")
+    @Column(name = "nomina_cod")
     private String identificacion;
 
 
-    @Column (name = "empresa")
+    @Column(name = "empresa")
     private String empresa;
 
-    @Column (name = "nomina_nom")
+    @Column(name = "nomina_nom")
     private String nombres;
 
-    @Column (name = "nomina_ape")
+    @Column(name = "nomina_ape")
     private String apellidos;
 
-   @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "asis_zona", referencedColumnName="ip_biometrico",  insertable = false, updatable = false)
-    private  Biometrico  biometrico;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "asis_zona", referencedColumnName = "ip_biometrico", insertable = false, updatable = false)
+    private Biometrico biometrico;
+
+    @Column (name = "asis_horas_suplementaria")
+    private Boolean asisHorasSuplementaria;
 
     public AsistnowPK getId() {
         return id;
@@ -121,6 +126,27 @@ public class AsistNow implements Serializable  {
 
     public void setApellidos(String apellidos) {
         this.apellidos = apellidos;
+    }
+
+    public Boolean getAsisHorasSuplementaria() {
+        return asisHorasSuplementaria;
+    }
+
+    public void setAsisHorasSuplementaria(Boolean asisHorasSuplementaria) {
+        this.asisHorasSuplementaria = asisHorasSuplementaria;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AsistNow t = (AsistNow) o;
+        return asisFecha.equals(t.asisFecha);
+    }
+
+    @Override
+    public int hashCode() {
+        return asisFecha.hashCode();
     }
 }
 

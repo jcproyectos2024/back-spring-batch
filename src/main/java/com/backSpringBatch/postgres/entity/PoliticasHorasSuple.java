@@ -38,6 +38,8 @@ public class PoliticasHorasSuple {
     
     @Column(name = "fecha_modificacion")
     private Timestamp fechaModificacion;
+	@Column(name = "tipo")
+	private String tipo;
 
 	public Long getId() {
 		return id;
@@ -110,7 +112,12 @@ public class PoliticasHorasSuple {
 	public void setFechaModificacion(Timestamp fechaModificacion) {
 		this.fechaModificacion = fechaModificacion;
 	}
-    
-    
-    
+
+	public String getTipo() {
+		return tipo;
+	}
+
+	public void setTipo(String tipo) {
+		this.tipo = tipo;
+	}
 }

@@ -3,8 +3,7 @@ package com.backSpringBatch.postgres.models;
 public class HorasSuplementariasPersonalBody
 {
 
-    private String fechaIni;
-    private String fechaFin;
+    private String periodo;
     private String identificacion;
     private String empresa;
 
@@ -12,20 +11,12 @@ public class HorasSuplementariasPersonalBody
     public HorasSuplementariasPersonalBody() {
     }
 
-    public String getFechaIni() {
-        return fechaIni;
+    public String getPeriodo() {
+        return periodo;
     }
 
-    public void setFechaIni(String fechaIni) {
-        this.fechaIni = fechaIni;
-    }
-
-    public String getFechaFin() {
-        return fechaFin;
-    }
-
-    public void setFechaFin(String fechaFin) {
-        this.fechaFin = fechaFin;
+    public void setPeriodo(String periodo) {
+        this.periodo = periodo;
     }
 
     public String getIdentificacion() {

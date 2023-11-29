@@ -1,8 +1,4 @@
 package com.backSpringBatch.postgres.repository;
-
-
-
-import com.backSpringBatch.postgres.entity.AsistNow;
 import com.backSpringBatch.postgres.entity.Atrasos;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
