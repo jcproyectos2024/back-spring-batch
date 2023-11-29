@@ -36,6 +36,9 @@ public class HorasSuplementariasPersonal {
     @Column(name = "porcentaje")
     private  Double porcentaje;
 
+	@Column(name = "periodo")
+	private  String periodo;
+
 
 	public Long getId() {
 		return id;
@@ -92,9 +95,12 @@ public class HorasSuplementariasPersonal {
 		//super();
 	}
 
-	
-	
 
-   
+	public String getPeriodo() {
+		return periodo;
+	}
 
+	public void setPeriodo(String periodo) {
+		this.periodo = periodo;
+	}
 }

@@ -110,5 +110,11 @@ public class DataBaseontroller {
 	{
 		return dataBaseServices.consultarEntradaSalidaMarcacionPorDia(body);
 	}
+
+	@GetMapping("calculoHorasSuplementariasProduccionXPersona/")
+	public HorasSuplementariasPersonalResponses calculoHorasSuplementariasProduccionXPersona(@RequestParam String identificacion,@RequestParam  String empresa  ) throws Exception
+	{
+		return dataBaseServices.calculoHorasSuplementariasProduccionXPersona(identificacion,empresa);
+	}
 }
 	
