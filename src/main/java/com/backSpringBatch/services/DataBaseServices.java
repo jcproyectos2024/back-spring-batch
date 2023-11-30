@@ -101,7 +101,8 @@ public class DataBaseServices {
                   // System.out.println("lsRegistros Cantidad" + lsRegistros.size());
                     //   lsRegistros.forEach(x->{
                     lsRegistros.forEach(x -> {
-                        asistNowRegistroError[0] =Utils.toJson(x);
+                        //asistNowRegistroError[0] =Utils.toJson(x);
+                       //"AsistNowRegistro",Utils.toJson(x));
                         AsistNow regActual = asisRegistroMapper.asistNowRegistroToAsistNow(x);
                         Biometrico biometricoGuarado = biometricoRepository.findByIpBiometrico(regActual.getId().getAsisZona());
                         regActual.setBiometrico(biometricoGuarado);
@@ -111,6 +112,7 @@ public class DataBaseServices {
                           // System.out.println("YA ESTA GUARDADO");
                         }, () -> {
                           //  System.out.println("NUEVO.");
+                           // Utils.console("regActual",Utils.toJson(regActual));
                             postGresRepository.save(regActual);
                         });
 
@@ -253,7 +255,6 @@ public class DataBaseServices {
 
         }catch (Exception ex)
         {
-
             throw new GenericExceptionUtils(ex);
         }
     }
@@ -1113,12 +1114,12 @@ public class DataBaseServices {
         {
             List<PoliticasHorasSuple> lsPoliticas=politicasHorasSupleRepository.findByEstadoTrue();
             ResponsePeriodoActual periodoActual =restServices.consultarPeriodoActual();
-            Utils.console("periodoActual",Utils.toJson(periodoActual));
+            //Utils.console("periodoActual",Utils.toJson(periodoActual));
             String[] fechaPeriodo= utily.fechaPeriodoSplit(periodoActual.getPeriodoAsistencia());
             PersonResponseS  personResponseS=   restServices.consultarPersonaTipoBiometricoCalculo(identificacion);
             if (personResponseS.isSuccess())
             {
-                Utils.console("personResponseS",Utils.toJson(personResponseS));
+                //Utils.console("personResponseS",Utils.toJson(personResponseS));
                 List<AsistNow>  listaSinDuplicados =postGresRepository.findAllByIdentificacionEntada(fechaPeriodo[0],fechaPeriodo[1],identificacion,empresa,personResponseS.getTipoBiometricoCalculoDto()==null?"": personResponseS.getTipoBiometricoCalculoDto().getNombreBiometrico(),"INGRESO",false, Sort.by(Sort.Direction.ASC,"id.asisIng"));
                 //asistNowList.stream().distinct();
                 //List<AsistNow>  asistNowListfilterd =asistNowList.stream().filter(x->(x.getAsisFecha()==x.getAsisFecha())).collect(Collectors.toList());
@@ -1133,7 +1134,7 @@ public class DataBaseServices {
                         .values()
                         .stream()
                         .collect(Collectors.toList());
-                Utils.console("asistNowList",Utils.toJson(asistNowList));
+                //Utils.console("asistNowList",Utils.toJson(asistNowList));
                 ///Verificamos que tenga Horarios
                 if (!(personResponseS.getScheduleDTOList() ==null ?new ArrayList<>():personResponseS.getScheduleDTOList()).isEmpty())
                 {
@@ -1144,7 +1145,7 @@ public class DataBaseServices {
                         System.out.println("TIENE TURNO NOCTURNO--**........**--");
                         //Filtramos las Horas de Salidad que sea en Jornada Nocturna >=16
                         List<AsistNow>  asistNowListFilter= asistNowList==null? new ArrayList<>() :asistNowList.stream().filter(c->((utily.horasSplit(c.getAsisHora()))>=16)).collect(Collectors.toList());
-                        Utils.console("asistNowListFilter",Utils.toJson(asistNowListFilter));
+                        //Utils.console("asistNowListFilter",Utils.toJson(asistNowListFilter));
                         asistNowListFilter.stream().forEach(regActual ->
                         {
                             System.out.println("regActual--***-ENTRADA-"+regActual.getAsisFecha()  +"-----"+regActual.getAsisHora());
@@ -1178,8 +1179,8 @@ public class DataBaseServices {
         {
 
             //HORARIO
-            Utils.console("scheduleDTOListFilter", Utils.toJson(scheduleDTOListFilter));
-            Utils.console("stringSplit", Utils.toJson(utily.stringSplit(scheduleDTOListFilter.get(0).getNameSchedule().replaceAll(" ",""),"-")));
+            //Utils.console("scheduleDTOListFilter", Utils.toJson(scheduleDTOListFilter));
+            //Utils.console("stringSplit", Utils.toJson(utily.stringSplit(scheduleDTOListFilter.get(0).getNameSchedule().replaceAll(" ",""),"-")));
             String[] horarioNocturno=utily.stringSplit(scheduleDTOListFilter.get(0).getNameSchedule().replaceAll(" ",""),"-");
            String fechaMasUnDias=utily.sumarUnDia(utily.convertirDateStringSinHhMnSs(asistNow.getId().getAsisIng()));
           //  String fechaMasUnDias=utily.sumarUnDia("2023-10-31");
@@ -1209,7 +1210,7 @@ public class DataBaseServices {
                   //  Object[] salida= utily.nuevesHorasMediaTrabajadas(marcacionAtiempo?utily.convertirDateStringSinHhMnSs(asistNow.getAsisFecha())+" "+horarioNocturno[0]:utily.convertirDateString(asistNow.getId().getAsisIng()),utily.convertirDateString(asistNowList.get(0).getId().getAsisIng()));
                //Object[] salida= utily.nuevesHorasMediaTrabajadas(utily.convertirDateStringSinHhMnSs(asistNow.getAsisFecha())+" "+horarioNocturno[0],utily.convertirDateString(asistNowList.get(0).getId().getAsisIng()));
                     Object[] salida= utily.nuevesHorasMediaTrabajadas(utily.convertirDateStringSinHhMnSs(asistNow.getAsisFecha())+" "+lsPoliticasFilter25.get(0).getRangoHoraInicial(),utily.convertirDateStringSinHhMnSs(asistNowList.get(0).getAsisFecha())+" "+lsPoliticasFilter25.get(0).getRangoHoraFinal());
-                Utils.console("salida --Object", Utils.toJson(salida));
+                //Utils.console("salida --Object", Utils.toJson(salida));
                    // System.out.println("totalHorasTrabajadas"+totalHorasTrabajadas);
                     //String totalHorasTrabajadasReales= utily.restarHoras(totalHorasTrabajadas,"01:30:00");
                 boolean nuevesHorasMediaTrabajadas = Boolean.valueOf(salida[1].toString());
@@ -1230,9 +1231,9 @@ public class DataBaseServices {
                     horaPersonal.setPorcentaje(lsPoliticasFilter25.get(0).getPorcentaje());
                     horasSuplementariasPersonalRepository.save(horaPersonal);
                     String[] hora5 =utily.convertirStringFechaHMS(nuevesHorasMediaTraba);
-                    Utils.console("hora5 --Object", Utils.toJson(hora5));
+                    //Utils.console("hora5 --Object", Utils.toJson(hora5));
                     String[] hora05 =utily.stringSplit(lsPoliticasFilter100.get(0).getRangoHoraInicial(),":");
-                    Utils.console("hora05 --Object", Utils.toJson(hora05));
+                    //Utils.console("hora05 --Object", Utils.toJson(hora05));
                     String horasMinutosSegundos="";
                     if (hora5[0].equalsIgnoreCase(hora05[0]))
                     {
@@ -1277,7 +1278,7 @@ public class DataBaseServices {
 
 
                // }
-                Utils.console("asistNowList +regActual--***-SALIDAD-", Utils.toJson(asistNowList));
+                //Utils.console("asistNowList +regActual--***-SALIDAD-", Utils.toJson(asistNowList));
                 postGresRepository.updateHorasSuplementaria(asistNowList.get(0).getIdentificacion(),asistNowList.get(0).getId().getAsisIng(),asistNowList.get(0).getAsisTipo(),true);
             }
 
@@ -1328,7 +1329,7 @@ public class DataBaseServices {
                 //  Object[] salida= utily.nuevesHorasMediaTrabajadas(marcacionAtiempo?utily.convertirDateStringSinHhMnSs(asistNow.getAsisFecha())+" "+horarioNocturno[0]:utily.convertirDateString(asistNow.getId().getAsisIng()),utily.convertirDateString(asistNowList.get(0).getId().getAsisIng()));
                 //Object[] salida= utily.nuevesHorasMediaTrabajadas(utily.convertirDateStringSinHhMnSs(asistNow.getAsisFecha())+" "+horarioNocturno[0],utily.convertirDateString(asistNowList.get(0).getId().getAsisIng()));
                 Object[] salida= utily.nuevesHorasMediaTrabajadas(utily.convertirDateStringSinHhMnSs(asistNow.getAsisFecha())+" "+lsPoliticasFilter25.get(0).getRangoHoraInicial(),utily.convertirDateStringSinHhMnSs(asistNowList.get(0).getAsisFecha())+" "+lsPoliticasFilter25.get(0).getRangoHoraFinal());
-                Utils.console("salida --Object", Utils.toJson(salida));
+                //Utils.console("salida --Object", Utils.toJson(salida));
                 // System.out.println("totalHorasTrabajadas"+totalHorasTrabajadas);
                 //String totalHorasTrabajadasReales= utily.restarHoras(totalHorasTrabajadas,"01:30:00");
                 boolean nuevesHorasMediaTrabajadas = Boolean.valueOf(salida[1].toString());
@@ -1348,9 +1349,9 @@ public class DataBaseServices {
                     horaPersonal.setPorcentaje(lsPoliticasFilter25.get(0).getPorcentaje());
                     horasSuplementariasPersonalRepository.save(horaPersonal);
                     String[] hora5 =utily.convertirStringFechaHMS(nuevesHorasMediaTraba);
-                    Utils.console("hora5 --Object", Utils.toJson(hora5));
+                   // Utils.console("hora5 --Object", Utils.toJson(hora5));
                     String[] hora05 =utily.stringSplit(lsPoliticasFilter100.get(0).getRangoHoraInicial(),":");
-                    Utils.console("hora05 --Object", Utils.toJson(hora05));
+                   // Utils.console("hora05 --Object", Utils.toJson(hora05));
                     String horasMinutosSegundos="";
                     if (hora5[0].equalsIgnoreCase(hora05[0]))
                     {
@@ -1392,7 +1393,7 @@ public class DataBaseServices {
                     }
 
                 }
-                Utils.console("asistNowList +regActual--***-SALIDAD-", Utils.toJson(asistNowList));
+               // Utils.console("asistNowList +regActual--***-SALIDAD-", Utils.toJson(asistNowList));
                 postGresRepository.updateHorasSuplementaria(asistNowList.get(0).getIdentificacion(),asistNowList.get(0).getId().getAsisIng(),asistNowList.get(0).getAsisTipo(),true);
             }
 
