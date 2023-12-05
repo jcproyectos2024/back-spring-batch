@@ -111,7 +111,7 @@ public class DataBaseServices {
                         {
                           // System.out.println("YA ESTA GUARDADO");
                         }, () -> {
-                          //  System.out.println("NUEVO.");
+                            //System.out.println("NUEVO.");
                            // Utils.console("regActual",Utils.toJson(regActual));
                             postGresRepository.save(regActual);
                         });
@@ -1083,7 +1083,6 @@ public class DataBaseServices {
         {
             EmpresaResponse empresaResponse =restServices.findByEstadoEmpCodigoEmpresa(consultarAsistenciasDias.getEmpresa());
             consultarAsistenciasDias.setEmpresa(empresaResponse.getSuccess()?empresaResponse.getEmpresaDTO().getEmpNombre():"");
-           // consultarAsistenciasDias.setEmpresa(utily.empresa(consultarAsistenciasDias.getEmpresa()));
             List<AsistNow> lsMarcacionesEntrada=postGresRepository.listaDiaAsistenciasBiometrico(consultarAsistenciasDias.getFechaInicio(),consultarAsistenciasDias.getFechaFin(),consultarAsistenciasDias.getIdentificacion(),"GARITA","INGRESO", consultarAsistenciasDias.getEmpresa());
             List<AsistNow> lsMarcacionesSalida=postGresRepository.listaDiaAsistenciasBiometrico(consultarAsistenciasDias.getFechaInicio(),consultarAsistenciasDias.getFechaFin(),consultarAsistenciasDias.getIdentificacion(),"GARITA","SALIDA", consultarAsistenciasDias.getEmpresa());
             response.setLsMarcacionesEntrada(lsMarcacionesEntrada);

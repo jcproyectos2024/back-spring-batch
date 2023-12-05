@@ -24,10 +24,10 @@ public class DataBaseontroller {
 	private DataBaseServices dataBaseServices;
 
 
-	@Scheduled (cron = "0/3 * * ? * *")
+	/*@Scheduled (cron = "0/3 * * ? * *")
 	public void insertSqlToPostgres() {
 		dataBaseServices.insertSqlToPostgres();
-	}
+	}*/
 
 	/*metodo anterior, ahora estara el refactorizado
 	@PostMapping("obtenerMarcaciones/")
