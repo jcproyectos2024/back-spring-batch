@@ -562,7 +562,7 @@ public class Utily {
         return fechaComoCadena;
     }
 
-    public  List<RegistroMarcacionesDTO> conversioRegistroMarcacionesEntraSalidaValidarTurnos(List<RegistroMarcacionesEntraSalida> list ,String fechaInicio ,String fechaFin)
+  /*  public  List<RegistroMarcacionesDTO> conversioRegistroMarcacionesEntraSalidaValidarTurnos(List<RegistroMarcacionesEntraSalida> list ,String fechaInicio ,String fechaFin)
     {
         int cont = 0;
         List<RegistroMarcacionesDTO> registroMarcacionesDTOList = new ArrayList<>();
@@ -614,6 +614,6 @@ public class Utily {
 
         }
         return registroMarcacionesDTOList;
-    }
+    }*/
 
 }
