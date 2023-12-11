@@ -48,6 +48,8 @@ public class AsistNow implements Serializable {
     @Column (name = "asis_horas_suplementaria")
     private Boolean asisHorasSuplementaria;
 
+
+
     public AsistnowPK getId() {
         return id;
     }
@@ -148,6 +150,7 @@ public class AsistNow implements Serializable {
     public int hashCode() {
         return asisFecha.hashCode();
     }
+
 }
 
 

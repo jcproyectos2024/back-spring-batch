@@ -155,7 +155,6 @@ public class RESTServices {
                     .get(ruta)
                     .then().extract().response();
             rootc = response.getBody().as(EmpresaResponse.class);
-            Utils.console("findByEstadoEmpCodigoEmpresa",Utils.toJson(rootc));
         } catch (Exception ex)
         {
             // TODO: handle exception
@@ -165,5 +164,28 @@ public class RESTServices {
         return rootc;
 
     }
+/*
+    public EmpresaResponse findByEstadoEmpCodigoEmpresa(String empCodigo)
+    {
+        String ruta = env.getProperty("urlFindByEstadoEmpCodigoEmpresa");
+        ruta+="?empCodigo="+empCodigo;
+        EmpresaResponse rootc=null;
+        try {
+            Response response = RestAssured.given()
+                    .headers(
+                            "Content-Type", ContentType.JSON, "Accept", ContentType.JSON)
+                    .contentType("application/json;charset=utf-8").when()
+                    .get(ruta)
+                    .then().extract().response();
+            rootc = response.getBody().as(EmpresaResponse.class);
+        } catch (Exception ex)
+        {
+            // TODO: handle exception
+            ex.printStackTrace();
+            throw new GenericExceptionUtils(ex);
+        }
+        return rootc;
+
+    }*/
 
 }

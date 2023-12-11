@@ -1,15 +1,18 @@
 package com.backSpringBatch.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ConsultarEntradaSalida
 {
     private  String identificacion;
+    private String apellidos;
     private String fechaInicio;
     private String fechaFin;
     private  String biometrico;
-
-
     private String empresa;
-
+    private int numeroPagina;
+    private int numeroRegistros;
     public ConsultarEntradaSalida() {
     }
 
@@ -51,5 +54,29 @@ public class ConsultarEntradaSalida
 
     public void setEmpresa(String empresa) {
         this.empresa = empresa;
+    }
+
+    public int getNumeroPagina() {
+        return numeroPagina;
+    }
+
+    public void setNumeroPagina(int numeroPagina) {
+        this.numeroPagina = numeroPagina;
+    }
+
+    public int getNumeroRegistros() {
+        return numeroRegistros;
+    }
+
+    public void setNumeroRegistros(int numeroRegistros) {
+        this.numeroRegistros = numeroRegistros;
+    }
+
+    public String getApellidos() {
+        return apellidos;
+    }
+
+    public void setApellidos(String apellidos) {
+        this.apellidos = apellidos;
     }
 }
