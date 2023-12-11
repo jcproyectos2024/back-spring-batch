@@ -1,7 +1,9 @@
 package com.backSpringBatch.postgres.models;
 
-import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.util.Date;
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ScheduleDTO {
 
     private Long id;

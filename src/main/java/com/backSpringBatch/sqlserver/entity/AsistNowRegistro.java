@@ -38,6 +38,10 @@ public class AsistNowRegistro {
     @Column (name = "estado_asistnow_registro")
     private Boolean estadoAsistnowRegistro;
 
+    @Column (name = "asis_horas_suplementaria")
+    private Boolean asisHorasSuplementaria;
+
+
     public AsistnowRegistroPK getId() {
         return id;
     }
@@ -116,5 +120,13 @@ public class AsistNowRegistro {
 
     public void setEstadoAsistnowRegistro(Boolean estadoAsistnowRegistro) {
         this.estadoAsistnowRegistro = estadoAsistnowRegistro;
+    }
+
+    public Boolean getAsisHorasSuplementaria() {
+        return asisHorasSuplementaria;
+    }
+
+    public void setAsisHorasSuplementaria(Boolean asisHorasSuplementaria) {
+        this.asisHorasSuplementaria = asisHorasSuplementaria;
     }
 }
