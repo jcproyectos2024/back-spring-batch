@@ -124,5 +124,53 @@ public interface PostGresRepository extends JpaRepository<AsistNow, String> {
     @Transactional
     void updateHorasSuplementaria(@Param("identificacion") String identificacion,  @Param("asisIng") Date asisIng  , @Param("asisTipo") String asisTipo  , @Param("asisHorasSuplementaria") boolean asisHorasSuplementaria);
 
+    @Query(nativeQuery = false, value = "SELECT asw.id.asisId,asw.asisFecha,asw.identificacion,asw.apellidos,asw.nombres, " +
+            " asw.biometrico.nombreBiometrico AS zona," +
+            "    MAX(CASE WHEN asw.asisTipo = 'INGRESO' THEN asw.asisHora END) AS hora_entrada," +
+            "    MAX(CASE WHEN asw.asisTipo = 'SALIDA' THEN asw.asisHora END) AS hora_salida," +
+            "    MAX(CASE WHEN asw.asisTipo = 'INGRESO' THEN asw.id.asisIng END) AS fecha_entrada," +
+            "    MAX(CASE WHEN asw.asisTipo = 'SALIDA' THEN asw.id.asisIng  END) AS fecha_salida, " +
+            " asw.empresa " +
+            " FROM AsistNow asw " +
+            " WHERE ((asw.identificacion like:identificacion or :identificacion is null) AND (asw.apellidos like:apellidos or :apellidos is null)  " +
+            " AND to_char(asw.asisFecha,'yyyy-MM-dd') BETWEEN :fechaIni  AND :fechaFin  ) " +
+            " AND   (asw.biometrico.nombreBiometrico=:nombreBiometrico) AND (asw.empresa=:empresa) " +
+            " GROUP BY" +
+            " asw.id.asisId," +
+            " asw.asisFecha," +
+            " asw.nombres," +
+            " asw.apellidos," +
+            " asw.identificacion," +
+            " asw.biometrico.nombreBiometrico," +
+            " asw.empresa " +
+            "  ORDER by " +
+            " asw.apellidos," +
+            " asw.asisFecha  ASC")
+      Page<Object[]> consultarMarcacionesEntradaSalidaPagineo(@Param("identificacion") String identificacion,
+                                                              @Param("apellidos") String apellidos,
+                                                             @Param("fechaIni")  String fechaIni,
+                                                             @Param("fechaFin")  String fechaFin ,
+                                                             @Param("nombreBiometrico")  String nombreBiometrico,
+                                                             @Param("empresa") String empresa  ,Pageable pageable);
+
+
+    @Query(nativeQuery = false, value = "SELECT " +
+            "asw.id.asisId,asw.asisFecha,asw.identificacion,asw.apellidos,asw.nombres,asw.asisTipo, " +
+            " asw.biometrico.nombreBiometrico AS zona,asw.asisHora,asw.id.asisIng," +
+            " asw.empresa " +
+            " FROM AsistNow asw " +
+            " WHERE ((asw.identificacion like:identificacion or :identificacion is null) AND (asw.apellidos like:apellidos or :apellidos is null)  " +
+            " AND to_char(asw.asisFecha,'yyyy-MM-dd') BETWEEN :fechaIni  AND :fechaFin  ) " +
+            " AND   (asw.biometrico.nombreBiometrico=:nombreBiometrico) AND (asw.empresa=:empresa) " +
+            "  ORDER by " +
+            " asw.apellidos," +
+            " asw.asisFecha  ASC")
+    List<Object[]>  consultarMarcacionesEntradaSalida(@Param("identificacion") String identificacion,
+                                                            @Param("apellidos") String apellidos,
+                                                            @Param("fechaIni")  String fechaIni,
+                                                            @Param("fechaFin")  String fechaFin ,
+                                                            @Param("nombreBiometrico")  String nombreBiometrico,
+                                                            @Param("empresa") String empresa );
+
 }
 

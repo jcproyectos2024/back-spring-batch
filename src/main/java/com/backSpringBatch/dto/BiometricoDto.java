@@ -1,6 +1,7 @@
 package com.backSpringBatch.dto;
 
 import com.backSpringBatch.postgres.entity.Biometrico;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -8,7 +9,7 @@ import java.io.Serializable;
 /**
  * A DTO for the {@link Biometrico} entity
  */
-@Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class BiometricoDto implements Serializable {
     private  Long id;
     private  String ipBiometrico;

@@ -1,5 +1,7 @@
 package com.backSpringBatch.Util;
 
+import com.backSpringBatch.dto.RegistroMarcacionesDTO;
+import com.backSpringBatch.dto.RegistroMarcacionesEntraSalida;
 import com.diosmar.GenericExceptionUtils;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +15,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.time.LocalTime;
 import java.time.Duration;
+import java.util.stream.Collectors;
+
 @Component
 public class Utily {
 
@@ -126,11 +130,11 @@ public class Utily {
          return fh;
 
     }
-    
+
     public Date concatenaHoraFechaActual(String horaPendienteFormat, int dia) throws ParseException {
    	 SimpleDateFormat dtf = new SimpleDateFormat("yyyy-MM-dd");
         Calendar calendar = Calendar.getInstance();
-        
+
             	calendar.add(Calendar.DAY_OF_MONTH, +dia);
 
         Date dateObj = calendar.getTime();
@@ -198,24 +202,6 @@ public class Utily {
         }
         return empresa;
     }
-
-
-
-    public  Date convertirStringDate(String fecha)
-    {
-        try
-        {
-            SimpleDateFormat formato = new SimpleDateFormat("yyyy/MM/dd");
-            Date fechaDate = formato.parse(fecha);
-            return  fechaDate;
-        }
-        catch (Exception e)
-        {
-        }
-
-        return null;
-    }
-
 
     public   String  convertirDateString (Date date)
     {
@@ -488,6 +474,146 @@ public class Utily {
         {
             return null;
         }
+    }
+
+
+    public  List<RegistroMarcacionesDTO> conversioRegistroMarcacionesDTO(List<Object[]> list)
+    {
+        int cont = 0;
+        List<RegistroMarcacionesDTO> registroMarcacionesDTOList = new ArrayList<>();
+        for (Object[] registroMarcaciones : list)
+        {
+            cont++;
+            RegistroMarcacionesDTO  registroMarcacionesDTO= new RegistroMarcacionesDTO();
+            registroMarcacionesDTO.setIdRegistroMarcaciones(cont);
+            registroMarcacionesDTO.setAsisId(registroMarcaciones[0] == null ? "": (String) registroMarcaciones[0]);
+            registroMarcacionesDTO.setAsisFecha(registroMarcaciones[1] == null ? null : (Date) registroMarcaciones[1]);
+            registroMarcacionesDTO.setIdentificacion(registroMarcaciones[2] == null ? "" : (String) registroMarcaciones[2]);
+            registroMarcacionesDTO.setApellidos(registroMarcaciones[3] == null ? "" : (String) registroMarcaciones[3]);
+            registroMarcacionesDTO.setNombres(registroMarcaciones[4] == null ? "" : (String) registroMarcaciones[4]);
+            registroMarcacionesDTO.setZona(registroMarcaciones[5] == null ? "" : (String) registroMarcaciones[5]);
+            registroMarcacionesDTO.setHoraEntrada(registroMarcaciones[6] == null ? null : (String) registroMarcaciones[6]);
+            registroMarcacionesDTO.setHoraSalida(registroMarcaciones[7] == null ? null : (String) registroMarcaciones[7]);
+            registroMarcacionesDTO.setFechaEntrada(registroMarcaciones[8] == null ? null : (Date) registroMarcaciones[8]);
+            registroMarcacionesDTO.setFechaSalida(registroMarcaciones[9] == null ? null : (Date) registroMarcaciones[9]);
+            registroMarcacionesDTO.setEmpresa(registroMarcaciones[10] == null ? null : (String) registroMarcaciones[10]);
+            if (registroMarcacionesDTO.getHoraEntrada()==null)
+            {
+                registroMarcacionesDTO.setEditado("INGRESO");
+            }
+            if (registroMarcacionesDTO.getHoraSalida()==null)
+            {
+                registroMarcacionesDTO.setEditado("SALIDA");
+            }
+            registroMarcacionesDTOList.add(registroMarcacionesDTO);
+
+        }
+        return registroMarcacionesDTOList;
+    }
+
+    public  List<RegistroMarcacionesEntraSalida> conversioRegistroMarcacionesEntraSalida(List<Object[]> list)
+    {
+
+        List<RegistroMarcacionesEntraSalida> registroMarcacionesDTOList = new ArrayList<>();
+        for (Object[] registroMarcaciones : list)
+        {
+            RegistroMarcacionesEntraSalida  registroMarcacionesDTO= new RegistroMarcacionesEntraSalida();
+            registroMarcacionesDTO.setAsisId(registroMarcaciones[0] == null ? "": (String) registroMarcaciones[0]);
+            registroMarcacionesDTO.setAsisFecha(registroMarcaciones[1] == null ? null : (Date) registroMarcaciones[1]);
+            registroMarcacionesDTO.setIdentificacion(registroMarcaciones[2] == null ? "" : (String) registroMarcaciones[2]);
+            registroMarcacionesDTO.setApellidos(registroMarcaciones[3] == null ? "" : (String) registroMarcaciones[3]);
+            registroMarcacionesDTO.setNombres(registroMarcaciones[4] == null ? "" : (String) registroMarcaciones[4]);
+            registroMarcacionesDTO.setAsisTipo(registroMarcaciones[5] == null ? "" : (String) registroMarcaciones[5]);
+            registroMarcacionesDTO.setZona(registroMarcaciones[6] == null ? "" : (String) registroMarcaciones[6]);
+            registroMarcacionesDTO.setAsisHora(registroMarcaciones[7] == null ? null : (String) registroMarcaciones[7]);
+            registroMarcacionesDTO.setAsisIng(registroMarcaciones[8] == null ? null : (Date) registroMarcaciones[8]);
+            registroMarcacionesDTO.setEmpresa(registroMarcaciones[9] == null ? null : (String) registroMarcaciones[9]);
+            registroMarcacionesDTOList.add(registroMarcacionesDTO);
+
+        }
+        return registroMarcacionesDTOList;
+    }
+
+
+    public List<Date> recorrerDosRangosFechas(Date fechaInicio, Date fechaFin) {
+        Calendar c1 = Calendar.getInstance();
+        c1.setTime(fechaInicio);
+        Calendar c2 = Calendar.getInstance();
+        c2.setTime(fechaFin);
+        List<Date> listaFechas = new ArrayList<>();
+        while (!c1.after(c2)) {
+            listaFechas.add(c1.getTime());
+            c1.add(Calendar.DAY_OF_MONTH, 1);
+        }
+        return listaFechas;
+    }
+
+    public Date convertirStringDate(String date) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            return formatter.parse(date);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public String convertirDateStringAnosMesDias(Date date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String fechaComoCadena = sdf.format(date);
+        return fechaComoCadena;
+    }
+
+    public  List<RegistroMarcacionesDTO> conversioRegistroMarcacionesEntraSalidaValidarTurnos(List<RegistroMarcacionesEntraSalida> list ,String fechaInicio ,String fechaFin)
+    {
+        int cont = 0;
+        List<RegistroMarcacionesDTO> registroMarcacionesDTOList = new ArrayList<>();
+        List<Date> listaEntreFechas = recorrerDosRangosFechas(convertirStringDate(fechaInicio),convertirStringDate(fechaFin));
+        for (Iterator<Date> it = listaEntreFechas.iterator(); it.hasNext();)
+        {
+            Date date = it.next();
+            List<RegistroMarcacionesEntraSalida> lsMarcacionesEntradaFilter = list.stream().filter(e -> (convertirDateStringAnosMesDias(e.getAsisFecha()).equalsIgnoreCase(convertirDateStringAnosMesDias(date))&& e.getAsisTipo().equalsIgnoreCase("INGRESO") )).collect(Collectors.toList());
+            for (RegistroMarcacionesEntraSalida registroMarcaciones : lsMarcacionesEntradaFilter)
+            {
+                String[] horas= horasMinutosSegundosSplit(registroMarcaciones.getAsisHora());
+                if (Integer.parseInt(horas[0])>=16)
+                {
+                }
+                if (Integer.parseInt(horas[0])<=16)
+                {
+
+                }
+            }
+
+        }
+
+
+        for (RegistroMarcacionesEntraSalida registroMarcaciones : list)
+        {
+            cont++;
+            RegistroMarcacionesDTO  registroMarcacionesDTO= new RegistroMarcacionesDTO();
+            registroMarcacionesDTO.setIdRegistroMarcaciones(cont);
+            registroMarcacionesDTO.setAsisId(registroMarcaciones[0] == null ? "": (String) registroMarcaciones[0]);
+            registroMarcacionesDTO.setAsisFecha(registroMarcaciones[1] == null ? null : (Date) registroMarcaciones[1]);
+            registroMarcacionesDTO.setIdentificacion(registroMarcaciones[2] == null ? "" : (String) registroMarcaciones[2]);
+            registroMarcacionesDTO.setApellidos(registroMarcaciones[3] == null ? "" : (String) registroMarcaciones[3]);
+            registroMarcacionesDTO.setNombres(registroMarcaciones[4] == null ? "" : (String) registroMarcaciones[4]);
+            registroMarcacionesDTO.setZona(registroMarcaciones[5] == null ? "" : (String) registroMarcaciones[5]);
+            registroMarcacionesDTO.setHoraEntrada(registroMarcaciones[6] == null ? null : (String) registroMarcaciones[6]);
+            registroMarcacionesDTO.setHoraSalida(registroMarcaciones[7] == null ? null : (String) registroMarcaciones[7]);
+            registroMarcacionesDTO.setFechaEntrada(registroMarcaciones[8] == null ? null : (Date) registroMarcaciones[8]);
+            registroMarcacionesDTO.setFechaSalida(registroMarcaciones[9] == null ? null : (Date) registroMarcaciones[9]);
+            registroMarcacionesDTO.setEmpresa(registroMarcaciones[10] == null ? null : (String) registroMarcaciones[10]);
+            if (registroMarcacionesDTO.getHoraEntrada()==null)
+            {
+                registroMarcacionesDTO.setEditado("INGRESO");
+            }
+            if (registroMarcacionesDTO.getHoraSalida()==null)
+            {
+                registroMarcacionesDTO.setEditado("SALIDA");
+            }
+            registroMarcacionesDTOList.add(registroMarcacionesDTO);
+
+        }
+        return registroMarcacionesDTOList;
     }
 
 }

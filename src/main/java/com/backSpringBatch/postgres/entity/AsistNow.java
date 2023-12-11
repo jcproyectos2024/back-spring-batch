@@ -48,8 +48,7 @@ public class AsistNow implements Serializable {
     @Column (name = "asis_horas_suplementaria")
     private Boolean asisHorasSuplementaria;
 
-    @Column (name = "sub_centro_costo")
-    private String subCentroCosto;
+
 
     public AsistnowPK getId() {
         return id;
@@ -152,13 +151,6 @@ public class AsistNow implements Serializable {
         return asisFecha.hashCode();
     }
 
-    public String getSubCentroCosto() {
-        return subCentroCosto;
-    }
-
-    public void setSubCentroCosto(String subCentroCosto) {
-        this.subCentroCosto = subCentroCosto;
-    }
 }
 
 

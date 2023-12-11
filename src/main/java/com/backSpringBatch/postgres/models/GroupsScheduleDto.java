@@ -1,12 +1,13 @@
 package com.backSpringBatch.postgres.models;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 import java.io.Serializable;
 
 
-@Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class GroupsScheduleDto implements Serializable {
     private  ScheduleDTO schedule;
 

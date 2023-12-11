@@ -1,5 +1,6 @@
 package com.backSpringBatch.postgres.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -8,7 +9,7 @@ import java.sql.Timestamp;
 /**
 
  */
-@Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class TipoBiometricoCalculoDto implements Serializable {
     private  Long idTipoBiometricoCalculo;
     private  String horaTrabajada;

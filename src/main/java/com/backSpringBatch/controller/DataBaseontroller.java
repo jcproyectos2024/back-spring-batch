@@ -6,6 +6,7 @@ import com.backSpringBatch.dto.*;
 import com.backSpringBatch.postgres.models.*;
 import com.backSpringBatch.services.DataBaseServices;
 import com.backSpringBatch.sqlserver.models.ResponsesEntradaSalidaMarcacionDias;
+import com.diosmar.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
@@ -13,7 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
-
+import java.util.List;
 
 
 @Controller
@@ -99,9 +100,9 @@ public class DataBaseontroller {
 
 
 	@PostMapping("guardadoEntradaSalidaMarcacion/")
-	public RegistroMarcacionesResponses guardadoEntradaSalidaMarcacion(@RequestBody @Validated RegistroMarcacionesDTO registroMarcacionesDTO)
+	public RegistroMarcacionesResponses guardadoEntradaSalidaMarcacion(@RequestBody @Validated List<RegistroMarcacionesDTO> registroMarcacionesDTO)
 	{
-
+		Utils.console("registroMarcacionesDTOLista",Utils.toJson(registroMarcacionesDTO));
 		return dataBaseServices.guardadoEntradaSalidaMarcacion(registroMarcacionesDTO);
 	}
 
