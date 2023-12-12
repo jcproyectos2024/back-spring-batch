@@ -270,6 +270,37 @@ public interface PostGresRepository extends JpaRepository<AsistNow, String> {
                                                             @Param("empresa") String empresa  ,Pageable pageable);
 
 
+    @Query(nativeQuery = false, value = "SELECT asw " +
+            " FROM AsistNow asw " +
+            " WHERE ((asw.identificacion like:identificacion or :identificacion is null) AND (asw.apellidos like:apellidos or :apellidos is null)  " +
+            " AND to_char(asw.asisFecha,'yyyy-MM-dd') BETWEEN :fechaIni  AND :fechaFin  ) " +
+            " AND   (asw.biometrico.nombreBiometrico=:nombreBiometrico) AND (asw.empresa=:empresa)  AND (asw.asisTipo=:asisTipo ) " +
+            "  ORDER by " +
+            " asw.apellidos," +
+            " asw.asisFecha  ASC")
+    Page<AsistNow> consultarMarcacioneEntradaPagineo(@Param("identificacion") String identificacion,
+                                                            @Param("apellidos") String apellidos,
+                                                            @Param("fechaIni")  String fechaIni,
+                                                            @Param("fechaFin")  String fechaFin ,
+                                                            @Param("nombreBiometrico")  String nombreBiometrico,
+                                                            @Param("empresa") String empresa ,
+                                                             @Param("asisTipo") String asisTipo  ,Pageable pageable);
+
+
+    @Query(nativeQuery = false, value = "SELECT asw " +
+            " FROM AsistNow asw " +
+            " WHERE ((asw.identificacion like:identificacion or :identificacion is null) " +
+            " AND to_char(asw.asisFecha,'yyyy-MM-dd') BETWEEN :fechaIni  AND :fechaFin  ) " +
+            " AND   (asw.biometrico.nombreBiometrico=:nombreBiometrico) AND (asw.empresa=:empresa)  AND (asw.asisTipo=:asisTipo ) " +
+            "  ORDER by " +
+            " asw.apellidos," +
+            " asw.asisFecha  ASC")
+    AsistNow consultarMarcacioneSalida(@Param("identificacion") String identificacion,
+                                                     @Param("fechaIni")  String fechaIni,
+                                                     @Param("fechaFin")  String fechaFin ,
+                                                     @Param("nombreBiometrico")  String nombreBiometrico,
+                                                     @Param("empresa") String empresa ,
+                                                     @Param("asisTipo") String asisTipo );
 
 }
 
