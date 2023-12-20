@@ -569,7 +569,7 @@ public class DataBaseServices {
         System.out.println("findAllByHorasSuplementariasPersonal ---- horasSuplementariasPersonalBody.getEmpresa()"+horasSuplementariasPersonalBody.getEmpresa());
         EmpresaResponse empresaResponse =restServices.findByEstadoEmpCodigoEmpresa(horasSuplementariasPersonalBody.getEmpresa());
         try {
-            calculoHorasSuplementariasProduccionXPersona(horasSuplementariasPersonalBody.getIdentificacion(),empresaResponse.getSuccess()?empresaResponse.getEmpresaDTO().getEmpNombre():"");
+          //  calculoHorasSuplementariasProduccionXPersona(horasSuplementariasPersonalBody.getIdentificacion(),empresaResponse.getSuccess()?empresaResponse.getEmpresaDTO().getEmpNombre():"");
             List<HorasSuplementariasPersonal> horasSuplementariasPersonalList = horasSuplementariasPersonalRepository.findAllByIdentificacionAndEstadoTrueAndPeriodo(horasSuplementariasPersonalBody.getIdentificacion(),horasSuplementariasPersonalBody.getPeriodo());
             List<HorasSuplementariasPersonalDto>  horasSuplementariasPersonalDtoList = horasSuplementariasPersonalMapper.toHorasSuplementariasPersonalDtoList(horasSuplementariasPersonalList);
             if (horasSuplementariasPersonalDtoList.isEmpty())
@@ -1435,7 +1435,7 @@ public class DataBaseServices {
     }
 
 
-    public MarcacionIndentificacionResponses consultarMarcacionIdentificacion(String identificacion , String empresa)
+    public MarcacionIndentificacionResponses consultarMarcacionIdentificacion(String identificacion ,String apellidos, String empresa)
     {
         MarcacionIndentificacionResponses response = new MarcacionIndentificacionResponses();
 
@@ -1443,12 +1443,13 @@ public class DataBaseServices {
         {
 
             String identificacionConsulta=(identificacion!=null && !identificacion.equals("")?"%"+identificacion+"%":null);
+            String apellidosConsulta=(apellidos!=null && !apellidos.equals("")?"%"+apellidos+"%":null);
             EmpresaResponse empresaResponse =restServices.findByEstadoEmpCodigoEmpresa(empresa);
             empresa =empresaResponse.getSuccess()?empresaResponse.getEmpresaDTO().getEmpNombre():"";
-            postGresRepository.consultarMarcacionIdentificacion(identificacionConsulta,empresa).ifPresentOrElse(masterProfesionOcupacion ->
+            postGresRepository.consultarMarcacionIdentificacion(identificacionConsulta,apellidosConsulta,empresa).ifPresentOrElse(masterProfesionOcupacion ->
             {
-                List<AsistNowIdentificacionDto> asistNowIdentificacionDtoList = asistNowMapper.asistNowIdentificacionDtoToAsistNow(masterProfesionOcupacion);
-                response.setAsistNowIdentificacionDtoList(asistNowIdentificacionDtoList);
+                List<MarcacionIdentificacionDto> registroMarcacionesDTOList = utily.conversioMarcacionIdentificacion(masterProfesionOcupacion);
+                response.setMarcacionIdentificacionDtos(registroMarcacionesDTOList);
                 response.setMessage("Consulta Existosa");
                 response.setSuccess(true);
 
@@ -1472,4 +1473,19 @@ public class DataBaseServices {
         return response;
     }
 
+    public void calculoHorasSuplementariasProduccionFija()
+    {
+
+        try
+        {
+            restServices.consultarPersonaProduccionFijaCalculo("PRODUCCIÓN FIJA");
+            System.out.println("***********************AQUI"+utily.convertirDateString(new Date()));
+           // Utils.console("response",Utils.toJson(response));
+        }
+        catch (Exception ex)
+        {
+            throw new GenericExceptionUtils(ex);
+        }
+
+    }
 }

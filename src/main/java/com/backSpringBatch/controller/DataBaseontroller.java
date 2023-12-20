@@ -2,6 +2,7 @@ package com.backSpringBatch.controller;
 
 
 import com.backSpringBatch.Util.SaveMantDTO;
+import com.backSpringBatch.Util.UtilsJSON;
 import com.backSpringBatch.dto.*;
 import com.backSpringBatch.postgres.models.*;
 import com.backSpringBatch.postgres.models.Master.MarcacionIndentificacionResponses;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.util.List;
+import java.util.Map;
 
 
 @Controller
@@ -127,11 +129,29 @@ public class DataBaseontroller {
 		return biometricoServices.findAllByBiometricoEmpresa(empresa);
 	}
 
-	@GetMapping("consultarMarcacionIdentificacion/")
-	public MarcacionIndentificacionResponses consultarMarcacionIdentificacion(@RequestParam String identificacion , @RequestParam  String empresa)
+	@PostMapping("consultarMarcacionIdentificacion/")
+	public MarcacionIndentificacionResponses consultarMarcacionIdentificacion(@RequestBody String json)
 	{
-		return dataBaseServices.consultarMarcacionIdentificacion(identificacion,empresa);
+		Map<String, Object> map = UtilsJSON.jsonToMap(json);
+		String empresa = UtilsJSON.jsonToObjeto(String.class, map.get("empresa"));
+		String identificacion = UtilsJSON.jsonToObjeto(String.class, map.get("identificacion"));
+		String apellidos = UtilsJSON.jsonToObjeto(String.class, map.get("apellidos"));
+		return dataBaseServices.consultarMarcacionIdentificacion(identificacion,apellidos,empresa);
 	}
+
+		//@Scheduled (cron = "0/3 * * ? * *")
+	//cada dos horas
+		//@Scheduled (cron = "0 0 */2 * * ?")
+		//@Scheduled (cron = "0/15 0 * * * ?")
+		//@Scheduled(cron = "0 0 */6 * * *")//cada 6 hora
+		//@Scheduled(cron = "0 0 */12 * * *")//12 horas
+		//@Scheduled(cron = "0 0 */8 * * *")8 horas
+		//@Scheduled(cron = "0 * * * * *")//cada un minutos
+		@Scheduled(cron = "0 0 */1 * * *")//cada 6 hora
+	  public void calculoHorasSuplementariasProduccionFija() {
+		dataBaseServices.calculoHorasSuplementariasProduccionFija();
+	}
+
 
 }
 	

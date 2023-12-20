@@ -1,9 +1,6 @@
 package com.backSpringBatch.services;
 
-import com.backSpringBatch.postgres.models.EmpresaResponse;
-import com.backSpringBatch.postgres.models.PersonResponseS;
-import com.backSpringBatch.postgres.models.ResponsePeriodoActual;
-import com.backSpringBatch.postgres.models.ShedulePersonDto;
+import com.backSpringBatch.postgres.models.*;
 import com.backSpringBatch.sqlserver.models.MarcacionesMongo;
 import com.backSpringBatch.sqlserver.models.ResponseMarcacionesMongo;
 import com.diosmar.GenericExceptionUtils;
@@ -164,12 +161,12 @@ public class RESTServices {
         return rootc;
 
     }
-/*
-    public EmpresaResponse findByEstadoEmpCodigoEmpresa(String empCodigo)
+
+    public ResponsePersonaProduccionFija consultarPersonaProduccionFijaCalculo(String tipoNomina)
     {
-        String ruta = env.getProperty("urlFindByEstadoEmpCodigoEmpresa");
-        ruta+="?empCodigo="+empCodigo;
-        EmpresaResponse rootc=null;
+        String ruta = env.getProperty("urlConsultarPersonaProduccionFija");
+        ruta+="?tipoNomina="+tipoNomina;
+        ResponsePersonaProduccionFija rootc=null;
         try {
             Response response = RestAssured.given()
                     .headers(
@@ -177,7 +174,7 @@ public class RESTServices {
                     .contentType("application/json;charset=utf-8").when()
                     .get(ruta)
                     .then().extract().response();
-            rootc = response.getBody().as(EmpresaResponse.class);
+            rootc = response.getBody().as(ResponsePersonaProduccionFija.class);
         } catch (Exception ex)
         {
             // TODO: handle exception
@@ -186,6 +183,6 @@ public class RESTServices {
         }
         return rootc;
 
-    }*/
+    }
 
 }

@@ -3,6 +3,7 @@ package com.backSpringBatch.Util;
 import com.backSpringBatch.dto.RegistroMarcacionesDTO;
 import com.backSpringBatch.dto.RegistroMarcacionesEntraSalida;
 import com.backSpringBatch.postgres.entity.AsistNow;
+import com.backSpringBatch.postgres.models.MarcacionIdentificacionDto;
 import com.backSpringBatch.postgres.repository.PostGresRepository;
 import com.diosmar.GenericExceptionUtils;
 import com.diosmar.Utils;
@@ -595,23 +596,19 @@ public class Utily {
         return fechaComoCadena;
     }
 
-    public  List<RegistroMarcacionesEntraSalida> conversioMarcacionIdentificacion(List<Object[]> list)
+    public  List<MarcacionIdentificacionDto> conversioMarcacionIdentificacion(List<Object[]> list)
     {
 
-        List<RegistroMarcacionesEntraSalida> registroMarcacionesDTOList = new ArrayList<>();
+        List<MarcacionIdentificacionDto> registroMarcacionesDTOList = new ArrayList<>();
         for (Object[] registroMarcaciones : list)
         {
-            RegistroMarcacionesEntraSalida  registroMarcacionesDTO= new RegistroMarcacionesEntraSalida();
+            MarcacionIdentificacionDto  registroMarcacionesDTO= new MarcacionIdentificacionDto();
             registroMarcacionesDTO.setAsisId(registroMarcaciones[0] == null ? "": (String) registroMarcaciones[0]);
-            registroMarcacionesDTO.setAsisFecha(registroMarcaciones[1] == null ? null : (Date) registroMarcaciones[1]);
-            registroMarcacionesDTO.setIdentificacion(registroMarcaciones[2] == null ? "" : (String) registroMarcaciones[2]);
-            registroMarcacionesDTO.setApellidos(registroMarcaciones[3] == null ? "" : (String) registroMarcaciones[3]);
-            registroMarcacionesDTO.setNombres(registroMarcaciones[4] == null ? "" : (String) registroMarcaciones[4]);
-            registroMarcacionesDTO.setAsisTipo(registroMarcaciones[5] == null ? "" : (String) registroMarcaciones[5]);
-            registroMarcacionesDTO.setZona(registroMarcaciones[6] == null ? "" : (String) registroMarcaciones[6]);
-            registroMarcacionesDTO.setAsisHora(registroMarcaciones[7] == null ? null : (String) registroMarcaciones[7]);
-            registroMarcacionesDTO.setAsisIng(registroMarcaciones[8] == null ? null : (Date) registroMarcaciones[8]);
-            registroMarcacionesDTO.setEmpresa(registroMarcaciones[9] == null ? null : (String) registroMarcaciones[9]);
+            registroMarcacionesDTO.setIdentificacion(registroMarcaciones[1] == null ? "" : (String) registroMarcaciones[1]);
+            registroMarcacionesDTO.setApellidos(registroMarcaciones[2] == null ? "" : (String) registroMarcaciones[2]);
+            registroMarcacionesDTO.setNombres(registroMarcaciones[3] == null ? "" : (String) registroMarcaciones[3]);
+            registroMarcacionesDTO.setEmpresa(registroMarcaciones[4] == null ? null : (String) registroMarcaciones[4]);
+            registroMarcacionesDTO.setIdentificacionApellidos(registroMarcacionesDTO.getIdentificacion()+" - "+registroMarcacionesDTO.getApellidos());
             registroMarcacionesDTOList.add(registroMarcacionesDTO);
 
         }

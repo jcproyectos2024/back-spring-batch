@@ -249,8 +249,8 @@ public interface PostGresRepository extends JpaRepository<AsistNow, String> {
 
     @Query(nativeQuery = false, value = "SELECT  distinct asw.id.asisId, asw.identificacion ,asw.apellidos ,asw.nombres ,asw.empresa " +
             " FROM AsistNow asw " +
-            " WHERE (asw.identificacion like:identificacion or :identificacion is null) AND (asw.empresa=:empresa) ")
-    Optional<List<Object[]>>  consultarMarcacionIdentificacion(@Param("identificacion") String identificacion, @Param("empresa") String empresa );
+            " WHERE (asw.identificacion like:identificacion or :identificacion is null) AND (asw.apellidos like:apellidos or :apellidos is null)  AND (asw.empresa=:empresa) ")
+    Optional<List<Object[]>>  consultarMarcacionIdentificacion(@Param("identificacion") String identificacion,@Param("apellidos") String apellidos, @Param("empresa") String empresa );
 
 }
 

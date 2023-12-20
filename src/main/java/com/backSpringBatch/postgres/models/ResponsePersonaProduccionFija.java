@@ -1,25 +1,24 @@
 package com.backSpringBatch.postgres.models;
 
-import com.backSpringBatch.dto.BiometricoDto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class BiometricoResponse
+public class ResponsePersonaProduccionFija
 {
-    private List<BiometricoDto>  biometricoDtoList;
+    private List<PersonaProduccionFijaDto> personaProduccionFijaDtoList;
     private String message;
-    private boolean success;
+    private   boolean  success;
 
-    public BiometricoResponse() {
+    public ResponsePersonaProduccionFija() {
     }
 
-    public List<BiometricoDto> getBiometricoDtoList() {
-        return biometricoDtoList;
+    public List<PersonaProduccionFijaDto> getPersonaProduccionFijaDtoList() {
+        return personaProduccionFijaDtoList;
     }
 
-    public void setBiometricoDtoList(List<BiometricoDto> biometricoDtoList) {
-        this.biometricoDtoList = biometricoDtoList;
+    public void setPersonaProduccionFijaDtoList(List<PersonaProduccionFijaDto> personaProduccionFijaDtoList) {
+        this.personaProduccionFijaDtoList = personaProduccionFijaDtoList;
     }
 
     public String getMessage() {
