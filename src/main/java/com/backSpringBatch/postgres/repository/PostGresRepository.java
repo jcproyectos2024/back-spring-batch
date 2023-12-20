@@ -246,5 +246,11 @@ public interface PostGresRepository extends JpaRepository<AsistNow, String> {
                                               @Param("asisTipo") String asisTipo );
 
 
+
+    @Query(nativeQuery = false, value = "SELECT  distinct asw.id.asisId, asw.identificacion ,asw.apellidos ,asw.nombres ,asw.empresa " +
+            " FROM AsistNow asw " +
+            " WHERE (asw.identificacion like:identificacion or :identificacion is null) AND (asw.empresa=:empresa) ")
+    Optional<List<Object[]>>  consultarMarcacionIdentificacion(@Param("identificacion") String identificacion, @Param("empresa") String empresa );
+
 }
 

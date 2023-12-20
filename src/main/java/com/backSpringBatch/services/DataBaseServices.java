@@ -7,6 +7,7 @@ import com.backSpringBatch.dto.*;
 import com.backSpringBatch.postgres.entity.*;
 import com.backSpringBatch.postgres.mapper.*;
 import com.backSpringBatch.postgres.models.*;
+import com.backSpringBatch.postgres.models.Master.MarcacionIndentificacionResponses;
 import com.backSpringBatch.postgres.repository.*;
 import com.backSpringBatch.sqlserver.entity.AsistNowRegistro;
 import com.backSpringBatch.sqlserver.mapper.AsisRegistroMapper;
@@ -1432,4 +1433,43 @@ public class DataBaseServices {
 
         return response;
     }
+
+
+    public MarcacionIndentificacionResponses consultarMarcacionIdentificacion(String identificacion , String empresa)
+    {
+        MarcacionIndentificacionResponses response = new MarcacionIndentificacionResponses();
+
+        try
+        {
+
+            String identificacionConsulta=(identificacion!=null && !identificacion.equals("")?"%"+identificacion+"%":null);
+            EmpresaResponse empresaResponse =restServices.findByEstadoEmpCodigoEmpresa(empresa);
+            empresa =empresaResponse.getSuccess()?empresaResponse.getEmpresaDTO().getEmpNombre():"";
+            postGresRepository.consultarMarcacionIdentificacion(identificacionConsulta,empresa).ifPresentOrElse(masterProfesionOcupacion ->
+            {
+                List<AsistNowIdentificacionDto> asistNowIdentificacionDtoList = asistNowMapper.asistNowIdentificacionDtoToAsistNow(masterProfesionOcupacion);
+                response.setAsistNowIdentificacionDtoList(asistNowIdentificacionDtoList);
+                response.setMessage("Consulta Existosa");
+                response.setSuccess(true);
+
+            }, () -> {
+                response.setMessage("No se encotraron Datos");
+                response.setSuccess(false);
+            });
+
+
+        }catch (Exception ex)
+        {
+            ex.printStackTrace();
+            response.setMessage("Error de Servidor");
+            response.setSuccess(false);
+            // return response;
+            throw new GenericExceptionUtils(ex);
+
+        }
+
+
+        return response;
+    }
+
 }

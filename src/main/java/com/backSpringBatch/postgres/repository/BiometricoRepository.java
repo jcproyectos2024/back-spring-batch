@@ -7,6 +7,9 @@ import com.backSpringBatch.postgres.entity.Biometrico;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Optional;
+
 
 @Repository
 public interface BiometricoRepository extends JpaRepository<Biometrico, Long> {
@@ -17,6 +20,7 @@ public interface BiometricoRepository extends JpaRepository<Biometrico, Long> {
 	
     Biometrico findByIpBiometrico( String ip);
 
+   Optional<List<Biometrico>> findAllByEmpresa(String empresa);
 
 
 }
