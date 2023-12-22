@@ -8,4 +8,5 @@ import java.util.List;
 public interface BiometricoMapper
 {
         List<BiometricoDto> biometricoToBiometricoDto(List<Biometrico> all);
+        BiometricoDto biometricoDTOToBiometrico(Biometrico biometrico);
 }

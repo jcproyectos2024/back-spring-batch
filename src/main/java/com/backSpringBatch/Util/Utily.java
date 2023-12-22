@@ -3,7 +3,10 @@ package com.backSpringBatch.Util;
 import com.backSpringBatch.dto.RegistroMarcacionesDTO;
 import com.backSpringBatch.dto.RegistroMarcacionesEntraSalida;
 import com.backSpringBatch.postgres.entity.AsistNow;
+import com.backSpringBatch.postgres.entity.Biometrico;
+import com.backSpringBatch.postgres.mapper.BiometricoMapper;
 import com.backSpringBatch.postgres.models.MarcacionIdentificacionDto;
+import com.backSpringBatch.postgres.repository.BiometricoRepository;
 import com.backSpringBatch.postgres.repository.PostGresRepository;
 import com.diosmar.GenericExceptionUtils;
 import com.diosmar.Utils;
@@ -26,6 +29,10 @@ import java.util.stream.Collectors;
 public class Utily {
     @Autowired
     private PostGresRepository postGresRepository;
+    @Autowired
+    BiometricoRepository biometricoRepository;
+    @Autowired
+    BiometricoMapper biometricoMapper;
     public Date getSumBetwenDates (Date dateInicio, Date dateFinal) {
 
         int seconds1 = dateInicio.getSeconds();
@@ -499,7 +506,10 @@ public class Utily {
             registroMarcacionesDTO.setNombres(registroMarcaciones.getNombres() == null ? "" : (String) registroMarcaciones.getNombres());
             registroMarcacionesDTO.setZona(registroMarcaciones.getBiometrico().getNombreBiometrico() == null ? "" : (String) registroMarcaciones.getBiometrico().getNombreBiometrico());
             registroMarcacionesDTO.setHoraEntrada(registroMarcaciones.getAsisHora() == null ? null : (String) registroMarcaciones.getAsisHora());
-            registroMarcacionesDTO.setFechaEntrada(registroMarcaciones.getId().getAsisIng() == null ? null : (Date) registroMarcaciones.getId().getAsisIng());
+            registroMarcacionesDTO.setFechaEntradaHHmmss(registroMarcaciones.getId().getAsisIng() == null ? null : (Date) registroMarcaciones.getId().getAsisIng());
+            registroMarcacionesDTO.setFechaEntrada(registroMarcaciones.getId().getAsisIng() == null ? null : (Date) registroMarcaciones.getAsisFecha());
+            Biometrico biometricoEntrada = biometricoRepository.findByIpBiometrico(registroMarcaciones.getId().getAsisZona());
+            registroMarcacionesDTO.setBiometricoEntrada( (biometricoEntrada==null?null:biometricoMapper.biometricoDTOToBiometrico(biometricoEntrada)) );
             String[] horas = horasMinutosSegundosSplit(registroMarcaciones.getAsisHora());
             if (biometrico.equalsIgnoreCase("GARITA"))
             {
@@ -511,14 +521,20 @@ public class Utily {
                     List<AsistNow> asistNowNoche = postGresRepository.consultarMarcacioneSalida(registroMarcaciones.getIdentificacion(), fechaTurnoNche, fechaTurnoNche, registroMarcaciones.getBiometrico().getNombreBiometrico(), registroMarcaciones.getEmpresa(), "SALIDA");
                     //Utils.console("asistNowNoche", Utils.toJson(asistNowNoche));
                     registroMarcacionesDTO.setHoraSalida(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getAsisHora());
-                    registroMarcacionesDTO.setFechaSalida(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getId().getAsisIng());
+                    registroMarcacionesDTO.setFechaSalidaHHmmss(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getId().getAsisIng());
+                    registroMarcacionesDTO.setFechaSalida(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getAsisFecha());
+                    Biometrico biometricoSalida = biometricoRepository.findByIpBiometrico(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getId().getAsisZona());
+                    registroMarcacionesDTO.setBiometricoSalida( (biometricoEntrada==null?null:biometricoMapper.biometricoDTOToBiometrico(biometricoSalida)));
                 }
                 if (Integer.parseInt(horas[0]) <= 16)
                 {
                 String asisFecha = convertirDateStringAnosMesDias(registroMarcaciones.getAsisFecha());
                 List<AsistNow> asistNowNoche = postGresRepository.consultarMarcacioneSalida(registroMarcaciones.getIdentificacion(), asisFecha, asisFecha, registroMarcaciones.getBiometrico().getNombreBiometrico(), registroMarcaciones.getEmpresa(), "SALIDA");
                 registroMarcacionesDTO.setHoraSalida(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getAsisHora());
-                registroMarcacionesDTO.setFechaSalida(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getId().getAsisIng());
+                    registroMarcacionesDTO.setFechaSalidaHHmmss(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getId().getAsisIng());
+                    registroMarcacionesDTO.setFechaSalida(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getAsisFecha());
+                    Biometrico biometricoSalida = biometricoRepository.findByIpBiometrico(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getId().getAsisZona());
+                    registroMarcacionesDTO.setBiometricoSalida( (biometricoEntrada==null?null:biometricoMapper.biometricoDTOToBiometrico(biometricoSalida)));
                 }
 
         }else
@@ -526,8 +542,8 @@ public class Utily {
             //System.out.println("biometrico"+biometrico);
             String asisFecha = convertirDateStringAnosMesDias(registroMarcaciones.getAsisFecha());
             List<AsistNow> asistNowNoche = postGresRepository.consultarMarcacioneSalida(registroMarcaciones.getIdentificacion(), asisFecha, asisFecha, registroMarcaciones.getBiometrico().getNombreBiometrico(), registroMarcaciones.getEmpresa(), "SALIDA");
-            registroMarcacionesDTO.setHoraSalida(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getAsisHora());
-            registroMarcacionesDTO.setFechaSalida(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getId().getAsisIng());
+            registroMarcacionesDTO.setFechaSalidaHHmmss(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getId().getAsisIng());
+            registroMarcacionesDTO.setFechaSalida(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getAsisFecha());
 
         }
             registroMarcacionesDTO.setEmpresa(registroMarcaciones.getEmpresa() == null ? null : (String) registroMarcaciones.getEmpresa() );

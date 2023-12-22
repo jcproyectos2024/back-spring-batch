@@ -147,11 +147,19 @@ public class DataBaseontroller {
 		//@Scheduled(cron = "0 0 */12 * * *")//12 horas
 		//@Scheduled(cron = "0 0 */8 * * *")8 horas
 		//@Scheduled(cron = "0 * * * * *")//cada un minutos
-		@Scheduled(cron = "0 0 */1 * * *")//cada 6 hora
+		//@Scheduled(cron = "0 0 */6 * * *")//cada 6 hora
+		//@Scheduled(cron = "0 * * * * *")//cada un minutos
+		@Scheduled(cron = "0 0 */4 * * *")//cada 4 hora
 	  public void calculoHorasSuplementariasProduccionFija() {
 		dataBaseServices.calculoHorasSuplementariasProduccionFija();
 	}
 
+	@PostMapping("guardadoEntradaSalidaMarcacionDia/")
+	public RegistroMarcacionesResponses guardadoEntradaSalidaMarcacionDia(@RequestBody @Validated List<RegistroMarcacionesGuardadoDTO> registroMarcacionesDTO)
+	{
+		Utils.console("registroMarcacionesDTOLista",Utils.toJson(registroMarcacionesDTO));
+		return dataBaseServices.guardadoEntradaSalidaMarcacionDia(registroMarcacionesDTO);
+	}
 
 }
 	

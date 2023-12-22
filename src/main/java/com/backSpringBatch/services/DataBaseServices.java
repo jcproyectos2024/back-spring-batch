@@ -569,7 +569,8 @@ public class DataBaseServices {
         System.out.println("findAllByHorasSuplementariasPersonal ---- horasSuplementariasPersonalBody.getEmpresa()"+horasSuplementariasPersonalBody.getEmpresa());
         EmpresaResponse empresaResponse =restServices.findByEstadoEmpCodigoEmpresa(horasSuplementariasPersonalBody.getEmpresa());
         try {
-          //  calculoHorasSuplementariasProduccionXPersona(horasSuplementariasPersonalBody.getIdentificacion(),empresaResponse.getSuccess()?empresaResponse.getEmpresaDTO().getEmpNombre():"");
+
+            //calculoHorasSuplementariasProduccionXPersona(horasSuplementariasPersonalBody.getIdentificacion(),empresaResponse.getSuccess()?empresaResponse.getEmpresaDTO().getEmpNombre():"");
             List<HorasSuplementariasPersonal> horasSuplementariasPersonalList = horasSuplementariasPersonalRepository.findAllByIdentificacionAndEstadoTrueAndPeriodo(horasSuplementariasPersonalBody.getIdentificacion(),horasSuplementariasPersonalBody.getPeriodo());
             List<HorasSuplementariasPersonalDto>  horasSuplementariasPersonalDtoList = horasSuplementariasPersonalMapper.toHorasSuplementariasPersonalDtoList(horasSuplementariasPersonalList);
             if (horasSuplementariasPersonalDtoList.isEmpty())
@@ -605,20 +606,9 @@ public class DataBaseServices {
     {
 
         HorasSuplementariasPersonalResponses response = new HorasSuplementariasPersonalResponses();
-
-
        List<AsistNow>  asistNowList =postGresRepository.findByElementByFechasEmpresa(fechaIni,fechaFin,identificacion,empresa,"GARITA" ,Sort.by(Sort.Direction.ASC,"id.asisIng"));
-
-
-
-
         asistNowList.stream().forEach(regActual ->
         {
-
-
-
-
-
        // Biometrico bio = biometricoRepository.findByIpBiometrico(regActual.getId().getAsisZona());
         //logica para el calculo de las horas suplementarias de producción
     //   if(bio.getNombreBiometrico().equals("GARITA") && bio.getTipoBiometrinco().equals("SALIDA"))
@@ -910,8 +900,6 @@ public class DataBaseServices {
             String apellidos=(consultarEntradaSalida.getApellidos()!=null && !consultarEntradaSalida.getApellidos().equals("")?"%"+consultarEntradaSalida.getApellidos().toUpperCase()+"%":null);
             EmpresaResponse empresaResponse =restServices.findByEstadoEmpCodigoEmpresa(consultarEntradaSalida.getEmpresa());
             consultarEntradaSalida.setEmpresa(empresaResponse.getSuccess()?empresaResponse.getEmpresaDTO().getEmpNombre():"");
-           //Page<Object[]> pc2  =postGresRepository.consultarMarcacionesEntradaSalidaPagineo(identificacion,apellidos,consultarEntradaSalida.getFechaInicio(),consultarEntradaSalida.getFechaFin(),consultarEntradaSalida.getBiometrico(),consultarEntradaSalida.getEmpresa(),pageable);
-           // Page<Object[]> pc2  =postGresRepository.consultarMarcacionesEntradaSalidaPagin(identificacion,apellidos,consultarEntradaSalida.getFechaInicio(),consultarEntradaSalida.getFechaFin(),consultarEntradaSalida.getBiometrico(),consultarEntradaSalida.getEmpresa(),pageable);
             Page<AsistNow> pc2= postGresRepository.consultarMarcacioneEntradaPagineo(identificacion,apellidos,consultarEntradaSalida.getFechaInicio(),consultarEntradaSalida.getFechaFin(),consultarEntradaSalida.getBiometrico(),consultarEntradaSalida.getEmpresa(),"INGRESO",pageable);
             if (!pc2.getContent().isEmpty())
             {
@@ -1008,26 +996,27 @@ public class DataBaseServices {
                     asistnowPK.setAsisId(asistNowExiste.get(0).getId().getAsisId());
                     if (marcacionesDTO.getEditado().equalsIgnoreCase("INGRESO"))
                     {
+                        registroMarcaciones.setAsisFecha(marcacionesDTO.getFechaEntrada());
                         registroMarcaciones.setAsisHora(marcacionesDTO.getHoraEntrada());
-                        asistnowPK.setAsisIng(utily.concatenaHoraFechaEntradaSalidaMarcacion(marcacionesDTO.getAsisFecha(),marcacionesDTO.getHoraEntrada()));
+                        asistnowPK.setAsisIng(utily.concatenaHoraFechaEntradaSalidaMarcacion(marcacionesDTO.getFechaEntrada(),marcacionesDTO.getHoraEntrada()));
                     }
                     if (marcacionesDTO.getEditado().equalsIgnoreCase("SALIDA"))
                     {
+                        registroMarcaciones.setAsisFecha(marcacionesDTO.getFechaSalida());
                         registroMarcaciones.setAsisHora(marcacionesDTO.getHoraSalida());
-                        asistnowPK.setAsisIng(utily.concatenaHoraFechaEntradaSalidaMarcacion(marcacionesDTO.getAsisFecha(),marcacionesDTO.getHoraSalida()));
+                        asistnowPK.setAsisIng(utily.concatenaHoraFechaEntradaSalidaMarcacion(marcacionesDTO.getFechaSalida(),marcacionesDTO.getHoraSalida()));
                     }
                     asistnowPK.setAsisZona(biometrico.getIpBiometrico());
                     registroMarcaciones.setId(asistnowPK);
                     registroMarcaciones.setAsisRes("OK");
                     registroMarcaciones.setAsisTipo(biometrico.getTipoBiometrinco());
-                    registroMarcaciones.setAsisFecha(marcacionesDTO.getAsisFecha());
                     registroMarcaciones.setAsisHorasSuplementaria(false);
                     AsistNow registroMarcacionesSave = postGresRepository.save(registroMarcaciones);
                     RegistroMarcacionesDTO marcacionesMapperDTO = registroMarcacionesMapper.asistNowToRegistroMarcacionesDTO(registroMarcacionesSave);
                     response.setMessage("GUARDADO CON EXISTO");
                     response.setSuccess(true);
                     response.setRegistroMarcacionesDTO(marcacionesMapperDTO);
-                    guardadoHistorialMarcaciones(marcacionesDTO.getUsuario(),registroMarcacionesSave);
+                    guardadoHistorialMarcaciones(marcacionesDTO.getObservacion(),marcacionesDTO.getUsuario(),registroMarcacionesSave);
                     return response;
                 }
             }
@@ -1051,19 +1040,16 @@ public class DataBaseServices {
 
 
 
-    public RegistroMarcacionesResponses guardadoHistorialMarcaciones( String usuario ,AsistNow asistNow)
+    public RegistroMarcacionesResponses guardadoHistorialMarcaciones( String observacion ,String usuario ,AsistNow asistNow)
     {
         RegistroMarcacionesResponses response = new RegistroMarcacionesResponses();
 
         try
         {
-
             //History
             AsistNowRegistroDTO  historyAsistNowRDTO = new AsistNowRegistroDTO();
             MarcacionesMongo  marcacionesMongo = new MarcacionesMongo();
             List<AsistNowRegistroDTO>  asistNowRegistroDTOS= new ArrayList<>();
-            //Datos de multi Tenant
-           // System.out.println("tenant"+ev.getProperty("tenant"));
             marcacionesMongo.setTenant(ev.getProperty("tenant"));
             marcacionesMongo.setDatabase(ev.getProperty("database"));
             marcacionesMongo.setCollection(ev.getProperty("collectionAsistencias"));
@@ -1082,6 +1068,7 @@ public class DataBaseServices {
             historyAsistNowRDTO.setFechaAccion(utily.convertirDateString(new Date()));
             historyAsistNowRDTO.setAccion("GUARDADO");
             historyAsistNowRDTO.setUsuario(usuario);
+            historyAsistNowRDTO.setObservacion(observacion);
             historyAsistNowRDTO.setFechaAccion(utily.convertirDateString(new Date()));
             asistNowRegistroDTOS.add(historyAsistNowRDTO);
             marcacionesMongo.setPayload(asistNowRegistroDTOS);
@@ -1151,7 +1138,7 @@ public class DataBaseServices {
             if (personResponseS.isSuccess())
             {
                 List<AsistNow>  listaSinDuplicados =postGresRepository.findAllByIdentificacionEntada(fechaPeriodo[0],fechaPeriodo[1],identificacion,empresa,personResponseS.getTipoBiometricoCalculoDto()==null?"": personResponseS.getTipoBiometricoCalculoDto().getNombreBiometrico(),"INGRESO",false, Sort.by(Sort.Direction.ASC,"id.asisIng"));
-                List<AsistNow>  asistNowListSalida =postGresRepository.findAllByIdentificacionSalida(fechaPeriodo[0],fechaPeriodo[1],identificacion,empresa,personResponseS.getTipoBiometricoCalculoDto()==null?"": personResponseS.getTipoBiometricoCalculoDto().getNombreBiometrico(),"SALIDA",false, Sort.by(Sort.Direction.ASC,"id.asisIng"));
+                List<AsistNow>  asistNowListSalida =postGresRepository.findAllByIdentificacionSalida(fechaPeriodo[0],fechaPeriodo[1],identificacion,empresa,personResponseS.getTipoBiometricoCalculoDto()==null?"": personResponseS.getTipoBiometricoCalculoDto().getNombreBiometrico(),"SALIDA",false, Sort.by(Sort.Direction.DESC,"id.asisIng"));
                 List<AsistNow> asistNowList = listaSinDuplicados.stream()
                         .collect(Collectors.toMap(
                                 AsistNow::getAsisFecha,  // Clave: asisFecha
@@ -1441,7 +1428,6 @@ public class DataBaseServices {
 
         try
         {
-
             String identificacionConsulta=(identificacion!=null && !identificacion.equals("")?"%"+identificacion+"%":null);
             String apellidosConsulta=(apellidos!=null && !apellidos.equals("")?"%"+apellidos+"%":null);
             EmpresaResponse empresaResponse =restServices.findByEstadoEmpCodigoEmpresa(empresa);
@@ -1457,8 +1443,6 @@ public class DataBaseServices {
                 response.setMessage("No se encotraron Datos");
                 response.setSuccess(false);
             });
-
-
         }catch (Exception ex)
         {
             ex.printStackTrace();
@@ -1468,24 +1452,81 @@ public class DataBaseServices {
             throw new GenericExceptionUtils(ex);
 
         }
-
-
         return response;
     }
 
     public void calculoHorasSuplementariasProduccionFija()
     {
-
         try
         {
-            restServices.consultarPersonaProduccionFijaCalculo("PRODUCCIÓN FIJA");
-            System.out.println("***********************AQUI"+utily.convertirDateString(new Date()));
-           // Utils.console("response",Utils.toJson(response));
+            ResponsePersonaProduccionFija responsePersonaProduccionFija =restServices.consultarPersonaProduccionFijaCalculo("PRODUCCIÓN FIJA");
+            if (responsePersonaProduccionFija.isSuccess())
+            {
+                responsePersonaProduccionFija.getPersonaProduccionFijaDtoList().forEach(x ->
+                {
+                    try
+                    {
+                        calculoHorasSuplementariasProduccionXPersona(x.getIdentificacion(), x.getEmpCodigo());
+                    } catch (Exception e)
+                    {
+                        throw new GenericExceptionUtils(e);
+                    }
+                });
+              //  Utils.console("responsePersonaProduccionFija",Utils.toJson(responsePersonaProduccionFija));
+                System.out.println("***********************AQUI-----"+utily.convertirDateString(new Date()));
+            }
         }
         catch (Exception ex)
         {
             throw new GenericExceptionUtils(ex);
         }
-
     }
+
+    public RegistroMarcacionesResponses guardadoEntradaSalidaMarcacionDia( List<RegistroMarcacionesGuardadoDTO> marcacionesGuardadoDTOList)
+    {
+        RegistroMarcacionesResponses response = new RegistroMarcacionesResponses();
+
+        try
+        {
+            for (RegistroMarcacionesGuardadoDTO marcacionesDTO :marcacionesGuardadoDTOList)
+            {
+                List<AsistNow>   asistNowExiste=  postGresRepository.findAllByIdentificacion(marcacionesDTO.getIdentificacion());
+                if (!asistNowExiste.isEmpty()) {
+                    AsistnowPK asistnowPK = new AsistnowPK();
+                    Biometrico biometrico = biometricoRepository.findByTipoBiometrincoAndNombreBiometrico(marcacionesDTO.getBiometrico().getTipoBiometrinco(), marcacionesDTO.getBiometrico().getNombreBiometrico());
+                    AsistNow registroMarcaciones = registroMarcacionesMapper.registroMarcacionesGuardadoDTOToAsistNow(marcacionesDTO);
+                    registroMarcaciones.setBiometrico(biometrico);
+                    asistnowPK.setAsisId(asistNowExiste.get(0).getId().getAsisId());
+                    registroMarcaciones.setAsisHora(marcacionesDTO.getHora());
+                    asistnowPK.setAsisIng(utily.concatenaHoraFechaEntradaSalidaMarcacion(marcacionesDTO.getAsisFecha(),marcacionesDTO.getHora()));
+                    asistnowPK.setAsisZona(biometrico.getIpBiometrico());
+                    registroMarcaciones.setId(asistnowPK);
+                    registroMarcaciones.setAsisRes("OK");
+                    registroMarcaciones.setAsisTipo(biometrico.getTipoBiometrinco());
+                    registroMarcaciones.setAsisFecha(marcacionesDTO.getAsisFecha());
+                    registroMarcaciones.setAsisHorasSuplementaria(false);
+                    AsistNow registroMarcacionesSave = postGresRepository.save(registroMarcaciones);
+                    //RegistroMarcacionesDTO marcacionesMapperDTO = registroMarcacionesMapper.asistNowToRegistroMarcacionesDTO(registroMarcacionesSave);
+                    response.setMessage("GUARDADO CON EXISTO");
+                    response.setSuccess(true);
+                   // response.setRegistroMarcacionesDTO(marcacionesMapperDTO);
+                    guardadoHistorialMarcaciones(marcacionesDTO.getObservacion(), marcacionesDTO.getUsuario()==null?marcacionesDTO.getUsuarioModificacion():marcacionesDTO.getUsuario(),registroMarcacionesSave);
+                    return response;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            // TODO: handle exception
+            response.setMessage(ex.getMessage());
+            response.setSuccess(false);
+            //  return response;
+            throw new GenericExceptionUtils(ex);
+        }
+
+
+        return response;
+    }
+
+
 }

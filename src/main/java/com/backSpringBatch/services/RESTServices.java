@@ -185,4 +185,49 @@ public class RESTServices {
 
     }
 
+    public ResponsePersonaProduccionFija findAllByPersonalHorasExtras(String horasExtras)
+    {
+        String ruta = env.getProperty("urlFindAllByPersonalHorasExtras");
+        ruta+="?horasExtras="+horasExtras;
+        ResponsePersonaProduccionFija rootc=null;
+        try {
+            Response response = RestAssured.given()
+                    .headers(
+                            "Content-Type", ContentType.JSON, "Accept", ContentType.JSON)
+                    .contentType("application/json;charset=utf-8").when()
+                    .get(ruta)
+                    .then().extract().response();
+            rootc = response.getBody().as(ResponsePersonaProduccionFija.class);
+        } catch (Exception ex)
+        {
+            // TODO: handle exception
+            ex.printStackTrace();
+            throw new GenericExceptionUtils(ex);
+        }
+        return rootc;
+
+    }
+
+    public EmpresaResponse findAllByEmpresa()
+    {
+        String ruta = env.getProperty("urlFindAllByEmpresa");
+        EmpresaResponse rootc=null;
+        try {
+            Response response = RestAssured.given()
+                    .headers(
+                            "Content-Type", ContentType.JSON, "Accept", ContentType.JSON)
+                    .contentType("application/json;charset=utf-8").when()
+                    .get(ruta)
+                    .then().extract().response();
+            rootc = response.getBody().as(EmpresaResponse.class);
+        } catch (Exception ex)
+        {
+            // TODO: handle exception
+            ex.printStackTrace();
+            throw new GenericExceptionUtils(ex);
+        }
+        return rootc;
+
+    }
+
 }
