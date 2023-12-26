@@ -2,19 +2,24 @@ package com.backSpringBatch.controller;
 
 
 import com.backSpringBatch.Util.SaveMantDTO;
+import com.backSpringBatch.Util.UtilsJSON;
 import com.backSpringBatch.dto.*;
 import com.backSpringBatch.postgres.models.*;
+import com.backSpringBatch.postgres.models.Master.MarcacionIndentificacionResponses;
+import com.backSpringBatch.services.BiometricoServices;
 import com.backSpringBatch.services.DataBaseServices;
 import com.backSpringBatch.sqlserver.models.ResponsesEntradaSalidaMarcacionDias;
 import com.diosmar.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.util.List;
+import java.util.Map;
 
 
 @Controller
@@ -23,6 +28,8 @@ import java.util.List;
 public class DataBaseontroller {
 	@Autowired
 	private DataBaseServices dataBaseServices;
+	@Autowired
+	private BiometricoServices biometricoServices;
 
 
 	@Scheduled (cron = "0/3 * * ? * *")
@@ -117,5 +124,44 @@ public class DataBaseontroller {
 	{
 		return dataBaseServices.calculoHorasSuplementariasProduccionXPersona(identificacion,empresa);
 	}
+	@GetMapping("findAllByBiometricoEmpresa/")
+	public BiometricoResponse findAllByBiometricoEmpresa()
+	{
+		return biometricoServices.findAllByBiometrico();
+	}
+
+	@PostMapping("consultarMarcacionIdentificacion/")
+	public MarcacionIndentificacionResponses consultarMarcacionIdentificacion(@RequestBody String json)
+	{
+		Map<String, Object> map = UtilsJSON.jsonToMap(json);
+		String empresa = UtilsJSON.jsonToObjeto(String.class, map.get("empresa"));
+		String identificacion = UtilsJSON.jsonToObjeto(String.class, map.get("identificacion"));
+		String apellidos = UtilsJSON.jsonToObjeto(String.class, map.get("apellidos"));
+		return dataBaseServices.consultarMarcacionIdentificacion(identificacion,apellidos,empresa);
+	}
+
+		//@Scheduled (cron = "0/3 * * ? * *")
+	//cada dos horas
+		//@Scheduled (cron = "0 0 */2 * * ?")
+		//@Scheduled (cron = "0/15 0 * * * ?")
+		//@Scheduled(cron = "0 0 */6 * * *")//cada 6 hora
+		//@Scheduled(cron = "0 0 */12 * * *")//12 horas
+		//@Scheduled(cron = "0 0 */8 * * *")8 horas
+		//@Scheduled(cron = "0 * * * * *")//cada un minutos
+		//@Scheduled(cron = "0 0 */6 * * *")//cada 6 hora
+		//@Scheduled(cron = "0 * * * * *")//cada un minutos
+	//	@Scheduled(cron = "0 0 */4 * * *")//cada 4 hora
+	 /* public void calculoHorasSuplementariasProduccionFija()
+		{
+		dataBaseServices.calculoHorasSuplementariasProduccionFija();
+		}*/
+
+	@PostMapping("guardadoEntradaSalidaMarcacionDia/")
+	public RegistroMarcacionesResponses guardadoEntradaSalidaMarcacionDia(@RequestBody @Validated List<RegistroMarcacionesGuardadoDTO> registroMarcacionesDTO) throws Exception
+	{
+		Utils.console("registroMarcacionesDTOLista",Utils.toJson(registroMarcacionesDTO));
+		return dataBaseServices.guardadoEntradaSalidaMarcacionDia(registroMarcacionesDTO);
+	}
+
 }
 	

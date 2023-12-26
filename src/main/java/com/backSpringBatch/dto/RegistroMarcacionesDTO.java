@@ -26,14 +26,26 @@ public class RegistroMarcacionesDTO implements Serializable
     private  String horaSalida;
     private String usuario;
     private BiometricoDto biometrico;
+    private BiometricoDto biometricoEntrada;
+    private BiometricoDto biometricoSalida;
 
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    private Date fechaEntradaHHmmss;
+
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    private Date fechaSalidaHHmmss;
+
+
+    @JsonFormat(pattern="yyyy-MM-dd")
     private Date fechaEntrada;
 
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern="yyyy-MM-dd")
     private Date fechaSalida;
 
+
     private String editado;
+
+    private String observacion;
 
     public RegistroMarcacionesDTO() {
     }
@@ -157,4 +169,45 @@ public class RegistroMarcacionesDTO implements Serializable
     public void setEditado(String editado) {
         this.editado = editado;
     }
+
+    public String getObservacion() {
+        return observacion;
+    }
+
+    public void setObservacion(String observacion) {
+        this.observacion = observacion;
+    }
+
+    public Date getFechaEntradaHHmmss() {
+        return fechaEntradaHHmmss;
+    }
+
+    public void setFechaEntradaHHmmss(Date fechaEntradaHHmmss) {
+        this.fechaEntradaHHmmss = fechaEntradaHHmmss;
+    }
+
+    public Date getFechaSalidaHHmmss() {
+        return fechaSalidaHHmmss;
+    }
+
+    public void setFechaSalidaHHmmss(Date fechaSalidaHHmmss) {
+        this.fechaSalidaHHmmss = fechaSalidaHHmmss;
+    }
+
+    public BiometricoDto getBiometricoEntrada() {
+        return biometricoEntrada;
+    }
+
+    public void setBiometricoEntrada(BiometricoDto biometricoEntrada) {
+        this.biometricoEntrada = biometricoEntrada;
+    }
+
+    public BiometricoDto getBiometricoSalida() {
+        return biometricoSalida;
+    }
+
+    public void setBiometricoSalida(BiometricoDto biometricoSalida) {
+        this.biometricoSalida = biometricoSalida;
+    }
+
 }

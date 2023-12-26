@@ -3,8 +3,14 @@ package com.backSpringBatch.Util;
 import com.backSpringBatch.dto.RegistroMarcacionesDTO;
 import com.backSpringBatch.dto.RegistroMarcacionesEntraSalida;
 import com.backSpringBatch.postgres.entity.AsistNow;
+import com.backSpringBatch.postgres.entity.Biometrico;
+import com.backSpringBatch.postgres.mapper.BiometricoMapper;
+import com.backSpringBatch.postgres.models.MarcacionIdentificacionDto;
+import com.backSpringBatch.postgres.repository.BiometricoRepository;
 import com.backSpringBatch.postgres.repository.PostGresRepository;
+import com.backSpringBatch.services.RESTServices;
 import com.diosmar.GenericExceptionUtils;
+import com.diosmar.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +30,12 @@ import java.util.stream.Collectors;
 public class Utily {
     @Autowired
     private PostGresRepository postGresRepository;
+    @Autowired
+    BiometricoRepository biometricoRepository;
+    @Autowired
+    BiometricoMapper biometricoMapper;
+    @Autowired
+    RESTServices  restServices;
     public Date getSumBetwenDates (Date dateInicio, Date dateFinal) {
 
         int seconds1 = dateInicio.getSeconds();
@@ -232,7 +244,19 @@ public class Utily {
         return fh;
 
     }
-
+    public Date  stringToDate(String dateString)
+    {
+        // Create a SimpleDateFormat object with the desired format
+        Date date = null;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            // Parse the string to obtain a Date object
+             date = sdf.parse(dateString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date;
+    }
     public String[] fechaPeriodoSplit(String periodo) {
         try {
             String[] horasMinutosSegundosSplit = periodo.split("_");
@@ -481,40 +505,91 @@ public class Utily {
     }
 
 
-    public  List<RegistroMarcacionesDTO> conversioRegistroMarcacionesDTO(List<AsistNow> list)
+    public  List<RegistroMarcacionesDTO> conversioRegistroMarcacionesDTO( String ipBiometrico,String biometrico ,List<AsistNow> list)
     {
         int cont = 0;
         List<RegistroMarcacionesDTO> registroMarcacionesDTOList = new ArrayList<>();
-        for (AsistNow registroMarcaciones : list)
-        {
+        for (AsistNow registroMarcaciones : list) {
             cont++;
-            RegistroMarcacionesDTO  registroMarcacionesDTO= new RegistroMarcacionesDTO();
+            RegistroMarcacionesDTO registroMarcacionesDTO = new RegistroMarcacionesDTO();
             registroMarcacionesDTO.setIdRegistroMarcaciones(cont);
-            registroMarcacionesDTO.setAsisId(registroMarcaciones.getId().getAsisId() == null ? "":registroMarcaciones.getId().getAsisId());
+            registroMarcacionesDTO.setAsisId(registroMarcaciones.getId().getAsisId() == null ? "" : registroMarcaciones.getId().getAsisId());
             registroMarcacionesDTO.setAsisFecha(registroMarcaciones.getAsisFecha() == null ? null : (Date) registroMarcaciones.getAsisFecha());
             registroMarcacionesDTO.setIdentificacion(registroMarcaciones.getIdentificacion() == null ? "" : (String) registroMarcaciones.getIdentificacion());
             registroMarcacionesDTO.setApellidos(registroMarcaciones.getApellidos() == null ? "" : (String) registroMarcaciones.getApellidos());
-            registroMarcacionesDTO.setNombres(registroMarcaciones.getNombres() == null ? "" : (String) registroMarcaciones.getNombres()) ;
+            registroMarcacionesDTO.setNombres(registroMarcaciones.getNombres() == null ? "" : (String) registroMarcaciones.getNombres());
             registroMarcacionesDTO.setZona(registroMarcaciones.getBiometrico().getNombreBiometrico() == null ? "" : (String) registroMarcaciones.getBiometrico().getNombreBiometrico());
             registroMarcacionesDTO.setHoraEntrada(registroMarcaciones.getAsisHora() == null ? null : (String) registroMarcaciones.getAsisHora());
-            registroMarcacionesDTO.setFechaEntrada(registroMarcaciones.getId().getAsisIng() == null ? null : (Date) registroMarcaciones.getId().getAsisIng() );
-            String[] horas= horasMinutosSegundosSplit(registroMarcaciones.getAsisHora());
-            if (Integer.parseInt(horas[0])>=16)
+            registroMarcacionesDTO.setFechaEntradaHHmmss(registroMarcaciones.getId().getAsisIng() == null ? null : (Date) registroMarcaciones.getId().getAsisIng());
+            registroMarcacionesDTO.setFechaEntrada(registroMarcaciones.getId().getAsisIng() == null ? null : (Date) registroMarcaciones.getAsisFecha());
+            Biometrico biometricoEntrada = biometricoRepository.findByIpBiometrico(registroMarcaciones.getId().getAsisZona());
+            registroMarcacionesDTO.setBiometricoEntrada( (biometricoEntrada==null?null:biometricoMapper.biometricoDTOToBiometrico(biometricoEntrada)) );
+            String[] horas = horasMinutosSegundosSplit(registroMarcaciones.getAsisHora());
+            if (biometrico.equalsIgnoreCase("GARITA"))
             {
-                String  asisFecha =convertirDateStringAnosMesDias(registroMarcaciones.getAsisFecha());
-                String fechaTurnoNche= sumarUnDia(asisFecha);
-                AsistNow asistNowNoche=    postGresRepository.consultarMarcacioneSalida(registroMarcaciones.getIdentificacion(),fechaTurnoNche,fechaTurnoNche,registroMarcaciones.getBiometrico().getNombreBiometrico(),registroMarcaciones.getEmpresa(),"SALIDA" );
-                registroMarcacionesDTO.setHoraSalida(asistNowNoche == null ? null : asistNowNoche.getAsisHora());
-                registroMarcacionesDTO.setFechaSalida(asistNowNoche == null ? null : asistNowNoche.getId().getAsisIng());
-            }
-            if (Integer.parseInt(horas[0])<=16)
-            {
-                String  asisFecha =convertirDateStringAnosMesDias(registroMarcaciones.getAsisFecha());
-                AsistNow asistNowNoche=    postGresRepository.consultarMarcacioneSalida(registroMarcaciones.getIdentificacion(),asisFecha,asisFecha,registroMarcaciones.getBiometrico().getNombreBiometrico(),registroMarcaciones.getEmpresa(),"SALIDA" );
-                registroMarcacionesDTO.setHoraSalida(asistNowNoche == null ? null : asistNowNoche.getAsisHora());
-                registroMarcacionesDTO.setFechaSalida(asistNowNoche == null ? null : asistNowNoche.getId().getAsisIng());
-            }
+                if (Integer.parseInt(horas[0]) >= 16)
+                {
+                    List<AsistNow> asistNowNoche;
+                    String asisFecha = convertirDateStringAnosMesDias(registroMarcaciones.getAsisFecha());
+                    String fechaTurnoNche = sumarUnDia(asisFecha);
+                    if (ipBiometrico.equalsIgnoreCase("192.168.54.242"))
+                    {
+                         asistNowNoche = postGresRepository.consultarMarcacioneSalidaFahdi(registroMarcaciones.getIdentificacion(), fechaTurnoNche, fechaTurnoNche,ipBiometrico, registroMarcaciones.getEmpresa(), "SALIDA");
+                        Biometrico biometricoSalida = biometricoRepository.findByIpBiometrico(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getId().getAsisZona());
+                        if (biometricoSalida!=null)
+                        {
+                            biometricoSalida.setId(9L);
+                        }
+                        registroMarcacionesDTO.setBiometricoSalida( (biometricoEntrada==null?null:biometricoMapper.biometricoDTOToBiometrico(biometricoSalida)));
+                    }
+                    else
+                    {
+                        asistNowNoche = postGresRepository.consultarMarcacioneSalida(registroMarcaciones.getIdentificacion(), asisFecha, asisFecha, registroMarcaciones.getBiometrico().getNombreBiometrico(), registroMarcaciones.getEmpresa(), "SALIDA");
+                        Biometrico biometricoSalida = biometricoRepository.findByIpBiometrico(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getId().getAsisZona());
+                        registroMarcacionesDTO.setBiometricoSalida( (biometricoEntrada==null?null:biometricoMapper.biometricoDTOToBiometrico(biometricoSalida)));
+                    }
+                   /// List<AsistNow> asistNowNoche = postGresRepository.consultarMarcacioneSalida(registroMarcaciones.getIdentificacion(), fechaTurnoNche, fechaTurnoNche,registroMarcaciones.getBiometrico().getNombreBiometrico(), registroMarcaciones.getEmpresa(), tipoBiometrinco);
+                    //Utils.console("asistNowNoche", Utils.toJson(asistNowNoche));
+                    registroMarcacionesDTO.setHoraSalida(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getAsisHora());
+                    registroMarcacionesDTO.setFechaSalidaHHmmss(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getId().getAsisIng());
+                    registroMarcacionesDTO.setFechaSalida(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getAsisFecha());
+                }
+                if (Integer.parseInt(horas[0]) <= 16)
+                {
+                    List<AsistNow> asistNowNoche = null;
+                    String asisFecha = convertirDateStringAnosMesDias(registroMarcaciones.getAsisFecha());
+                    if (ipBiometrico.equalsIgnoreCase("192.168.54.242"))
+                    {
+                        asistNowNoche = postGresRepository.consultarMarcacioneSalidaFahdi(registroMarcaciones.getIdentificacion(), asisFecha, asisFecha,ipBiometrico, registroMarcaciones.getEmpresa(), "SALIDA");
+                        Biometrico biometricoSalida = biometricoRepository.findByIpBiometrico(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getId().getAsisZona());
+                        if (biometricoSalida!=null)
+                        {
+                            biometricoSalida.setId(9L);
+                        }
+                        registroMarcacionesDTO.setBiometricoSalida( (biometricoEntrada==null?null:biometricoMapper.biometricoDTOToBiometrico(biometricoSalida)));
+                    }
+                    else
+                    {
+                        asistNowNoche = postGresRepository.consultarMarcacioneSalida(registroMarcaciones.getIdentificacion(), asisFecha, asisFecha, registroMarcaciones.getBiometrico().getNombreBiometrico(), registroMarcaciones.getEmpresa(), "SALIDA");
+                        Biometrico biometricoSalida = biometricoRepository.findByIpBiometrico(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getId().getAsisZona());
+                        registroMarcacionesDTO.setBiometricoSalida( (biometricoEntrada==null?null:biometricoMapper.biometricoDTOToBiometrico(biometricoSalida)));
+                    }
+               // List<AsistNow> asistNowNoche = postGresRepository.consultarMarcacioneSalida(registroMarcaciones.getIdentificacion(), asisFecha, asisFecha, registroMarcaciones.getBiometrico().getNombreBiometrico(), registroMarcaciones.getEmpresa(), tipoBiometrinco);
+                registroMarcacionesDTO.setHoraSalida(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getAsisHora());
+                    registroMarcacionesDTO.setFechaSalidaHHmmss(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getId().getAsisIng());
+                    registroMarcacionesDTO.setFechaSalida(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getAsisFecha());
+                }
 
+        }
+            else
+        {
+            //System.out.println("biometrico"+biometrico);
+            String asisFecha = convertirDateStringAnosMesDias(registroMarcaciones.getAsisFecha());
+            List<AsistNow> asistNowNoche = postGresRepository.consultarMarcacioneSalida(registroMarcaciones.getIdentificacion(), asisFecha, asisFecha, registroMarcaciones.getBiometrico().getNombreBiometrico(), registroMarcaciones.getEmpresa(), "SALIDA");
+            registroMarcacionesDTO.setFechaSalidaHHmmss(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getId().getAsisIng());
+            registroMarcacionesDTO.setFechaSalida(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getAsisFecha());
+
+        }
             registroMarcacionesDTO.setEmpresa(registroMarcaciones.getEmpresa() == null ? null : (String) registroMarcaciones.getEmpresa() );
             if (registroMarcacionesDTO.getHoraEntrada()==null)
             {
@@ -581,46 +656,75 @@ public class Utily {
         return fechaComoCadena;
     }
 
-  /*  public  List<RegistroMarcacionesDTO> conversioRegistroMarcacionesEntraSalidaValidarTurnos(List<RegistroMarcacionesEntraSalida> list ,String fechaInicio ,String fechaFin)
+    public  List<MarcacionIdentificacionDto> conversioMarcacionIdentificacion(List<Object[]> list)
     {
-        int cont = 0;
-        List<RegistroMarcacionesDTO> registroMarcacionesDTOList = new ArrayList<>();
-        List<Date> listaEntreFechas = recorrerDosRangosFechas(convertirStringDate(fechaInicio),convertirStringDate(fechaFin));
-        for (Iterator<Date> it = listaEntreFechas.iterator(); it.hasNext();)
-        {
-            Date date = it.next();
-            List<RegistroMarcacionesEntraSalida> lsMarcacionesEntradaFilter = list.stream().filter(e -> (convertirDateStringAnosMesDias(e.getAsisFecha()).equalsIgnoreCase(convertirDateStringAnosMesDias(date))&& e.getAsisTipo().equalsIgnoreCase("INGRESO") )).collect(Collectors.toList());
-            for (RegistroMarcacionesEntraSalida registroMarcaciones : lsMarcacionesEntradaFilter)
-            {
-                String[] horas= horasMinutosSegundosSplit(registroMarcaciones.getAsisHora());
-                if (Integer.parseInt(horas[0])>=16)
-                {
-                }
-                if (Integer.parseInt(horas[0])<=16)
-                {
 
-                }
-            }
+        List<MarcacionIdentificacionDto> registroMarcacionesDTOList = new ArrayList<>();
+        for (Object[] registroMarcaciones : list)
+        {
+            MarcacionIdentificacionDto  registroMarcacionesDTO= new MarcacionIdentificacionDto();
+            registroMarcacionesDTO.setAsisId(registroMarcaciones[0] == null ? "": (String) registroMarcaciones[0]);
+            registroMarcacionesDTO.setIdentificacion(registroMarcaciones[1] == null ? "" : (String) registroMarcaciones[1]);
+            registroMarcacionesDTO.setApellidos(registroMarcaciones[2] == null ? "" : (String) registroMarcaciones[2]);
+            registroMarcacionesDTO.setNombres(registroMarcaciones[3] == null ? "" : (String) registroMarcaciones[3]);
+            registroMarcacionesDTO.setEmpresa(registroMarcaciones[4] == null ? null : (String) registroMarcaciones[4]);
+            registroMarcacionesDTO.setIdentificacionApellidos(registroMarcacionesDTO.getIdentificacion()+" - "+registroMarcacionesDTO.getApellidos());
+            registroMarcacionesDTOList.add(registroMarcacionesDTO);
 
         }
+        return registroMarcacionesDTOList;
+    }
 
 
-        for (RegistroMarcacionesEntraSalida registroMarcaciones : list)
-        {
+    public  List<RegistroMarcacionesDTO> conversioRegistroMarcacionesDTOFahdi( String biometrico ,List<AsistNow> list)
+    {
+
+        int cont = 0;
+        List<RegistroMarcacionesDTO> registroMarcacionesDTOList = new ArrayList<>();
+        for (AsistNow registroMarcaciones : list) {
             cont++;
-            RegistroMarcacionesDTO  registroMarcacionesDTO= new RegistroMarcacionesDTO();
+            RegistroMarcacionesDTO registroMarcacionesDTO = new RegistroMarcacionesDTO();
             registroMarcacionesDTO.setIdRegistroMarcaciones(cont);
-            registroMarcacionesDTO.setAsisId(registroMarcaciones[0] == null ? "": (String) registroMarcaciones[0]);
-            registroMarcacionesDTO.setAsisFecha(registroMarcaciones[1] == null ? null : (Date) registroMarcaciones[1]);
-            registroMarcacionesDTO.setIdentificacion(registroMarcaciones[2] == null ? "" : (String) registroMarcaciones[2]);
-            registroMarcacionesDTO.setApellidos(registroMarcaciones[3] == null ? "" : (String) registroMarcaciones[3]);
-            registroMarcacionesDTO.setNombres(registroMarcaciones[4] == null ? "" : (String) registroMarcaciones[4]);
-            registroMarcacionesDTO.setZona(registroMarcaciones[5] == null ? "" : (String) registroMarcaciones[5]);
-            registroMarcacionesDTO.setHoraEntrada(registroMarcaciones[6] == null ? null : (String) registroMarcaciones[6]);
-            registroMarcacionesDTO.setHoraSalida(registroMarcaciones[7] == null ? null : (String) registroMarcaciones[7]);
-            registroMarcacionesDTO.setFechaEntrada(registroMarcaciones[8] == null ? null : (Date) registroMarcaciones[8]);
-            registroMarcacionesDTO.setFechaSalida(registroMarcaciones[9] == null ? null : (Date) registroMarcaciones[9]);
-            registroMarcacionesDTO.setEmpresa(registroMarcaciones[10] == null ? null : (String) registroMarcaciones[10]);
+            registroMarcacionesDTO.setAsisId(registroMarcaciones.getId().getAsisId() == null ? "" : registroMarcaciones.getId().getAsisId());
+            registroMarcacionesDTO.setAsisFecha(registroMarcaciones.getAsisFecha() == null ? null : (Date) registroMarcaciones.getAsisFecha());
+            registroMarcacionesDTO.setIdentificacion(registroMarcaciones.getIdentificacion() == null ? "" : (String) registroMarcaciones.getIdentificacion());
+            registroMarcacionesDTO.setApellidos(registroMarcaciones.getApellidos() == null ? "" : (String) registroMarcaciones.getApellidos());
+            registroMarcacionesDTO.setNombres(registroMarcaciones.getNombres() == null ? "" : (String) registroMarcaciones.getNombres());
+            registroMarcacionesDTO.setZona(registroMarcaciones.getBiometrico().getNombreBiometrico() == null ? "" : (String) registroMarcaciones.getBiometrico().getNombreBiometrico());
+            registroMarcacionesDTO.setHoraEntrada(registroMarcaciones.getAsisHora() == null ? null : (String) registroMarcaciones.getAsisHora());
+            registroMarcacionesDTO.setFechaEntradaHHmmss(registroMarcaciones.getId().getAsisIng() == null ? null : (Date) registroMarcaciones.getId().getAsisIng());
+            registroMarcacionesDTO.setFechaEntrada(registroMarcaciones.getId().getAsisIng() == null ? null : (Date) registroMarcaciones.getAsisFecha());
+            Biometrico biometricoEntrada = biometricoRepository.findByIpBiometrico(registroMarcaciones.getId().getAsisZona());
+            registroMarcacionesDTO.setBiometricoEntrada( (biometricoEntrada==null?null:biometricoMapper.biometricoDTOToBiometrico(biometricoEntrada)) );
+            String[] horas = horasMinutosSegundosSplit(registroMarcaciones.getAsisHora());
+            if (biometrico.equalsIgnoreCase("GARITA"))
+            {
+                if (Integer.parseInt(horas[0]) >= 16)
+                {
+                    String asisFecha = convertirDateStringAnosMesDias(registroMarcaciones.getAsisFecha());
+                    String fechaTurnoNche = sumarUnDia(asisFecha);
+                    List<AsistNow> asistNowNoche = postGresRepository.consultarMarcacioneSalidaFahdi(registroMarcaciones.getIdentificacion(), fechaTurnoNche, fechaTurnoNche, registroMarcaciones.getBiometrico().getNombreBiometrico(), registroMarcaciones.getEmpresa(), "SALIDA");
+                    //Utils.console("asistNowNoche", Utils.toJson(asistNowNoche));
+                    registroMarcacionesDTO.setHoraSalida(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getAsisHora());
+                    registroMarcacionesDTO.setFechaSalidaHHmmss(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getId().getAsisIng());
+                    registroMarcacionesDTO.setFechaSalida(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getAsisFecha());
+                    Biometrico biometricoSalida = biometricoRepository.findByIpBiometrico(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getId().getAsisZona());
+                    registroMarcacionesDTO.setBiometricoSalida( (biometricoEntrada==null?null:biometricoMapper.biometricoDTOToBiometrico(biometricoSalida)));
+                }
+                if (Integer.parseInt(horas[0]) <= 16)
+                {
+                    String asisFecha = convertirDateStringAnosMesDias(registroMarcaciones.getAsisFecha());
+                    List<AsistNow> asistNowNoche = postGresRepository.consultarMarcacioneSalida(registroMarcaciones.getIdentificacion(), asisFecha, asisFecha, registroMarcaciones.getBiometrico().getNombreBiometrico(), registroMarcaciones.getEmpresa(), "SALIDA");
+                    registroMarcacionesDTO.setHoraSalida(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getAsisHora());
+                    registroMarcacionesDTO.setFechaSalidaHHmmss(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getId().getAsisIng());
+                    registroMarcacionesDTO.setFechaSalida(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getAsisFecha());
+                    Biometrico biometricoSalida = biometricoRepository.findByIpBiometrico(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getId().getAsisZona());
+                    registroMarcacionesDTO.setBiometricoSalida( (biometricoEntrada==null?null:biometricoMapper.biometricoDTOToBiometrico(biometricoSalida)));
+                }
+
+            }
+
+            registroMarcacionesDTO.setEmpresa(registroMarcaciones.getEmpresa() == null ? null : (String) registroMarcaciones.getEmpresa() );
             if (registroMarcacionesDTO.getHoraEntrada()==null)
             {
                 registroMarcacionesDTO.setEditado("INGRESO");
@@ -633,6 +737,114 @@ public class Utily {
 
         }
         return registroMarcacionesDTOList;
-    }*/
+    }
+
+    public float calculoSalarioPorHoras(float sueldo)
+    {
+
+        float salarioPorHora=0;
+        int horaTrabajada= Integer.valueOf(restServices.parametrizacionRecursosHumanos("horaTrabajada"));
+        int diaTrabajado=Integer.valueOf(restServices.parametrizacionRecursosHumanos("diaTrabajado"));
+        try
+        {
+            float  sueldoDiaTrabajado= sueldo/diaTrabajado;
+            salarioPorHora= sueldoDiaTrabajado/horaTrabajada;
+        }
+        catch (Exception ex)
+        {
+            throw new GenericExceptionUtils(ex);
+        }
+        return salarioPorHora;
+    }
+
+    public float calculoSalarioPorMinutos(float sueldo)
+    {
+
+        float salarioPorHora=0;
+        float salarioMinutos=0;
+        int horaTrabajada= Integer.valueOf(restServices.parametrizacionRecursosHumanos("horaTrabajada"));
+        int diaTrabajado=Integer.valueOf(restServices.parametrizacionRecursosHumanos("diaTrabajado"));
+        int minutosTrabajado= Integer.valueOf(restServices.parametrizacionRecursosHumanos("minutosTrabajado"));
+
+        try
+        {
+            float  sueldoDiaTrabajado= sueldo/diaTrabajado;
+            salarioPorHora= sueldoDiaTrabajado/horaTrabajada;
+            salarioMinutos=salarioPorHora/minutosTrabajado;
+        }
+        catch (Exception ex)
+        {  throw new GenericExceptionUtils(ex);
+
+        }
+        return salarioMinutos;
+    }
+
+
+    public int convertirMillisecondSegundos(Long milliseconds) {
+        int segundo = (milliseconds.intValue() / 1000);
+        return segundo;
+    }
+
+    public String calcularSegundoATiempo(int tsegundos) {
+        int horas = (tsegundos / 3600);
+        int minutos = ((tsegundos - horas * 3600) / 60);
+        int segundos = tsegundos - (horas * 3600 + minutos * 60);
+        return horas + ":" + minutos + ":" + segundos;
+    }
+
+    public float calcularPorcentaje(float porcentaje, float cantidad) {
+
+        try {
+            float porcentajeCantidad = porcentaje * cantidad;
+            float porcentajeCantidadTotal = porcentajeCantidad / 100;
+            return porcentajeCantidadTotal;
+        } catch (Exception ex) {
+            return 0;
+        }
+
+
+    }
+
+
+    public boolean compararFechas(String fechaAnterior, String fechaActual) {
+        boolean estado= false;
+        try
+        {
+            // Definir las dos fechas
+            LocalDate fecha1 = LocalDate.parse(fechaAnterior);
+            LocalDate fecha2 = LocalDate.parse(fechaActual);
+
+            // Comparar las fechas
+            if (fecha1.isBefore(fecha2)) {
+                estado= false;
+            } else if (fecha1.isAfter(fecha2)) {
+                estado= true;
+            } else{
+            }
+        } catch (Exception ex)
+        {
+            throw new GenericExceptionUtils(ex);
+
+        }
+        return  estado;
+
+    }
+
+        public String  formatearFecha(String fechaString )
+        {
+            String fechaFormateada=null;
+            // Formatear la cadena de fecha
+            SimpleDateFormat formatoEntrada = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat formatoSalida = new SimpleDateFormat("yyyy-MM-dd");
+
+            try {
+                Date fecha = formatoEntrada.parse(fechaString);
+                 fechaFormateada = formatoSalida.format(fecha);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            return  fechaFormateada;
+        }
+
 
 }

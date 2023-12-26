@@ -1,5 +1,8 @@
 package com.backSpringBatch.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ConsultarAsistenciasDias
 {
 
@@ -9,6 +12,8 @@ public class ConsultarAsistenciasDias
     private  String biometrico;
     private  String tipoBiometrinco;
     private String empresa;
+
+    private String tipoBiometrincoGDSFahdi;
 
     public ConsultarAsistenciasDias() {
     }
@@ -59,5 +64,13 @@ public class ConsultarAsistenciasDias
 
     public void setEmpresa(String empresa) {
         this.empresa = empresa;
+    }
+
+    public String getTipoBiometrincoGDSFahdi() {
+        return tipoBiometrincoGDSFahdi;
+    }
+
+    public void setTipoBiometrincoGDSFahdi(String tipoBiometrincoGDSFahdi) {
+        this.tipoBiometrincoGDSFahdi = tipoBiometrincoGDSFahdi;
     }
 }
