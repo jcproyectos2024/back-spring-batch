@@ -22,6 +22,7 @@ public class RegistroMarcacionesGuardadoDTO
     private String usuarioModificacion;
     private BiometricoDto biometrico;
     private String observacion;
+    private String fechaHHmmss;
 
     public RegistroMarcacionesGuardadoDTO() {
     }
@@ -112,5 +113,13 @@ public class RegistroMarcacionesGuardadoDTO
 
     public void setUsuarioModificacion(String usuarioModificacion) {
         this.usuarioModificacion = usuarioModificacion;
+    }
+
+    public String getFechaHHmmss() {
+        return fechaHHmmss;
+    }
+
+    public void setFechaHHmmss(String fechaHHmmss) {
+        this.fechaHHmmss = fechaHHmmss;
     }
 }

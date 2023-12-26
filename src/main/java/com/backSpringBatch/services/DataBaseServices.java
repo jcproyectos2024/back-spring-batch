@@ -890,9 +890,10 @@ public class DataBaseServices {
 
 
 
-    public ConsultarEntradaSalidaMarcacionResponses consultarEntradaSalidaMarcacion(ConsultarEntradaSalida consultarEntradaSalida )
+    public ConsultarEntradaSalidaMarcacionResponses consultarEntradaSalidaMarcacionGDS(ConsultarEntradaSalida consultarEntradaSalida )
     {
         ConsultarEntradaSalidaMarcacionResponses response = new ConsultarEntradaSalidaMarcacionResponses();
+        Page<AsistNow> pc2 = null;
         try
         {
             Pageable pageable = PageRequest.of(consultarEntradaSalida.getNumeroPagina()-1, consultarEntradaSalida.getNumeroRegistros());
@@ -900,10 +901,18 @@ public class DataBaseServices {
             String apellidos=(consultarEntradaSalida.getApellidos()!=null && !consultarEntradaSalida.getApellidos().equals("")?"%"+consultarEntradaSalida.getApellidos().toUpperCase()+"%":null);
             EmpresaResponse empresaResponse =restServices.findByEstadoEmpCodigoEmpresa(consultarEntradaSalida.getEmpresa());
             consultarEntradaSalida.setEmpresa(empresaResponse.getSuccess()?empresaResponse.getEmpresaDTO().getEmpNombre():"");
-            Page<AsistNow> pc2= postGresRepository.consultarMarcacioneEntradaPagineo(identificacion,apellidos,consultarEntradaSalida.getFechaInicio(),consultarEntradaSalida.getFechaFin(),consultarEntradaSalida.getBiometrico(),consultarEntradaSalida.getEmpresa(),"INGRESO",pageable);
+            //Biometrico biometrico= biometricoRepository.findByIpBiometrico(consultarEntradaSalida.getIpBiometrico());
+            //String  tipoBiometrinco=(consultarEntradaSalida.getIpBiometrico().equalsIgnoreCase("192.168.54.242")?"INGRESO-SALIDA":"INGRESO");
+           if (consultarEntradaSalida.getIpBiometrico().equalsIgnoreCase("192.168.54.242"))
+           {
+               pc2= postGresRepository.consultarMarcacioneEntradaFahdiPagineo(identificacion,apellidos,consultarEntradaSalida.getFechaInicio(),consultarEntradaSalida.getFechaFin(),consultarEntradaSalida.getIpBiometrico() ,consultarEntradaSalida.getEmpresa(),"INGRESO",pageable);
+           }else
+           {
+               pc2= postGresRepository.consultarMarcacioneEntradaPagineo(identificacion,apellidos,consultarEntradaSalida.getFechaInicio(),consultarEntradaSalida.getFechaFin(),consultarEntradaSalida.getBiometrico() ,consultarEntradaSalida.getEmpresa(),"INGRESO",pageable);
+           }
             if (!pc2.getContent().isEmpty())
             {
-                List<RegistroMarcacionesDTO>  registroMarcacionesDTOList =utily.conversioRegistroMarcacionesDTO(consultarEntradaSalida.getBiometrico(),pc2.getContent());
+                List<RegistroMarcacionesDTO>  registroMarcacionesDTOList =utily.conversioRegistroMarcacionesDTO(consultarEntradaSalida.getIpBiometrico(),consultarEntradaSalida.getBiometrico(),pc2.getContent());
                 response.setLsMarcacionesEntradaSalida(registroMarcacionesDTOList);
                 response.setTotalRegistrosEntradaSalidad((int) pc2.getTotalElements());
                 response.setMensaje("Consulta Existosa");
@@ -1016,7 +1025,7 @@ public class DataBaseServices {
                     response.setMessage("GUARDADO CON EXISTO");
                     response.setSuccess(true);
                     response.setRegistroMarcacionesDTO(marcacionesMapperDTO);
-                    guardadoHistorialMarcaciones(marcacionesDTO.getObservacion(),marcacionesDTO.getUsuario(),registroMarcacionesSave);
+                    guardadoHistorialMarcaciones(marcacionesDTO.getObservacion(),marcacionesDTO.getUsuario(),registroMarcacionesSave,null);
                     return response;
                 }
             }
@@ -1040,7 +1049,7 @@ public class DataBaseServices {
 
 
 
-    public RegistroMarcacionesResponses guardadoHistorialMarcaciones( String observacion ,String usuario ,AsistNow asistNow)
+    public RegistroMarcacionesResponses guardadoHistorialMarcaciones( String observacion ,String usuario ,AsistNow asistNow ,String usuarioModifica)
     {
         RegistroMarcacionesResponses response = new RegistroMarcacionesResponses();
 
@@ -1066,7 +1075,7 @@ public class DataBaseServices {
             historyAsistNowRDTO.setNombres(asistNow.getNombres());
             historyAsistNowRDTO.setApellidos(asistNow.getApellidos());
             historyAsistNowRDTO.setFechaAccion(utily.convertirDateString(new Date()));
-            historyAsistNowRDTO.setAccion("GUARDADO");
+            historyAsistNowRDTO.setAccion(usuarioModifica==null ?"GUARDADO" :"MODIFICADO");
             historyAsistNowRDTO.setUsuario(usuario);
             historyAsistNowRDTO.setObservacion(observacion);
             historyAsistNowRDTO.setFechaAccion(utily.convertirDateString(new Date()));
@@ -1482,10 +1491,10 @@ public class DataBaseServices {
         }
     }
 
-    public RegistroMarcacionesResponses guardadoEntradaSalidaMarcacionDia( List<RegistroMarcacionesGuardadoDTO> marcacionesGuardadoDTOList)
+    @Transactional(rollbackFor = {Exception.class} )
+    public RegistroMarcacionesResponses guardadoEntradaSalidaMarcacionDia( List<RegistroMarcacionesGuardadoDTO> marcacionesGuardadoDTOList) throws Exception
     {
         RegistroMarcacionesResponses response = new RegistroMarcacionesResponses();
-
         try
         {
             for (RegistroMarcacionesGuardadoDTO marcacionesDTO :marcacionesGuardadoDTOList)
@@ -1505,28 +1514,67 @@ public class DataBaseServices {
                     registroMarcaciones.setAsisTipo(biometrico.getTipoBiometrinco());
                     registroMarcaciones.setAsisFecha(marcacionesDTO.getAsisFecha());
                     registroMarcaciones.setAsisHorasSuplementaria(false);
+                    if (marcacionesDTO.getFechaHHmmss()!=null)
+                    {
+                        AsistNow  asistNowEliminado= new AsistNow();
+                        AsistnowPK asistnowPKliminado = new AsistnowPK();
+                        asistnowPKliminado.setAsisId(marcacionesDTO.getAsisId());
+                        asistnowPKliminado.setAsisIng(utily.stringToDate(marcacionesDTO.getFechaHHmmss()));
+                        asistnowPKliminado.setAsisZona(biometrico.getIpBiometrico());
+                        asistNowEliminado.setId(asistnowPKliminado);
+                        postGresRepository.delete(asistNowEliminado);
+
+                    }
                     AsistNow registroMarcacionesSave = postGresRepository.save(registroMarcaciones);
                     //RegistroMarcacionesDTO marcacionesMapperDTO = registroMarcacionesMapper.asistNowToRegistroMarcacionesDTO(registroMarcacionesSave);
                     response.setMessage("GUARDADO CON EXISTO");
                     response.setSuccess(true);
                    // response.setRegistroMarcacionesDTO(marcacionesMapperDTO);
-                    guardadoHistorialMarcaciones(marcacionesDTO.getObservacion(), marcacionesDTO.getUsuario()==null?marcacionesDTO.getUsuarioModificacion():marcacionesDTO.getUsuario(),registroMarcacionesSave);
-                    return response;
+                    guardadoHistorialMarcaciones(marcacionesDTO.getObservacion(), marcacionesDTO.getUsuario()==null?marcacionesDTO.getUsuarioModificacion():marcacionesDTO.getUsuario(),registroMarcacionesSave,marcacionesDTO.getUsuarioModificacion());
+
                 }
             }
+            return response;
         }
         catch (Exception ex)
         {
             // TODO: handle exception
+            ex.printStackTrace();
             response.setMessage(ex.getMessage());
             response.setSuccess(false);
             //  return response;
             throw new GenericExceptionUtils(ex);
         }
 
-
-        return response;
     }
 
 
+
+
+    public ConsultarEntradaSalidaMarcacionResponses consultarEntradaSalidaMarcacion(ConsultarEntradaSalida consultarEntradaSalida )
+    {
+        ConsultarEntradaSalidaMarcacionResponses response = new ConsultarEntradaSalidaMarcacionResponses();
+        try
+        {
+           /* if (consultarEntradaSalida.getIpBiometrico().equalsIgnoreCase(""))
+            {
+               return response=  consultarEntradaSalidaMarcacionFahdi(consultarEntradaSalida);
+            }else
+            {*/
+                return response=  consultarEntradaSalidaMarcacionGDS(consultarEntradaSalida);
+         //  }
+
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            // TODO: handle exception
+            response.setMensaje(ex.getMessage());
+            response.setSuccess(false);
+            // return response;
+            throw new GenericExceptionUtils(ex);
+        }
+
+
+    }
 }

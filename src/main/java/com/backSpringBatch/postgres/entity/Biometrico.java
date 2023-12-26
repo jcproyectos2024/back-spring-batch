@@ -29,6 +29,10 @@ public class Biometrico implements Serializable {
     @Column(name = "empresa")
     private String empresa;
 
+    @Column(name = "empresa_nombre")
+    private String empresaNombre;
+
+
     public Long getId() {
         return id;
     }
@@ -68,6 +72,14 @@ public class Biometrico implements Serializable {
 
     public void setEmpresa(String empresa) {
         this.empresa = empresa;
+    }
+
+    public String getEmpresaNombre() {
+        return empresaNombre;
+    }
+
+    public void setEmpresaNombre(String empresaNombre) {
+        this.empresaNombre = empresaNombre;
     }
 }
 

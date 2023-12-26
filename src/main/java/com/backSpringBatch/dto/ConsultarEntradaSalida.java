@@ -13,6 +13,8 @@ public class ConsultarEntradaSalida
     private String empresa;
     private int numeroPagina;
     private int numeroRegistros;
+    private  String ipBiometrico;
+
     public ConsultarEntradaSalida() {
     }
 
@@ -78,5 +80,13 @@ public class ConsultarEntradaSalida
 
     public void setApellidos(String apellidos) {
         this.apellidos = apellidos;
+    }
+
+    public String getIpBiometrico() {
+        return ipBiometrico;
+    }
+
+    public void setIpBiometrico(String ipBiometrico) {
+        this.ipBiometrico = ipBiometrico;
     }
 }

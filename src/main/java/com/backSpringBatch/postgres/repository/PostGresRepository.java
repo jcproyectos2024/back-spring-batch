@@ -217,7 +217,8 @@ public interface PostGresRepository extends JpaRepository<AsistNow, String> {
             " FROM AsistNow asw " +
             " WHERE ((asw.identificacion like:identificacion or :identificacion is null) AND (asw.apellidos like:apellidos or :apellidos is null)  " +
             " AND to_char(asw.asisFecha,'yyyy-MM-dd') BETWEEN :fechaIni  AND :fechaFin  ) " +
-            " AND   (asw.biometrico.nombreBiometrico=:nombreBiometrico) AND (asw.empresa=:empresa)  AND (asw.biometrico.tipoBiometrinco=:asisTipo ) " +
+          " AND   (asw.biometrico.nombreBiometrico=:nombreBiometrico) AND (asw.empresa=:empresa)  AND (asw.biometrico.tipoBiometrinco=:tipoBiometrinco ) " +
+          // " AND   (asw.id.asisZona=:ipBiometrico) AND (asw.empresa=:empresa)  AND (asw.asisTipo=:asisTipo ) " +
             "  ORDER by " +
             " asw.apellidos," +
             " asw.id.asisIng  ASC")
@@ -227,14 +228,15 @@ public interface PostGresRepository extends JpaRepository<AsistNow, String> {
                                                      @Param("fechaFin")  String fechaFin ,
                                                      @Param("nombreBiometrico")  String nombreBiometrico,
                                                      @Param("empresa") String empresa ,
-                                                     @Param("asisTipo") String asisTipo  ,Pageable pageable);
+                                                     @Param("tipoBiometrinco") String tipoBiometrinco  ,Pageable pageable);
 
 
     @Query(nativeQuery = false, value = "SELECT asw " +
             " FROM AsistNow asw " +
             " WHERE ((asw.identificacion like:identificacion or :identificacion is null) " +
             " AND to_char(asw.asisFecha,'yyyy-MM-dd') BETWEEN :fechaIni  AND :fechaFin  ) " +
-            " AND   (asw.biometrico.nombreBiometrico=:nombreBiometrico) AND (asw.empresa=:empresa)  AND (asw.biometrico.tipoBiometrinco=:asisTipo ) " +
+            " AND   (asw.biometrico.nombreBiometrico=:nombreBiometrico) AND (asw.empresa=:empresa)  AND (asw.biometrico.tipoBiometrinco=:tipoBiometrinco ) " +
+            //AND   (asw.id.asisZona=:ipBiometrico) AND (asw.empresa=:empresa)  AND (asw.asisTipo=:asisTipo ) " +
             "  ORDER by " +
             " asw.apellidos," +
             " asw.id.asisIng  DESC")
@@ -243,7 +245,7 @@ public interface PostGresRepository extends JpaRepository<AsistNow, String> {
                                               @Param("fechaFin")  String fechaFin ,
                                               @Param("nombreBiometrico")  String nombreBiometrico,
                                               @Param("empresa") String empresa ,
-                                              @Param("asisTipo") String asisTipo );
+                                              @Param("tipoBiometrinco") String tipoBiometrinco );
 
 
 
@@ -252,5 +254,39 @@ public interface PostGresRepository extends JpaRepository<AsistNow, String> {
             " WHERE (asw.identificacion like:identificacion or :identificacion is null) AND (asw.apellidos like:apellidos or :apellidos is null)  AND (asw.empresa=:empresa) ")
     Optional<List<Object[]>>  consultarMarcacionIdentificacion(@Param("identificacion") String identificacion,@Param("apellidos") String apellidos, @Param("empresa") String empresa );
 
+
+    @Query(nativeQuery = false, value = "SELECT asw " +
+            " FROM AsistNow asw " +
+            " WHERE ((asw.identificacion like:identificacion or :identificacion is null) AND (asw.apellidos like:apellidos or :apellidos is null)  " +
+            " AND to_char(asw.asisFecha,'yyyy-MM-dd') BETWEEN :fechaIni  AND :fechaFin  ) " +
+            "   AND (asw.id.asisZona=:ipBiometrico)   AND (asw.empresa=:empresa)  AND (asw.asisTipo=:asisTipo ) " +
+            "  ORDER by " +
+            " asw.apellidos," +
+            " asw.id.asisIng  ASC")
+    Page<AsistNow> consultarMarcacioneEntradaFahdiPagineo(@Param("identificacion") String identificacion,
+                                                     @Param("apellidos") String apellidos,
+                                                     @Param("fechaIni")  String fechaIni,
+                                                     @Param("fechaFin")  String fechaFin ,
+                                                     @Param("ipBiometrico")  String ipBiometrico,
+                                                     @Param("empresa") String empresa ,
+                                                     @Param("asisTipo") String asisTipo  ,Pageable pageable);
+
+
+    @Query(nativeQuery = false, value = "SELECT asw " +
+            " FROM AsistNow asw " +
+            " WHERE ((asw.identificacion like:identificacion or :identificacion is null) " +
+            " AND to_char(asw.asisFecha,'yyyy-MM-dd') BETWEEN :fechaIni  AND :fechaFin  ) " +
+            " AND   (asw.id.asisZona=:ipBiometrico)   AND (asw.empresa=:empresa)  AND (asw.asisTipo=:asisTipo ) " +
+            "  ORDER by " +
+            " asw.apellidos," +
+            " asw.id.asisIng  DESC")
+    List<AsistNow>  consultarMarcacioneSalidaFahdi(@Param("identificacion") String identificacion,
+                                              @Param("fechaIni")  String fechaIni,
+                                              @Param("fechaFin")  String fechaFin ,
+                                              @Param("ipBiometrico")  String ipBiometrico,
+                                              @Param("empresa") String empresa ,
+                                              @Param("asisTipo") String asisTipo );
+    @Override
+    void delete(AsistNow entity);
 }
 

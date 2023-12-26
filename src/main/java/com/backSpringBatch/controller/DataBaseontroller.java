@@ -13,6 +13,7 @@ import com.diosmar.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -124,9 +125,9 @@ public class DataBaseontroller {
 		return dataBaseServices.calculoHorasSuplementariasProduccionXPersona(identificacion,empresa);
 	}
 	@GetMapping("findAllByBiometricoEmpresa/")
-	public BiometricoResponse findAllByBiometricoEmpresa(@RequestParam String empresa)
+	public BiometricoResponse findAllByBiometricoEmpresa()
 	{
-		return biometricoServices.findAllByBiometricoEmpresa(empresa);
+		return biometricoServices.findAllByBiometrico();
 	}
 
 	@PostMapping("consultarMarcacionIdentificacion/")
@@ -150,12 +151,13 @@ public class DataBaseontroller {
 		//@Scheduled(cron = "0 0 */6 * * *")//cada 6 hora
 		//@Scheduled(cron = "0 * * * * *")//cada un minutos
 		@Scheduled(cron = "0 0 */4 * * *")//cada 4 hora
-	  public void calculoHorasSuplementariasProduccionFija() {
+	  public void calculoHorasSuplementariasProduccionFija()
+		{
 		dataBaseServices.calculoHorasSuplementariasProduccionFija();
-	}
+		}
 
 	@PostMapping("guardadoEntradaSalidaMarcacionDia/")
-	public RegistroMarcacionesResponses guardadoEntradaSalidaMarcacionDia(@RequestBody @Validated List<RegistroMarcacionesGuardadoDTO> registroMarcacionesDTO)
+	public RegistroMarcacionesResponses guardadoEntradaSalidaMarcacionDia(@RequestBody @Validated List<RegistroMarcacionesGuardadoDTO> registroMarcacionesDTO) throws Exception
 	{
 		Utils.console("registroMarcacionesDTOLista",Utils.toJson(registroMarcacionesDTO));
 		return dataBaseServices.guardadoEntradaSalidaMarcacionDia(registroMarcacionesDTO);

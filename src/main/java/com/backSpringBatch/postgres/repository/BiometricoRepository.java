@@ -20,7 +20,8 @@ public interface BiometricoRepository extends JpaRepository<Biometrico, Long> {
 	
     Biometrico findByIpBiometrico( String ip);
 
-   Optional<List<Biometrico>> findAllByEmpresa(String empresa);
+   Optional<List<Biometrico>> findAllBy();
 
+    Biometrico findByNombreBiometricoAndEmpresa( String nombreBiometrico , String empresa );
 
 }

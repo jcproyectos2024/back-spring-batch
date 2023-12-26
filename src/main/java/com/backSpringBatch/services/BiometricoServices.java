@@ -18,12 +18,12 @@ public class BiometricoServices
     @Autowired
     BiometricoMapper biometricoMapper;
 
-    public BiometricoResponse findAllByBiometricoEmpresa(String empresa)
+    public BiometricoResponse findAllByBiometrico()
     {
         BiometricoResponse response = new BiometricoResponse();
         try
         {
-            biometricoRepository.findAllByEmpresa(empresa).ifPresentOrElse(biometricoList ->
+            biometricoRepository.findAllBy().ifPresentOrElse(biometricoList ->
             {
                 List<BiometricoDto> biometricoDtoList = biometricoMapper.biometricoToBiometricoDto(biometricoList);
                 response.setBiometricoDtoList(biometricoDtoList);
