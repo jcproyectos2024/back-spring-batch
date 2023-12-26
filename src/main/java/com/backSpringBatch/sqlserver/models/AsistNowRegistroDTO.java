@@ -43,6 +43,7 @@ public class AsistNowRegistroDTO {
     private String fechaAccion;
 
     private String usuario;
+    private String observacion;
 
     public AsistNowRegistroDTO() {
     }
@@ -157,6 +158,14 @@ public class AsistNowRegistroDTO {
 
     public void setUsuario(String usuario) {
         this.usuario = usuario;
+    }
+
+    public String getObservacion() {
+        return observacion;
+    }
+
+    public void setObservacion(String observacion) {
+        this.observacion = observacion;
     }
 }
 

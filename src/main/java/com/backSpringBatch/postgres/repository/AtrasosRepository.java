@@ -33,6 +33,6 @@ public interface AtrasosRepository extends JpaRepository<Atrasos, String> {
     Atrasos findByIdentificacionAndAndFecha (String identificacion, Date fecha );
 
 
-
-
+    @Override
+    void delete(Atrasos entity);
 }

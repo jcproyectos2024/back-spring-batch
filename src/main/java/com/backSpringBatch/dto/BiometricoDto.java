@@ -15,6 +15,8 @@ public class BiometricoDto implements Serializable {
     private  String ipBiometrico;
     private  String tipoBiometrinco;
     private  String nombreBiometrico;
+    private  String empresa;
+    private String empresaNombre;
 
     public BiometricoDto() {
     }
@@ -51,5 +53,19 @@ public class BiometricoDto implements Serializable {
         this.nombreBiometrico = nombreBiometrico;
     }
 
+    public String getEmpresa() {
+        return empresa;
+    }
 
+    public void setEmpresa(String empresa) {
+        this.empresa = empresa;
+    }
+
+    public String getEmpresaNombre() {
+        return empresaNombre;
+    }
+
+    public void setEmpresaNombre(String empresaNombre) {
+        this.empresaNombre = empresaNombre;
+    }
 }

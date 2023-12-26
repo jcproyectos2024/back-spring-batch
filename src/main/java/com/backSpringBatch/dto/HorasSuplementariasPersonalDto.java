@@ -4,10 +4,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 
-/**
- * A DTO for the {@link com.backSpringBatch.postgres.entity.HorasSuplementariasPersonal} entity
- */
-@Data
+
 public class HorasSuplementariasPersonalDto implements Serializable {
     private  Long id;
     private  String identificacion;
@@ -15,6 +12,8 @@ public class HorasSuplementariasPersonalDto implements Serializable {
     private  Boolean estado;
     private  Long horas;
     private  Double porcentaje;
+
+    private float saldoHorasExtras;
 
     public HorasSuplementariasPersonalDto() {
     }
@@ -66,5 +65,13 @@ public class HorasSuplementariasPersonalDto implements Serializable {
 
     public void setPorcentaje(Double porcentaje) {
         this.porcentaje = porcentaje;
+    }
+
+    public float getSaldoHorasExtras() {
+        return saldoHorasExtras;
+    }
+
+    public void setSaldoHorasExtras(float saldoHorasExtras) {
+        this.saldoHorasExtras = saldoHorasExtras;
     }
 }

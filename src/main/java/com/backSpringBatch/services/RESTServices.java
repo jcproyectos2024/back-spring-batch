@@ -1,9 +1,6 @@
 package com.backSpringBatch.services;
 
-import com.backSpringBatch.postgres.models.EmpresaResponse;
-import com.backSpringBatch.postgres.models.PersonResponseS;
-import com.backSpringBatch.postgres.models.ResponsePeriodoActual;
-import com.backSpringBatch.postgres.models.ShedulePersonDto;
+import com.backSpringBatch.postgres.models.*;
 import com.backSpringBatch.sqlserver.models.MarcacionesMongo;
 import com.backSpringBatch.sqlserver.models.ResponseMarcacionesMongo;
 import com.diosmar.GenericExceptionUtils;
@@ -164,11 +161,56 @@ public class RESTServices {
         return rootc;
 
     }
-/*
-    public EmpresaResponse findByEstadoEmpCodigoEmpresa(String empCodigo)
+
+    public ResponsePersonaProduccionFija consultarPersonaProduccionFijaCalculo(String tipoNomina)
     {
-        String ruta = env.getProperty("urlFindByEstadoEmpCodigoEmpresa");
-        ruta+="?empCodigo="+empCodigo;
+        String ruta = env.getProperty("urlConsultarPersonaProduccionFija");
+        ruta+="?tipoNomina="+tipoNomina;
+        ResponsePersonaProduccionFija rootc=null;
+        try {
+            Response response = RestAssured.given()
+                    .headers(
+                            "Content-Type", ContentType.JSON, "Accept", ContentType.JSON)
+                    .contentType("application/json;charset=utf-8").when()
+                    .get(ruta)
+                    .then().extract().response();
+            rootc = response.getBody().as(ResponsePersonaProduccionFija.class);
+        } catch (Exception ex)
+        {
+            // TODO: handle exception
+            ex.printStackTrace();
+            throw new GenericExceptionUtils(ex);
+        }
+        return rootc;
+
+    }
+
+    public ResponsePersonaProduccionFija findAllByPersonalHorasExtras(String horasExtras)
+    {
+        String ruta = env.getProperty("urlFindAllByPersonalHorasExtras");
+        ruta+="?horasExtras="+horasExtras;
+        ResponsePersonaProduccionFija rootc=null;
+        try {
+            Response response = RestAssured.given()
+                    .headers(
+                            "Content-Type", ContentType.JSON, "Accept", ContentType.JSON)
+                    .contentType("application/json;charset=utf-8").when()
+                    .get(ruta)
+                    .then().extract().response();
+            rootc = response.getBody().as(ResponsePersonaProduccionFija.class);
+        } catch (Exception ex)
+        {
+            // TODO: handle exception
+            ex.printStackTrace();
+            throw new GenericExceptionUtils(ex);
+        }
+        return rootc;
+
+    }
+
+    public EmpresaResponse findAllByEmpresa()
+    {
+        String ruta = env.getProperty("urlFindAllByEmpresa");
         EmpresaResponse rootc=null;
         try {
             Response response = RestAssured.given()
@@ -186,6 +228,30 @@ public class RESTServices {
         }
         return rootc;
 
-    }*/
+    }
+
+
+    public String parametrizacionRecursosHumanos(String nombreParametro)
+    {
+        String ruta = env.getProperty("urlParametrizacionRecursosHumanos");
+        ruta+="?nombreParametro="+nombreParametro;
+        String rootc=null;
+        try {
+            Response response = RestAssured.given()
+                    .headers(
+                            "Content-Type", ContentType.JSON, "Accept", ContentType.JSON)
+                    .contentType("application/json;charset=utf-8").when()
+                    .get(ruta)
+                    .then().extract().response();
+            rootc = response.getBody().as(String.class);
+        } catch (Exception ex)
+        {
+            // TODO: handle exception
+            ex.printStackTrace();
+            throw new GenericExceptionUtils(ex);
+        }
+        return rootc;
+
+    }
 
 }
