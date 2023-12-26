@@ -230,4 +230,28 @@ public class RESTServices {
 
     }
 
+
+    public String parametrizacionRecursosHumanos(String nombreParametro)
+    {
+        String ruta = env.getProperty("urlParametrizacionRecursosHumanos");
+        ruta+="?nombreParametro="+nombreParametro;
+        String rootc=null;
+        try {
+            Response response = RestAssured.given()
+                    .headers(
+                            "Content-Type", ContentType.JSON, "Accept", ContentType.JSON)
+                    .contentType("application/json;charset=utf-8").when()
+                    .get(ruta)
+                    .then().extract().response();
+            rootc = response.getBody().as(String.class);
+        } catch (Exception ex)
+        {
+            // TODO: handle exception
+            ex.printStackTrace();
+            throw new GenericExceptionUtils(ex);
+        }
+        return rootc;
+
+    }
+
 }

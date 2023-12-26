@@ -38,7 +38,8 @@ public class HorasSuplementariasPersonal {
 
 	@Column(name = "periodo")
 	private  String periodo;
-
+	@Column(name = "saldo_horas")
+	private float saldoHorasExtras;
 
 	public Long getId() {
 		return id;
@@ -102,5 +103,13 @@ public class HorasSuplementariasPersonal {
 
 	public void setPeriodo(String periodo) {
 		this.periodo = periodo;
+	}
+
+	public float getSaldoHorasExtras() {
+		return saldoHorasExtras;
+	}
+
+	public void setSaldoHorasExtras(float saldoHorasExtras) {
+		this.saldoHorasExtras = saldoHorasExtras;
 	}
 }

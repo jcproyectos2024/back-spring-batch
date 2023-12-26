@@ -25,7 +25,25 @@ public class BiometricoServices
         {
             biometricoRepository.findAllBy().ifPresentOrElse(biometricoList ->
             {
+                BiometricoDto  biometricoDtoIngreso= new BiometricoDto();
+                biometricoDtoIngreso.setId(8L);
+                biometricoDtoIngreso.setIpBiometrico("192.168.54.242");
+                biometricoDtoIngreso.setTipoBiometrinco("INGRESO");
+                biometricoDtoIngreso.setNombreBiometrico("GARITA");
+                biometricoDtoIngreso.setEmpresa("GD08");
+                biometricoDtoIngreso.setEmpresaNombre("FAHDI SA");
+
+                BiometricoDto  biometricoDtoSalida= new BiometricoDto();
+                biometricoDtoSalida.setId(9L);
+                biometricoDtoSalida.setIpBiometrico("192.168.54.242");
+                biometricoDtoSalida.setTipoBiometrinco("SALIDA");
+                biometricoDtoSalida.setNombreBiometrico("GARITA");
+                biometricoDtoSalida.setEmpresa("GD08");
+                biometricoDtoSalida.setEmpresaNombre("FAHDI SA");
+                biometricoList.removeIf(x->x.getId()==8);
                 List<BiometricoDto> biometricoDtoList = biometricoMapper.biometricoToBiometricoDto(biometricoList);
+                biometricoDtoList.add(biometricoDtoIngreso);
+                biometricoDtoList.add(biometricoDtoSalida);
                 response.setBiometricoDtoList(biometricoDtoList);
                 response.setMessage("Consulta Existosa");
                 response.setSuccess(true);
