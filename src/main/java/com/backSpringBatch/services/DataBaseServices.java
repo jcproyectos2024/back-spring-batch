@@ -1166,6 +1166,7 @@ public class DataBaseServices {
             {
                 List<AsistNow>  listaSinDuplicados =postGresRepository.findAllByIdentificacionEntada(fechaPeriodo[0],fechaPeriodo[1],identificacion,empresa,personResponseS.getTipoBiometricoCalculoDto()==null?"": personResponseS.getTipoBiometricoCalculoDto().getNombreBiometrico(),"INGRESO",false, Sort.by(Sort.Direction.ASC,"id.asisIng"));
                 List<AsistNow>  asistNowListSalida =postGresRepository.findAllByIdentificacionSalida(fechaPeriodo[0],fechaPeriodo[1],identificacion,empresa,personResponseS.getTipoBiometricoCalculoDto()==null?"": personResponseS.getTipoBiometricoCalculoDto().getNombreBiometrico(),"SALIDA",false, Sort.by(Sort.Direction.DESC,"id.asisIng"));
+
                 List<AsistNow> asistNowList = listaSinDuplicados.stream()
                         .collect(Collectors.toMap(
                                 AsistNow::getAsisFecha,  // Clave: asisFecha
@@ -1489,19 +1490,21 @@ public class DataBaseServices {
             ResponsePersonaProduccionFija responsePersonaProduccionFija =restServices.consultarPersonaProduccionFijaCalculo("PRODUCCIÓN FIJA");
             if (responsePersonaProduccionFija.isSuccess())
             {
-                responsePersonaProduccionFija.getPersonaProduccionFijaDtoList().forEach(x ->
-                {
+               // responsePersonaProduccionFija.getPersonaProduccionFijaDtoList().forEach(x ->
+              //  {
                     try
                     {
-                        calculoHorasSuplementariasProduccionXPersona(x.getIdentificacion(), x.getEmpCodigo());
+
+                        //calculoHorasSuplementariasProduccionXPersona(x.getIdentificacion(), x.getEmpCodigo());
+                        calculoHorasSuplementariasProduccionXPersona("0917425266", "PROCAMARONEX");
                         ResponsePeriodoActual periodoActual =restServices.consultarPeriodoActual();
-                        calculoNominaProduccionFija.calculoNominaProduccionFija(x.getIdentificacion(),x.getSueldo(),periodoActual.getPeriodoAsistencia());
+                       // calculoNominaProduccionFija.calculoNominaProduccionFija(x.getIdentificacion(),x.getSueldo(),periodoActual.getPeriodoAsistencia());
+                        calculoNominaProduccionFija.calculoNominaProduccionFija("0917425266", (float) 458.64,periodoActual.getPeriodoAsistencia());
                     } catch (Exception e)
                     {
                         throw new GenericExceptionUtils(e);
                     }
-                });
-              //  Utils.console("responsePersonaProduccionFija",Utils.toJson(responsePersonaProduccionFija));
+              //  });
                 System.out.println("***********************AQUI-----"+utily.convertirDateString(new Date()));
             }
         }

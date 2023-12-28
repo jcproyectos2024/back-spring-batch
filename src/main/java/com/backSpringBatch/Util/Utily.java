@@ -544,7 +544,7 @@ public class Utily {
                     }
                     else
                     {
-                        asistNowNoche = postGresRepository.consultarMarcacioneSalida(registroMarcaciones.getIdentificacion(), asisFecha, asisFecha, registroMarcaciones.getBiometrico().getNombreBiometrico(), registroMarcaciones.getEmpresa(), "SALIDA");
+                        asistNowNoche = postGresRepository.consultarMarcacioneSalida(registroMarcaciones.getIdentificacion(), fechaTurnoNche, fechaTurnoNche, registroMarcaciones.getBiometrico().getNombreBiometrico(), registroMarcaciones.getEmpresa(), "SALIDA");
                         Biometrico biometricoSalida = biometricoRepository.findByIpBiometrico(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getId().getAsisZona());
                         registroMarcacionesDTO.setBiometricoSalida( (biometricoEntrada==null?null:biometricoMapper.biometricoDTOToBiometrico(biometricoSalida)));
                     }

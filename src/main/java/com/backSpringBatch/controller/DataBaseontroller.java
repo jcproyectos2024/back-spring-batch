@@ -32,10 +32,10 @@ public class DataBaseontroller {
 	private BiometricoServices biometricoServices;
 
 
-	@Scheduled (cron = "0/3 * * ? * *")
+	/*@Scheduled (cron = "0/3 * * ? * *")
 	public void insertSqlToPostgres() {
 		dataBaseServices.insertSqlToPostgres();
-	}
+	}*/
 
 	/*metodo anterior, ahora estara el refactorizado
 	@PostMapping("obtenerMarcaciones/")
@@ -151,10 +151,11 @@ public class DataBaseontroller {
 		//@Scheduled(cron = "0 0 */6 * * *")//cada 6 hora
 		//@Scheduled(cron = "0 * * * * *")//cada un minutos
 	//	@Scheduled(cron = "0 0 */4 * * *")//cada 4 hora
-	 /* public void calculoHorasSuplementariasProduccionFija()
+		@GetMapping("calculoHorasSuplementariasProduccionFija/")
+	 public void calculoHorasSuplementariasProduccionFija()
 		{
 		dataBaseServices.calculoHorasSuplementariasProduccionFija();
-		}*/
+		}
 
 	@PostMapping("guardadoEntradaSalidaMarcacionDia/")
 	public RegistroMarcacionesResponses guardadoEntradaSalidaMarcacionDia(@RequestBody @Validated List<RegistroMarcacionesGuardadoDTO> registroMarcacionesDTO) throws Exception
