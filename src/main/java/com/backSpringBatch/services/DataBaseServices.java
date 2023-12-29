@@ -1152,14 +1152,14 @@ public class DataBaseServices {
     }
 
     @Transactional(rollbackFor = {RuntimeException.class})
-    public HorasSuplementariasPersonalResponses calculoHorasSuplementariasProduccionXPersona(String identificacion, String empresa ) throws Exception
+    public HorasSuplementariasPersonalResponses calculoHorasSuplementariasProduccionXPersona(String identificacion, String empresa ,ResponsePeriodoActual periodoActual ) throws Exception
     {
 
         HorasSuplementariasPersonalResponses response = new HorasSuplementariasPersonalResponses();
         try
         {
             List<PoliticasHorasSuple> lsPoliticas=politicasHorasSupleRepository.findByEstadoTrue();
-            ResponsePeriodoActual periodoActual =restServices.consultarPeriodoActual();
+            //ResponsePeriodoActual periodoActual =restServices.consultarPeriodoActual();
             String[] fechaPeriodo= utily.fechaPeriodoSplit(periodoActual.getPeriodoAsistencia());
             PersonResponseS  personResponseS=   restServices.consultarPersonaTipoBiometricoCalculo(identificacion);
             if (personResponseS.isSuccess())
@@ -1488,23 +1488,23 @@ public class DataBaseServices {
         try
         {
             ResponsePersonaProduccionFija responsePersonaProduccionFija =restServices.consultarPersonaProduccionFijaCalculo("PRODUCCIÓN FIJA");
+            //  Utils.console("responsePersonaProduccionFija",Utils.toJson(responsePersonaProduccionFija));
             if (responsePersonaProduccionFija.isSuccess())
             {
-               // responsePersonaProduccionFija.getPersonaProduccionFijaDtoList().forEach(x ->
-              //  {
+                responsePersonaProduccionFija.getPersonaProduccionFijaDtoList().forEach(x ->
+               {
                     try
                     {
-
-                        //calculoHorasSuplementariasProduccionXPersona(x.getIdentificacion(), x.getEmpCodigo());
-                        calculoHorasSuplementariasProduccionXPersona("0917425266", "PROCAMARONEX");
                         ResponsePeriodoActual periodoActual =restServices.consultarPeriodoActual();
-                       // calculoNominaProduccionFija.calculoNominaProduccionFija(x.getIdentificacion(),x.getSueldo(),periodoActual.getPeriodoAsistencia());
-                        calculoNominaProduccionFija.calculoNominaProduccionFija("0917425266", (float) 458.64,periodoActual.getPeriodoAsistencia());
+                        calculoHorasSuplementariasProduccionXPersona(x.getIdentificacion(), x.getEmpNombre(),periodoActual);
+                        //calculoHorasSuplementariasProduccionXPersona("0917425266", "PROCAMARONEX",periodoActual);
+                       calculoNominaProduccionFija.calculoNominaProduccionFija(x.getIdentificacion(),x.getSueldo(),periodoActual.getPeriodoAsistencia());
+                        //calculoNominaProduccionFija.calculoNominaProduccionFija("0917425266", (float) 458.64,periodoActual.getPeriodoAsistencia());
                     } catch (Exception e)
                     {
                         throw new GenericExceptionUtils(e);
                     }
-              //  });
+                });
                 System.out.println("***********************AQUI-----"+utily.convertirDateString(new Date()));
             }
         }

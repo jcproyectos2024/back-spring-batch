@@ -122,7 +122,9 @@ public class DataBaseontroller {
 	@GetMapping("calculoHorasSuplementariasProduccionXPersona/")
 	public HorasSuplementariasPersonalResponses calculoHorasSuplementariasProduccionXPersona(@RequestParam String identificacion,@RequestParam  String empresa  ) throws Exception
 	{
-		return dataBaseServices.calculoHorasSuplementariasProduccionXPersona(identificacion,empresa);
+		//ResponsePeriodoActual periodoActua=restServices.consultarPeriodoActual();
+		ResponsePeriodoActual periodoActua = null;
+		return dataBaseServices.calculoHorasSuplementariasProduccionXPersona(identificacion,empresa,periodoActua);
 	}
 	@GetMapping("findAllByBiometricoEmpresa/")
 	public BiometricoResponse findAllByBiometricoEmpresa()
