@@ -8,6 +8,7 @@ import com.backSpringBatch.postgres.models.*;
 import com.backSpringBatch.postgres.models.Master.MarcacionIndentificacionResponses;
 import com.backSpringBatch.services.BiometricoServices;
 import com.backSpringBatch.services.DataBaseServices;
+import com.backSpringBatch.services.MarcacionesIngresoSalidaServices;
 import com.backSpringBatch.sqlserver.models.ResponsesEntradaSalidaMarcacionDias;
 import com.diosmar.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,8 @@ public class DataBaseontroller {
 	private DataBaseServices dataBaseServices;
 	@Autowired
 	private BiometricoServices biometricoServices;
-
+	@Autowired
+	MarcacionesIngresoSalidaServices marcacionesIngresoSalidaServices;
 
 	/*@Scheduled (cron = "0/3 * * ? * *")
 	public void insertSqlToPostgres() {
@@ -165,6 +167,14 @@ public class DataBaseontroller {
 		Utils.console("registroMarcacionesDTOLista",Utils.toJson(registroMarcacionesDTO));
 		return dataBaseServices.guardadoEntradaSalidaMarcacionDia(registroMarcacionesDTO);
 	}
+
+
+	@GetMapping("findAllMarcacionesIngresoSalida/")
+	public void findAllMarcacionesIngresoSalida()
+	{
+		marcacionesIngresoSalidaServices.findAllMarcacionesIngresoSalida();
+	}
+
 
 }
 	
