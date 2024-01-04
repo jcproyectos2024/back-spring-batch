@@ -3,6 +3,7 @@ import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -40,7 +41,7 @@ public class MarcacionesIngresoSalida
     private String apellidos;
 
     @Column(name = "horas_trabajadas")
-    private float horasTrabajadas;
+    private BigDecimal horasTrabajadas;
 
     @Column(name = "horas_final_normales")
     private String horasFinalNormales;
@@ -145,11 +146,11 @@ public class MarcacionesIngresoSalida
         this.apellidos = apellidos;
     }
 
-    public float getHorasTrabajadas() {
+    public BigDecimal getHorasTrabajadas() {
         return horasTrabajadas;
     }
 
-    public void setHorasTrabajadas(float horasTrabajadas) {
+    public void setHorasTrabajadas(BigDecimal horasTrabajadas) {
         this.horasTrabajadas = horasTrabajadas;
     }
 

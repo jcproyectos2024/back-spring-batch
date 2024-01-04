@@ -101,7 +101,7 @@ public class DataBaseServices {
             //List<AsistNowRegistro> lsRegistros=sqlRepository.findAll();
             List<AsistNowRegistro>   lsRegistros = sqlRepository.findAllByEstadoAsistnowRegistroTrue();
                 if ( !(lsRegistros ==null ? new ArrayList<>():lsRegistros).isEmpty()) {
-                  // System.out.println("lsRegistros Cantidad" + lsRegistros.size());
+                   System.out.println("TIENES Registros Cantidad" + lsRegistros.size());
                     //   lsRegistros.forEach(x->{
                     lsRegistros.forEach(x -> {
                         //asistNowRegistroError[0] =Utils.toJson(x);
@@ -112,9 +112,9 @@ public class DataBaseServices {
                         //  postGresRepository.save(regActual);
                         postGresRepository.findById_AsisIdAndId_AsisIngAndId_AsisZona(regActual.getId().getAsisId(), regActual.getId().getAsisIng(), regActual.getId().getAsisZona()).ifPresentOrElse(asistNow ->
                         {
-                          // System.out.println("YA ESTA GUARDADO");
+                           System.out.println("YA ESTA GUARDADO");
                         }, () -> {
-                            //System.out.println("NUEVO.");
+                            System.out.println("NUEVO.");
                            // Utils.console("regActual",Utils.toJson(regActual));
                             postGresRepository.save(regActual);
                         });

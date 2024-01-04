@@ -765,12 +765,15 @@ public class Utily {
         int horaTrabajada= Integer.valueOf(restServices.parametrizacionRecursosHumanos("horaTrabajada"));
         int diaTrabajado=Integer.valueOf(restServices.parametrizacionRecursosHumanos("diaTrabajado"));
         int minutosTrabajado= Integer.valueOf(restServices.parametrizacionRecursosHumanos("minutosTrabajado"));
-
+        System.out.println("minutosTrabajado"+minutosTrabajado);
         try
         {
             float  sueldoDiaTrabajado= sueldo/diaTrabajado;
+            System.out.println("sueldoDiaTrabajado"+sueldoDiaTrabajado);
             salarioPorHora= sueldoDiaTrabajado/horaTrabajada;
+            System.out.println("salarioPorHora"+salarioPorHora);
             salarioMinutos=salarioPorHora/minutosTrabajado;
+            System.out.println("salarioMinutos"+salarioMinutos);
         }
         catch (Exception ex)
         {  throw new GenericExceptionUtils(ex);
