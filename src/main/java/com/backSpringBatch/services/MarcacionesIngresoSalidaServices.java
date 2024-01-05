@@ -64,7 +64,7 @@ public class MarcacionesIngresoSalidaServices
     }
 
 
-    public void findAllMarcacionesIngresoSalida2()
+    public void findAllMarcacionesIngresoSalidaCalculoHorasSuplementariasPersonal()
     {
         ResponsePeriodoActual periodoActual =restServices.consultarPeriodoActual();
         try
@@ -73,19 +73,19 @@ public class MarcacionesIngresoSalidaServices
             String[] fechaPeriodo= utily.fechaPeriodoSplit(periodoActual.getPeriodoAsistencia());
             marcacionesIngresoSalidaRepository. findAllByIngresoSalida(fechaPeriodo[0],fechaPeriodo[1],false).ifPresentOrElse(  marcacionesIngresoSalidaList ->
             {
-                Utils.console("marcacionesIngresoSalidaList",Utils.toJson(marcacionesIngresoSalidaList));
+               // Utils.console("marcacionesIngresoSalidaList",Utils.toJson(marcacionesIngresoSalidaList));
                 if (responsePersonaProduccionFija.isSuccess())
                 {
-                   // responsePersonaProduccionFija.getPersonaProduccionFijaDtoList().forEach(x ->
-                   // {
+                   responsePersonaProduccionFija.getPersonaProduccionFijaDtoList().forEach(x ->
+                   {
                         try
                         {
                             List<MarcacionesIngresoSalida> marcacionesIngresoSalidaListFilter=marcacionesIngresoSalidaList==null? new ArrayList<>() :marcacionesIngresoSalidaList.stream().filter(p->(p.getId().getIdentificacion().equalsIgnoreCase(/*x.getIdentificacion()*/"1725733529"))).collect(Collectors.toList());
                             if(!marcacionesIngresoSalidaListFilter.isEmpty())
                             {
-                                Utils.console("marcacionesIngresoSalidaListFilter",Utils.toJson(marcacionesIngresoSalidaListFilter));
-                                calculoNominaProduccionFijaService.acumularHorasSuplementariasPersonal(periodoActual.getPeriodoAsistencia(),/*x.getIdentificacion()*/"1725733529",marcacionesIngresoSalidaListFilter);
-                                calculoNominaProduccionFijaService.calculoNominaProduccionFija(/*x.getIdentificacion()*/"1725733529",/*x.getSueldo()*/(float) 458.64,periodoActual.getPeriodoAsistencia());
+                               // Utils.console("marcacionesIngresoSalidaListFilter",Utils.toJson(marcacionesIngresoSalidaListFilter));
+                                calculoNominaProduccionFijaService.acumularHorasSuplementariasPersonal(periodoActual.getPeriodoAsistencia(),x.getIdentificacion(),marcacionesIngresoSalidaListFilter);
+                                calculoNominaProduccionFijaService.calculoNominaProduccionFija(x.getIdentificacion(),x.getSueldo(),periodoActual.getPeriodoAsistencia());
                             }
 
                         } catch (Exception e)
@@ -93,8 +93,8 @@ public class MarcacionesIngresoSalidaServices
                             e.printStackTrace();
                             throw new GenericExceptionUtils(e);
                         }
-                   // });
-                    System.out.println("***********************AQUI-----"+utily.convertirDateString(new Date()));
+                    });
+                  ///  System.out.println("***********************AQUI-----"+utily.convertirDateString(new Date()));
                 }
 
             }, () -> {
@@ -105,6 +105,73 @@ public class MarcacionesIngresoSalidaServices
 
         }catch (Exception ex)
         {
+            ex.printStackTrace();
+            //  return response;
+            throw new GenericExceptionUtils(ex);
+        }
+    }
+
+
+
+    public void findAllMarcacionesIngresoSalidaCalculoHorasExtras()
+    {
+        ResponsePeriodoActual periodoActual =restServices.consultarPeriodoActual();
+        try
+        {
+            ResponsePersonaProduccionFija responsePersonaProduccionFija =restServices.findAllByPersonalHorasExtras(true);
+          //  Utils.console("responsePersonaProduccionFija",Utils.toJson(responsePersonaProduccionFija));
+            String[] fechaPeriodo= utily.fechaPeriodoSplit(periodoActual.getPeriodoAsistencia());
+            marcacionesIngresoSalidaRepository.findAllByIngresoSalidaHorasExtras(fechaPeriodo[0],fechaPeriodo[1],false).ifPresentOrElse(  marcacionesIngresoSalidaList ->
+            {
+               // Utils.console("marcacionesIngresoSalidaList",Utils.toJson(marcacionesIngresoSalidaList));
+                if (responsePersonaProduccionFija.isSuccess())
+                {
+                    responsePersonaProduccionFija.getPersonaProduccionFijaDtoList().forEach(x ->
+                     {
+                    try
+                    {
+                        List<MarcacionesIngresoSalida> marcacionesIngresoSalidaListFilter=marcacionesIngresoSalidaList==null? new ArrayList<>() :marcacionesIngresoSalidaList.stream().filter(p->(p.getId().getIdentificacion().equalsIgnoreCase(/*x.getIdentificacion()*/"1725733529"))).collect(Collectors.toList());
+                        if(!marcacionesIngresoSalidaListFilter.isEmpty())
+                        {
+                            //tils.console("marcacionesIngresoSalidaListFilter",Utils.toJson(marcacionesIngresoSalidaListFilter));
+                            calculoNominaProduccionFijaService.acumularHorasExtrasPersonal(periodoActual.getPeriodoAsistencia(),x.getIdentificacion(),marcacionesIngresoSalidaListFilter);
+                            calculoNominaProduccionFijaService.calculoHorasExtrasNominaProduccionFija(x.getIdentificacion(),x.getSueldo(),periodoActual.getPeriodoAsistencia());
+                        }
+
+                    } catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        throw new GenericExceptionUtils(e);
+                    }
+                    });
+                    //System.out.println("***********************AQUI-----"+utily.convertirDateString(new Date()));
+                }
+
+            }, () -> {
+              /*  response.setMensaje("No se encotraron Datos");
+                response.setSuccess(false);*/
+
+            });
+
+        }catch (Exception ex)
+        {
+            ex.printStackTrace();
+            //  return response;
+            throw new GenericExceptionUtils(ex);
+        }
+    }
+
+    public void calculoHorasExtrasCalculoHorasSuplementarias()
+    {
+        try
+        {
+
+            findAllMarcacionesIngresoSalidaCalculoHorasSuplementariasPersonal();
+            findAllMarcacionesIngresoSalidaCalculoHorasExtras();
+
+        }catch (Exception ex)
+        {
+
             ex.printStackTrace();
             //  return response;
             throw new GenericExceptionUtils(ex);

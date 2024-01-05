@@ -7,7 +7,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
+import java.math.BigDecimal;
+import static java.math.BigDecimal.ZERO;
 import groovyjarjarantlr4.v4.runtime.misc.Nullable;
 
 
@@ -34,12 +35,12 @@ public class HorasSuplementariasPersonal {
     private  Long horas;
     
     @Column(name = "porcentaje")
-    private  Double porcentaje;
+    private  BigDecimal porcentaje=ZERO;
 
 	@Column(name = "periodo")
 	private  String periodo;
 	@Column(name = "saldo_horas")
-	private float saldoHorasExtras;
+	private BigDecimal saldoHorasExtras = ZERO;
 
 	public Long getId() {
 		return id;
@@ -81,11 +82,11 @@ public class HorasSuplementariasPersonal {
 		this.horas = horas;
 	}
 
-	public Double getPorcentaje() {
+	public BigDecimal getPorcentaje() {
 		return porcentaje;
 	}
 
-	public void setPorcentaje(Double porcentaje) {
+	public void setPorcentaje(BigDecimal porcentaje) {
 		this.porcentaje = porcentaje;
 	}
 
@@ -105,11 +106,11 @@ public class HorasSuplementariasPersonal {
 		this.periodo = periodo;
 	}
 
-	public float getSaldoHorasExtras() {
+	public BigDecimal getSaldoHorasExtras() {
 		return saldoHorasExtras;
 	}
 
-	public void setSaldoHorasExtras(float saldoHorasExtras) {
+	public void setSaldoHorasExtras(BigDecimal saldoHorasExtras) {
 		this.saldoHorasExtras = saldoHorasExtras;
 	}
 }

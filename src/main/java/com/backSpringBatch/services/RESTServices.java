@@ -185,7 +185,7 @@ public class RESTServices {
 
     }
 
-    public ResponsePersonaProduccionFija findAllByPersonalHorasExtras(String horasExtras)
+    public ResponsePersonaProduccionFija findAllByPersonalHorasExtras(boolean horasExtras)
     {
         String ruta = env.getProperty("urlFindAllByPersonalHorasExtras");
         ruta+="?horasExtras="+horasExtras;

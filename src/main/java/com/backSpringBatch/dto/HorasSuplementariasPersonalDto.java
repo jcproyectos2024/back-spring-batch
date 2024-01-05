@@ -1,9 +1,7 @@
 package com.backSpringBatch.dto;
-
-import lombok.Data;
-
 import java.io.Serializable;
-
+import java.math.BigDecimal;
+import static java.math.BigDecimal.ZERO;
 
 public class HorasSuplementariasPersonalDto implements Serializable {
     private  Long id;
@@ -13,7 +11,7 @@ public class HorasSuplementariasPersonalDto implements Serializable {
     private  Long horas;
     private  Double porcentaje;
 
-    private float saldoHorasExtras;
+    private BigDecimal saldoHorasExtras = ZERO;
 
     public HorasSuplementariasPersonalDto() {
     }
@@ -67,11 +65,11 @@ public class HorasSuplementariasPersonalDto implements Serializable {
         this.porcentaje = porcentaje;
     }
 
-    public float getSaldoHorasExtras() {
+    public BigDecimal getSaldoHorasExtras() {
         return saldoHorasExtras;
     }
 
-    public void setSaldoHorasExtras(float saldoHorasExtras) {
+    public void setSaldoHorasExtras(BigDecimal saldoHorasExtras) {
         this.saldoHorasExtras = saldoHorasExtras;
     }
 }

@@ -25,6 +25,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -686,14 +688,14 @@ public class DataBaseServices {
                                             Integer horasPaso=utily.horasMilisegundosGeneral("8:00:00");
 
                                             horaPersonal.setHoras(horaPersonal.getHoras()+horasPaso);
-                                            horaPersonal.setPorcentaje(polHoras.getPorcentaje());
+                                            horaPersonal.setPorcentaje(BigDecimal.valueOf(polHoras.getPorcentaje()));
                                             horasSuplementariasPersonalRepository.save(horaPersonal);
                                          //   System.out.println("horas arrastradas i:"+i+"   "+  horasPaso+"_____________Porcentaje:"+polHoras.getPorcentaje());
                                         }else{
                                             horaArrastrada=utily.horasMilisegundosGeneral(polHoras.getRangoHoraInicial())-horaArrastrada;
 
                                             horaPersonal.setHoras(horaPersonal.getHoras()+horaArrastrada);
-                                            horaPersonal.setPorcentaje(polHoras.getPorcentaje());
+                                            horaPersonal.setPorcentaje(BigDecimal.valueOf(polHoras.getPorcentaje()));
                                             horasSuplementariasPersonalRepository.save(horaPersonal);
                                            // System.out.println("horas arrastradas i:"+i+"   "+  horaArrastrada+"_____________Porcentaje:"+polHoras.getPorcentaje());
                                             break;
@@ -707,7 +709,7 @@ public class DataBaseServices {
                                             horaArrastrada=horaArrastrada-dif;
 
                                             horaPersonal.setHoras(horaPersonal.getHoras()+horaArrastrada);
-                                            horaPersonal.setPorcentaje(polHoras.getPorcentaje());
+                                            horaPersonal.setPorcentaje(BigDecimal.valueOf(polHoras.getPorcentaje()));
                                             horasSuplementariasPersonalRepository.save(horaPersonal);
                                            // System.out.println("horas arrastradas i:"+i+"   "+  horaArrastrada+"_____________Porcentaje:"+polHoras.getPorcentaje());
                                         }
@@ -715,7 +717,7 @@ public class DataBaseServices {
                                             horaArrastrada= (utily.horasMilisegundosGeneral(polHoras.getRangoHoraFinal())-horaArrastrada)-utily.horasMilisegundosGeneral(polHoras.getRangoHoraInicial());
 
                                             horaPersonal.setHoras(horaPersonal.getHoras()+horaArrastrada);
-                                            horaPersonal.setPorcentaje(polHoras.getPorcentaje());
+                                            horaPersonal.setPorcentaje(BigDecimal.valueOf(polHoras.getPorcentaje()));
                                             horasSuplementariasPersonalRepository.save(horaPersonal);
                                            // System.out.println("horas arrastradas i:"+i+"   "+  horaArrastrada+"_____________Porcentaje:"+polHoras.getPorcentaje());
                                             break;
@@ -797,7 +799,7 @@ public class DataBaseServices {
                           Integer horasPaso=utily.horasMilisegundosGeneral("8:00:00");
 
                           horaPersonal.setHoras(horaPersonal.getHoras()+horasPaso);
-                          horaPersonal.setPorcentaje(lsPoliticasFilter25.get(0).getPorcentaje());
+                          horaPersonal.setPorcentaje(BigDecimal.valueOf(lsPoliticasFilter25.get(0).getPorcentaje()));
                           horasSuplementariasPersonalRepository.save(horaPersonal);
                          // System.out.println("horas arrastradas "+  horasPaso+"_____________Porcentaje:"+lsPoliticasFilter25.get(0).getPorcentaje());
                       }
@@ -837,7 +839,7 @@ public class DataBaseServices {
                             Integer horasPaso=utily.horasMilisegundosGeneral(horasGeneral100);
 
                             horaPersonal.setHoras(horaPersonal.getHoras()+horasPaso);
-                            horaPersonal.setPorcentaje(lsPoliticasFilter100.get(0).getPorcentaje());
+                            horaPersonal.setPorcentaje(BigDecimal.valueOf(lsPoliticasFilter100.get(0).getPorcentaje()));
                             horasSuplementariasPersonalRepository.save(horaPersonal);
                             //System.out.println("horas arrastradas "+  horasPaso+"_____________Porcentaje:"+lsPoliticasFilter100.get(0).getPorcentaje());
 
@@ -867,7 +869,7 @@ public class DataBaseServices {
                             Integer horasPaso=utily.horasMilisegundosGeneral(horasGeneral50);
 
                             horaPersonal.setHoras(horaPersonal.getHoras()+horasPaso);
-                            horaPersonal.setPorcentaje(lsPoliticasFilter50.get(0).getPorcentaje());
+                            horaPersonal.setPorcentaje(BigDecimal.valueOf(lsPoliticasFilter50.get(0).getPorcentaje()));
                             horasSuplementariasPersonalRepository.save(horaPersonal);
                            // System.out.println("horas arrastradas "+  horasPaso+"_____________Porcentaje:"+lsPoliticasFilter50.get(0).getPorcentaje());
 
@@ -1267,7 +1269,7 @@ public class DataBaseServices {
                     }
                     Integer horasPaso= (int) utily.convertirHorasAMilisegundos("08:00:00");
                     horaPersonal.setHoras(horaPersonal.getHoras()+horasPaso);
-                    horaPersonal.setPorcentaje(lsPoliticasFilter25.get(0).getPorcentaje());
+                    horaPersonal.setPorcentaje(BigDecimal.valueOf(lsPoliticasFilter25.get(0).getPorcentaje()));
                     horasSuplementariasPersonalRepository.save(horaPersonal);
                     String[] hora5 =utily.convertirStringFechaHMS(nuevesHorasMediaTraba);
                     //Utils.console("hora5 --Object", Utils.toJson(hora5));
@@ -1288,7 +1290,7 @@ public class DataBaseServices {
                         }
                         Integer horasPaso100= (int) utily.convertirHorasAMilisegundos(horasMinutosSegundos);
                         horaPersonal100.setHoras(horaPersonal100.getHoras()+horasPaso100);
-                        horaPersonal100.setPorcentaje(lsPoliticasFilter100.get(0).getPorcentaje());
+                        horaPersonal100.setPorcentaje(BigDecimal.valueOf(lsPoliticasFilter100.get(0).getPorcentaje()));
                         horasSuplementariasPersonalRepository.save(horaPersonal100);
                     }
                    String sumarHoras6= utily.sumarHoras(nuevesHorasMediaTraba,horasMinutosSegundos);
@@ -1309,7 +1311,7 @@ public class DataBaseServices {
                         }
                         Integer horasPaso50= (int) utily.convertirHorasAMilisegundos(horasMinutosSegundos6);
                         horaPersonal50.setHoras(horaPersonal50.getHoras()+horasPaso50);
-                        horaPersonal50.setPorcentaje(lsPoliticasFilter50.get(0).getPorcentaje());
+                        horaPersonal50.setPorcentaje(BigDecimal.valueOf(lsPoliticasFilter50.get(0).getPorcentaje()));
                         horasSuplementariasPersonalRepository.save(horaPersonal50);
                     }
 
@@ -1385,7 +1387,7 @@ public class DataBaseServices {
                     }
                     Integer horasPaso= (int) utily.convertirHorasAMilisegundos("08:00:00");
                     horaPersonal.setHoras(horaPersonal.getHoras()+horasPaso);
-                    horaPersonal.setPorcentaje(lsPoliticasFilter25.get(0).getPorcentaje());
+                    horaPersonal.setPorcentaje(BigDecimal.valueOf(lsPoliticasFilter25.get(0).getPorcentaje()));
                     horasSuplementariasPersonalRepository.save(horaPersonal);
                     String[] hora5 =utily.convertirStringFechaHMS(nuevesHorasMediaTraba);
                    // Utils.console("hora5 --Object", Utils.toJson(hora5));
@@ -1406,7 +1408,7 @@ public class DataBaseServices {
                         }
                         Integer horasPaso100= (int) utily.convertirHorasAMilisegundos(horasMinutosSegundos);
                         horaPersonal100.setHoras(horaPersonal100.getHoras()+horasPaso100);
-                        horaPersonal100.setPorcentaje(lsPoliticasFilter100.get(0).getPorcentaje());
+                        horaPersonal100.setPorcentaje(BigDecimal.valueOf(lsPoliticasFilter100.get(0).getPorcentaje()));
                         horasSuplementariasPersonalRepository.save(horaPersonal100);
                     }
                     String sumarHoras6= utily.sumarHoras(nuevesHorasMediaTraba,horasMinutosSegundos);
@@ -1427,7 +1429,7 @@ public class DataBaseServices {
                         }
                         Integer horasPaso100= (int) utily.convertirHorasAMilisegundos(horasMinutosSegundos6);
                         horaPersonal50.setHoras(horaPersonal50.getHoras()+horasPaso100);
-                        horaPersonal50.setPorcentaje(lsPoliticasFilter50.get(0).getPorcentaje());
+                        horaPersonal50.setPorcentaje(BigDecimal.valueOf(lsPoliticasFilter50.get(0).getPorcentaje()));
                         horasSuplementariasPersonalRepository.save(horaPersonal50);
                     }
 

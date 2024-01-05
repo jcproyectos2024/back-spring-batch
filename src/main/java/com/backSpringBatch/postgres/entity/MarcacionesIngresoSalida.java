@@ -62,6 +62,8 @@ public class MarcacionesIngresoSalida
 
     @Column(name = "procesado")
     private  boolean procesado;
+    @Column(name = "horas_extras_procesada")
+    private  boolean horasExtrasProcesada;
 
     public MarcacionesIngresoSalida() {
     }
@@ -200,5 +202,13 @@ public class MarcacionesIngresoSalida
 
     public void setProcesado(boolean procesado) {
         this.procesado = procesado;
+    }
+
+    public boolean isHorasExtrasProcesada() {
+        return horasExtrasProcesada;
+    }
+
+    public void setHorasExtrasProcesada(boolean horasExtrasProcesada) {
+        this.horasExtrasProcesada = horasExtrasProcesada;
     }
 }

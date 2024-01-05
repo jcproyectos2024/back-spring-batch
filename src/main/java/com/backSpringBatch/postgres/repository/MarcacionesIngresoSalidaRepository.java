@@ -20,4 +20,11 @@ public interface MarcacionesIngresoSalidaRepository  extends JpaRepository<Marca
                                                                      @Param("fechaFin") String fechaFin ,
                                                                      @Param("procesado") boolean procesado );
 
+    @Query(nativeQuery = false, value = " SELECT an " +
+            " from MarcacionesIngresoSalida an  " +
+            " where   to_char(an.id.fechaEntrada,'yyyy-MM-dd') between :fechaIni  and :fechaFin  AND an.horasExtrasProcesada=:horasExtrasProcesada ")
+    Optional<List<MarcacionesIngresoSalida>>  findAllByIngresoSalidaHorasExtras(@Param("fechaIni") String fechaIni ,
+                                                                     @Param("fechaFin") String fechaFin ,
+                                                                     @Param("horasExtrasProcesada") boolean horasExtrasProcesada );
+
 }

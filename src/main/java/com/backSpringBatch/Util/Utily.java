@@ -14,6 +14,9 @@ import com.diosmar.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -36,6 +39,8 @@ public class Utily {
     BiometricoMapper biometricoMapper;
     @Autowired
     RESTServices  restServices;
+
+
     public Date getSumBetwenDates (Date dateInicio, Date dateFinal) {
 
         int seconds1 = dateInicio.getSeconds();
@@ -739,16 +744,15 @@ public class Utily {
         return registroMarcacionesDTOList;
     }
 
-    public float calculoSalarioPorHoras(float sueldo)
+    public BigDecimal calculoSalarioPorHoras(BigDecimal sueldo)
     {
-
-        float salarioPorHora=0;
-        int horaTrabajada= Integer.valueOf(restServices.parametrizacionRecursosHumanos("horaTrabajada"));
-        int diaTrabajado=Integer.valueOf(restServices.parametrizacionRecursosHumanos("diaTrabajado"));
+        BigDecimal salarioPorHora= BigDecimal.valueOf(0);
+        BigDecimal horaTrabajada= BigDecimal.valueOf(Integer.valueOf(restServices.parametrizacionRecursosHumanos("horaTrabajada")));
+        BigDecimal diaTrabajado= BigDecimal.valueOf(Integer.valueOf(restServices.parametrizacionRecursosHumanos("diaTrabajado")));
         try
         {
-            float  sueldoDiaTrabajado= sueldo/diaTrabajado;
-            salarioPorHora= sueldoDiaTrabajado/horaTrabajada;
+            BigDecimal  sueldoDiaTrabajado= sueldo.divide(diaTrabajado,MathContext.DECIMAL128);
+            salarioPorHora= sueldoDiaTrabajado.divide(horaTrabajada);
         }
         catch (Exception ex)
         {
@@ -757,26 +761,24 @@ public class Utily {
         return salarioPorHora;
     }
 
-    public float calculoSalarioPorMinutos(float sueldo)
+    public BigDecimal calculoSalarioPorMinutos(BigDecimal sueldo)
     {
-
-        float salarioPorHora=0;
-        float salarioMinutos=0;
-        int horaTrabajada= Integer.valueOf(restServices.parametrizacionRecursosHumanos("horaTrabajada"));
-        int diaTrabajado=Integer.valueOf(restServices.parametrizacionRecursosHumanos("diaTrabajado"));
-        int minutosTrabajado= Integer.valueOf(restServices.parametrizacionRecursosHumanos("minutosTrabajado"));
-        System.out.println("minutosTrabajado"+minutosTrabajado);
+        BigDecimal salarioPorHora= BigDecimal.valueOf(0);
+        BigDecimal salarioMinutos= BigDecimal.valueOf(0);
+        BigDecimal horaTrabajada= BigDecimal.valueOf(Integer.valueOf(restServices.parametrizacionRecursosHumanos("horaTrabajada")));
+        BigDecimal diaTrabajado= BigDecimal.valueOf(Integer.valueOf(restServices.parametrizacionRecursosHumanos("diaTrabajado")));
+        BigDecimal minutosTrabajado= BigDecimal.valueOf(Integer.valueOf(restServices.parametrizacionRecursosHumanos("minutosTrabajado")));
         try
         {
-            float  sueldoDiaTrabajado= sueldo/diaTrabajado;
-            System.out.println("sueldoDiaTrabajado"+sueldoDiaTrabajado);
-            salarioPorHora= sueldoDiaTrabajado/horaTrabajada;
-            System.out.println("salarioPorHora"+salarioPorHora);
-            salarioMinutos=salarioPorHora/minutosTrabajado;
-            System.out.println("salarioMinutos"+salarioMinutos);
+
+            BigDecimal  sueldoDiaTrabajado= sueldo.divide(diaTrabajado,MathContext.DECIMAL128);
+            salarioPorHora= sueldoDiaTrabajado.divide(horaTrabajada,MathContext.DECIMAL128);
+            salarioMinutos=salarioPorHora.divide(minutosTrabajado,MathContext.DECIMAL128);
         }
         catch (Exception ex)
-        {  throw new GenericExceptionUtils(ex);
+        {
+            ex.printStackTrace();
+            throw new GenericExceptionUtils(ex);
 
         }
         return salarioMinutos;
@@ -795,17 +797,15 @@ public class Utily {
         return horas + ":" + minutos + ":" + segundos;
     }
 
-    public float calcularPorcentaje(float porcentaje, float cantidad) {
+    public BigDecimal calcularPorcentaje(BigDecimal porcentaje, BigDecimal cantidad) {
 
         try {
-            float porcentajeCantidad = porcentaje * cantidad;
-            float porcentajeCantidadTotal = porcentajeCantidad / 100;
+            BigDecimal porcentajeCantidad = porcentaje.multiply(cantidad);
+            BigDecimal porcentajeCantidadTotal = porcentajeCantidad.divide(BigDecimal.valueOf(100));
             return porcentajeCantidadTotal;
         } catch (Exception ex) {
-            return 0;
+            return BigDecimal.valueOf(0);
         }
-
-
     }
 
 
