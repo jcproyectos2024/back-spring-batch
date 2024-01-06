@@ -111,6 +111,7 @@ public class DataBaseServices {
                         AsistNow regActual = asisRegistroMapper.asistNowRegistroToAsistNow(x);
                         Biometrico biometricoGuarado = biometricoRepository.findByIpBiometrico(regActual.getId().getAsisZona());
                         regActual.setBiometrico(biometricoGuarado);
+                        regActual.setAsisTipoRegistro("B");
                         //  postGresRepository.save(regActual);
                         postGresRepository.findById_AsisIdAndId_AsisIngAndId_AsisZona(regActual.getId().getAsisId(), regActual.getId().getAsisIng(), regActual.getId().getAsisZona()).ifPresentOrElse(asistNow ->
                         {
@@ -569,11 +570,12 @@ public class DataBaseServices {
         HorasSuplementariasPersonalResponses response = new HorasSuplementariasPersonalResponses();
         //Comienza a calcular las horas suplementariasProduccion Fijas
        // calculoHorasSuplementariasProduccion(horasSuplementariasPersonalBody.getFechaIni(),horasSuplementariasPersonalBody.getFechaFin(),horasSuplementariasPersonalBody.getIdentificacion(),horasSuplementariasPersonalBody.getEmpresa());
-        System.out.println("findAllByHorasSuplementariasPersonal ---- horasSuplementariasPersonalBody.getEmpresa()"+horasSuplementariasPersonalBody.getEmpresa());
+      //  System.out.println("findAllByHorasSuplementariasPersonal ---- horasSuplementariasPersonalBody.getEmpresa()"+horasSuplementariasPersonalBody.getEmpresa());
         EmpresaResponse empresaResponse =restServices.findByEstadoEmpCodigoEmpresa(horasSuplementariasPersonalBody.getEmpresa());
         try {
             //calculoHorasSuplementariasProduccionXPersona(horasSuplementariasPersonalBody.getIdentificacion(),empresaResponse.getSuccess()?empresaResponse.getEmpresaDTO().getEmpNombre():"");
-            List<HorasSuplementariasPersonal> horasSuplementariasPersonalList = horasSuplementariasPersonalRepository.findAllByIdentificacionAndEstadoTrueAndPeriodo(horasSuplementariasPersonalBody.getIdentificacion(),horasSuplementariasPersonalBody.getPeriodo());
+          //  List<HorasSuplementariasPersonal> horasSuplementariasPersonalList = horasSuplementariasPersonalRepository.findAllByIdentificacionAndEstadoTrueAndPeriodo(horasSuplementariasPersonalBody.getIdentificacion(),horasSuplementariasPersonalBody.getPeriodo());
+            List<HorasSuplementariasPersonal> horasSuplementariasPersonalList = horasSuplementariasPersonalRepository.findAllByEstadoTrueAndPeriodo(horasSuplementariasPersonalBody.getPeriodo());
             List<HorasSuplementariasPersonalDto>  horasSuplementariasPersonalDtoList = horasSuplementariasPersonalMapper.toHorasSuplementariasPersonalDtoList(horasSuplementariasPersonalList);
             if (horasSuplementariasPersonalDtoList.isEmpty())
             {
@@ -1030,6 +1032,7 @@ public class DataBaseServices {
                     registroMarcaciones.setId(asistnowPK);
                     registroMarcaciones.setAsisRes("OK");
                     registroMarcaciones.setAsisHorasSuplementaria(false);
+                    registroMarcaciones.setAsisTipoRegistro("W");
                     AsistNow registroMarcacionesSave = postGresRepository.save(registroMarcaciones);
                     RegistroMarcacionesDTO marcacionesMapperDTO = registroMarcacionesMapper.asistNowToRegistroMarcacionesDTO(registroMarcacionesSave);
                     response.setMessage("GUARDADO CON EXISTO");
@@ -1566,6 +1569,7 @@ public class DataBaseServices {
                             postGresRepository.delete(asistNowEliminado);
 
                         }
+                        registroMarcaciones.setAsisTipoRegistro("W");
                         AsistNow registroMarcacionesSave = postGresRepository.save(registroMarcaciones);
                         //RegistroMarcacionesDTO marcacionesMapperDTO = registroMarcacionesMapper.asistNowToRegistroMarcacionesDTO(registroMarcacionesSave);
                         response.setMessage("GUARDADO CON EXISTO");

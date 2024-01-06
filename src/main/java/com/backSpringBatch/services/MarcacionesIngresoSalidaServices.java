@@ -36,17 +36,17 @@ public class MarcacionesIngresoSalidaServices
         try
         {
             ResponsePersonaProduccionFija responsePersonaProduccionFija =restServices.consultarPersonaProduccionFijaCalculo("PRODUCCIÓN FIJA");
-            String[] fechaPeriodo= utily.fechaPeriodoSplit(periodoActual.getPeriodoAsistencia());
+           // String[] fechaPeriodo= utily.fechaPeriodoSplit(periodoActual.getPeriodoAsistencia());
                 if (responsePersonaProduccionFija.isSuccess())
                 {
+                    Utils.console("responsePersonaProduccionFija",Utils.toJson(responsePersonaProduccionFija));
                     responsePersonaProduccionFija.getPersonaProduccionFijaDtoList().forEach(x ->
                     {
                         try
                         {
+                            periodoActual.setPeriodoAsistencia("2023-11-26_2024-12-25");
                             dataBaseServices.calculoHorasSuplementariasProduccionXPersona(x.getIdentificacion(), x.getEmpNombre(),periodoActual);
-                            //calculoHorasSuplementariasProduccionXPersona("0917425266", "PROCAMARONEX",periodoActual);
-                            dataBaseServices.calculoNominaProduccionFija.calculoNominaProduccionFija(x.getIdentificacion(),x.getSueldo(),periodoActual.getPeriodoAsistencia());
-                            //calculoNominaProduccionFija.calculoNominaProduccionFija("0917425266", (float) 458.64,periodoActual.getPeriodoAsistencia());
+                            calculoNominaProduccionFijaService.calculoNominaProduccionFija(x.getIdentificacion(),x.getSueldo(),periodoActual.getPeriodoAsistencia());
                         } catch (Exception e)
                         {
                             throw new GenericExceptionUtils(e);
@@ -77,7 +77,7 @@ public class MarcacionesIngresoSalidaServices
                 if (responsePersonaProduccionFija.isSuccess())
                 {
                    responsePersonaProduccionFija.getPersonaProduccionFijaDtoList().forEach(x ->
-                   {
+                 {
                         try
                         {
                             List<MarcacionesIngresoSalida> marcacionesIngresoSalidaListFilter=marcacionesIngresoSalidaList==null? new ArrayList<>() :marcacionesIngresoSalidaList.stream().filter(p->(p.getId().getIdentificacion().equalsIgnoreCase(/*x.getIdentificacion()*/"1725733529"))).collect(Collectors.toList());
@@ -93,7 +93,7 @@ public class MarcacionesIngresoSalidaServices
                             e.printStackTrace();
                             throw new GenericExceptionUtils(e);
                         }
-                    });
+                   });
                   ///  System.out.println("***********************AQUI-----"+utily.convertirDateString(new Date()));
                 }
 
@@ -126,8 +126,8 @@ public class MarcacionesIngresoSalidaServices
                // Utils.console("marcacionesIngresoSalidaList",Utils.toJson(marcacionesIngresoSalidaList));
                 if (responsePersonaProduccionFija.isSuccess())
                 {
-                    responsePersonaProduccionFija.getPersonaProduccionFijaDtoList().forEach(x ->
-                     {
+                   responsePersonaProduccionFija.getPersonaProduccionFijaDtoList().forEach(x ->
+                    {
                     try
                     {
                         List<MarcacionesIngresoSalida> marcacionesIngresoSalidaListFilter=marcacionesIngresoSalidaList==null? new ArrayList<>() :marcacionesIngresoSalidaList.stream().filter(p->(p.getId().getIdentificacion().equalsIgnoreCase(/*x.getIdentificacion()*/"1725733529"))).collect(Collectors.toList());
@@ -165,7 +165,6 @@ public class MarcacionesIngresoSalidaServices
     {
         try
         {
-
             findAllMarcacionesIngresoSalidaCalculoHorasSuplementariasPersonal();
             findAllMarcacionesIngresoSalidaCalculoHorasExtras();
 
