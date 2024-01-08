@@ -48,6 +48,9 @@ public class AsistNow implements Serializable {
     @Column (name = "asis_horas_suplementaria")
     private Boolean asisHorasSuplementaria;
 
+    @Column(name = "asis_tipo_registro")
+    private String asisTipoRegistro;
+
 
 
     public AsistnowPK getId() {
@@ -151,6 +154,13 @@ public class AsistNow implements Serializable {
         return asisFecha.hashCode();
     }
 
+    public String getAsisTipoRegistro() {
+        return asisTipoRegistro;
+    }
+
+    public void setAsisTipoRegistro(String asisTipoRegistro) {
+        this.asisTipoRegistro = asisTipoRegistro;
+    }
 }
 
 
