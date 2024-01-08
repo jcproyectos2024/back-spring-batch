@@ -254,4 +254,26 @@ public class RESTServices {
 
     }
 
+    public void modificacionAsistenciasEntradaSalida(String identificacion ,String periodo,String fechaAsistencia)
+    {
+        String ruta = env.getProperty("urlModificacionAsistenciasEntradaSalida");
+        ruta+="?identificacion="+identificacion+"&periodo="+periodo+"&fechaAsistencia="+fechaAsistencia;
+        String rootc=null;
+        try {
+            Response response = RestAssured.given()
+                    .headers(
+                            "Content-Type", ContentType.JSON, "Accept", ContentType.JSON)
+                    .contentType("application/json;charset=utf-8").when()
+                    .get(ruta)
+                    .then().extract().response();
+            rootc = response.getBody().as(String.class);
+        } catch (Exception ex)
+        {
+            // TODO: handle exception
+            ex.printStackTrace();
+            throw new GenericExceptionUtils(ex);
+        }
+
+    }
+
 }

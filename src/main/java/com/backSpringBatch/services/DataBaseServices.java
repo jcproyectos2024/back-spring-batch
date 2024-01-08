@@ -115,10 +115,12 @@ public class DataBaseServices {
                         //  postGresRepository.save(regActual);
                         postGresRepository.findById_AsisIdAndId_AsisIngAndId_AsisZona(regActual.getId().getAsisId(), regActual.getId().getAsisIng(), regActual.getId().getAsisZona()).ifPresentOrElse(asistNow ->
                         {
+                            Utils.console("regActual",Utils.toJson(regActual));
                            System.out.println("YA ESTA GUARDADO");
                         }, () -> {
                             System.out.println("NUEVO.");
                            // Utils.console("regActual",Utils.toJson(regActual));
+                            Utils.console("regActual",Utils.toJson(regActual));
                             postGresRepository.save(regActual);
                         });
 
@@ -917,6 +919,7 @@ public class DataBaseServices {
             if (!pc2.getContent().isEmpty())
             {
                 List<RegistroMarcacionesDTO>  registroMarcacionesDTOList =utily.conversioRegistroMarcacionesDTO(consultarEntradaSalida.getIpBiometrico(),consultarEntradaSalida.getBiometrico(),pc2.getContent());
+                //List<RegistroMarcacionesDTO>  registroMarcacionesDTOList =utily.conversioRegistroMarcacionesDTO2(consultarEntradaSalida.getFechaInicio(),consultarEntradaSalida.getFechaFin(),consultarEntradaSalida.getIpBiometrico(),consultarEntradaSalida.getBiometrico(),pc2.getContent());
                 response.setLsMarcacionesEntradaSalida(registroMarcacionesDTOList);
                 response.setTotalRegistrosEntradaSalidad((int) pc2.getTotalElements());
                 response.setMensaje("Consulta Existosa");
@@ -1571,6 +1574,11 @@ public class DataBaseServices {
                         }
                         registroMarcaciones.setAsisTipoRegistro("W");
                         AsistNow registroMarcacionesSave = postGresRepository.save(registroMarcaciones);
+                        if (registroMarcacionesSave.getBiometrico().getIpBiometrico().equalsIgnoreCase("192.168.9.100"))
+                        {
+                            ResponsePeriodoActual periodoActual =restServices.consultarPeriodoActual();
+                            restServices.modificacionAsistenciasEntradaSalida(registroMarcacionesSave.getIdentificacion(),periodoActual.getPeriodoAsistencia(),utily.convertirDateStringAnosMesDias(registroMarcacionesSave.getAsisFecha()));
+                        }
                         //RegistroMarcacionesDTO marcacionesMapperDTO = registroMarcacionesMapper.asistNowToRegistroMarcacionesDTO(registroMarcacionesSave);
                         response.setMessage("GUARDADO CON EXISTO");
                         response.setSuccess(true);
@@ -1603,14 +1611,7 @@ public class DataBaseServices {
         ConsultarEntradaSalidaMarcacionResponses response = new ConsultarEntradaSalidaMarcacionResponses();
         try
         {
-           /* if (consultarEntradaSalida.getIpBiometrico().equalsIgnoreCase(""))
-            {
-               return response=  consultarEntradaSalidaMarcacionFahdi(consultarEntradaSalida);
-            }else
-            {*/
                 return response=  consultarEntradaSalidaMarcacionGDS(consultarEntradaSalida);
-         //  }
-
         }
         catch (Exception ex)
         {
