@@ -8,6 +8,7 @@ import com.backSpringBatch.postgres.models.*;
 import com.backSpringBatch.postgres.models.Master.MarcacionIndentificacionResponses;
 import com.backSpringBatch.services.BiometricoServices;
 import com.backSpringBatch.services.DataBaseServices;
+import com.backSpringBatch.services.MarcacionesIngresoSalidaServices;
 import com.backSpringBatch.sqlserver.models.ResponsesEntradaSalidaMarcacionDias;
 import com.diosmar.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,8 @@ public class DataBaseontroller {
 	private DataBaseServices dataBaseServices;
 	@Autowired
 	private BiometricoServices biometricoServices;
-
+	@Autowired
+	MarcacionesIngresoSalidaServices marcacionesIngresoSalidaServices;
 
 	@Scheduled (cron = "0/3 * * ? * *")
 	public void insertSqlToPostgres() {
@@ -122,7 +124,9 @@ public class DataBaseontroller {
 	@GetMapping("calculoHorasSuplementariasProduccionXPersona/")
 	public HorasSuplementariasPersonalResponses calculoHorasSuplementariasProduccionXPersona(@RequestParam String identificacion,@RequestParam  String empresa  ) throws Exception
 	{
-		return dataBaseServices.calculoHorasSuplementariasProduccionXPersona(identificacion,empresa);
+		//ResponsePeriodoActual periodoActua=restServices.consultarPeriodoActual();
+		ResponsePeriodoActual periodoActua = null;
+		return dataBaseServices.calculoHorasSuplementariasProduccionXPersona(identificacion,empresa,periodoActua);
 	}
 	@GetMapping("findAllByBiometricoEmpresa/")
 	public BiometricoResponse findAllByBiometricoEmpresa()
@@ -151,10 +155,11 @@ public class DataBaseontroller {
 		//@Scheduled(cron = "0 0 */6 * * *")//cada 6 hora
 		//@Scheduled(cron = "0 * * * * *")//cada un minutos
 	//	@Scheduled(cron = "0 0 */4 * * *")//cada 4 hora
-	 /* public void calculoHorasSuplementariasProduccionFija()
+		@GetMapping("calculoHorasSuplementariasProduccionFija/")
+	 public void calculoHorasSuplementariasProduccionFija()
 		{
 		dataBaseServices.calculoHorasSuplementariasProduccionFija();
-		}*/
+		}
 
 	@PostMapping("guardadoEntradaSalidaMarcacionDia/")
 	public RegistroMarcacionesResponses guardadoEntradaSalidaMarcacionDia(@RequestBody @Validated List<RegistroMarcacionesGuardadoDTO> registroMarcacionesDTO) throws Exception
@@ -162,6 +167,14 @@ public class DataBaseontroller {
 		Utils.console("registroMarcacionesDTOLista",Utils.toJson(registroMarcacionesDTO));
 		return dataBaseServices.guardadoEntradaSalidaMarcacionDia(registroMarcacionesDTO);
 	}
+
+
+	@GetMapping("findAllMarcacionesIngresoSalida/")
+	public void findAllMarcacionesIngresoSalida()
+	{
+		marcacionesIngresoSalidaServices.findAllMarcacionesIngresoSalida();
+	}
+
 
 }
 	

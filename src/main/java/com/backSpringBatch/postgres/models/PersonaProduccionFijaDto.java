@@ -12,6 +12,8 @@ public class PersonaProduccionFijaDto
     private Float sueldo;
 
     private String empCodigo;
+
+    private String empNombre;
     public PersonaProduccionFijaDto() {
     }
 
@@ -61,5 +63,13 @@ public class PersonaProduccionFijaDto
 
     public void setEmpCodigo(String empCodigo) {
         this.empCodigo = empCodigo;
+    }
+
+    public String getEmpNombre() {
+        return empNombre;
+    }
+
+    public void setEmpNombre(String empNombre) {
+        this.empNombre = empNombre;
     }
 }

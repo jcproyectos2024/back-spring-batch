@@ -25,6 +25,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -101,7 +103,7 @@ public class DataBaseServices {
             //List<AsistNowRegistro> lsRegistros=sqlRepository.findAll();
             List<AsistNowRegistro>   lsRegistros = sqlRepository.findAllByEstadoAsistnowRegistroTrue();
                 if ( !(lsRegistros ==null ? new ArrayList<>():lsRegistros).isEmpty()) {
-                  // System.out.println("lsRegistros Cantidad" + lsRegistros.size());
+                   System.out.println("TIENES Registros Cantidad" + lsRegistros.size());
                     //   lsRegistros.forEach(x->{
                     lsRegistros.forEach(x -> {
                         //asistNowRegistroError[0] =Utils.toJson(x);
@@ -109,13 +111,16 @@ public class DataBaseServices {
                         AsistNow regActual = asisRegistroMapper.asistNowRegistroToAsistNow(x);
                         Biometrico biometricoGuarado = biometricoRepository.findByIpBiometrico(regActual.getId().getAsisZona());
                         regActual.setBiometrico(biometricoGuarado);
+                        regActual.setAsisTipoRegistro("B");
                         //  postGresRepository.save(regActual);
                         postGresRepository.findById_AsisIdAndId_AsisIngAndId_AsisZona(regActual.getId().getAsisId(), regActual.getId().getAsisIng(), regActual.getId().getAsisZona()).ifPresentOrElse(asistNow ->
                         {
-                          // System.out.println("YA ESTA GUARDADO");
+                            Utils.console("regActual",Utils.toJson(regActual));
+                           System.out.println("YA ESTA GUARDADO");
                         }, () -> {
-                            //System.out.println("NUEVO.");
+                            System.out.println("NUEVO.");
                            // Utils.console("regActual",Utils.toJson(regActual));
+                            Utils.console("regActual",Utils.toJson(regActual));
                             postGresRepository.save(regActual);
                         });
 
@@ -567,11 +572,12 @@ public class DataBaseServices {
         HorasSuplementariasPersonalResponses response = new HorasSuplementariasPersonalResponses();
         //Comienza a calcular las horas suplementariasProduccion Fijas
        // calculoHorasSuplementariasProduccion(horasSuplementariasPersonalBody.getFechaIni(),horasSuplementariasPersonalBody.getFechaFin(),horasSuplementariasPersonalBody.getIdentificacion(),horasSuplementariasPersonalBody.getEmpresa());
-        System.out.println("findAllByHorasSuplementariasPersonal ---- horasSuplementariasPersonalBody.getEmpresa()"+horasSuplementariasPersonalBody.getEmpresa());
+      //  System.out.println("findAllByHorasSuplementariasPersonal ---- horasSuplementariasPersonalBody.getEmpresa()"+horasSuplementariasPersonalBody.getEmpresa());
         EmpresaResponse empresaResponse =restServices.findByEstadoEmpCodigoEmpresa(horasSuplementariasPersonalBody.getEmpresa());
         try {
             //calculoHorasSuplementariasProduccionXPersona(horasSuplementariasPersonalBody.getIdentificacion(),empresaResponse.getSuccess()?empresaResponse.getEmpresaDTO().getEmpNombre():"");
-            List<HorasSuplementariasPersonal> horasSuplementariasPersonalList = horasSuplementariasPersonalRepository.findAllByIdentificacionAndEstadoTrueAndPeriodo(horasSuplementariasPersonalBody.getIdentificacion(),horasSuplementariasPersonalBody.getPeriodo());
+          //  List<HorasSuplementariasPersonal> horasSuplementariasPersonalList = horasSuplementariasPersonalRepository.findAllByIdentificacionAndEstadoTrueAndPeriodo(horasSuplementariasPersonalBody.getIdentificacion(),horasSuplementariasPersonalBody.getPeriodo());
+            List<HorasSuplementariasPersonal> horasSuplementariasPersonalList = horasSuplementariasPersonalRepository.findAllByEstadoTrueAndPeriodo(horasSuplementariasPersonalBody.getPeriodo());
             List<HorasSuplementariasPersonalDto>  horasSuplementariasPersonalDtoList = horasSuplementariasPersonalMapper.toHorasSuplementariasPersonalDtoList(horasSuplementariasPersonalList);
             if (horasSuplementariasPersonalDtoList.isEmpty())
             {
@@ -686,14 +692,14 @@ public class DataBaseServices {
                                             Integer horasPaso=utily.horasMilisegundosGeneral("8:00:00");
 
                                             horaPersonal.setHoras(horaPersonal.getHoras()+horasPaso);
-                                            horaPersonal.setPorcentaje(polHoras.getPorcentaje());
+                                            horaPersonal.setPorcentaje(BigDecimal.valueOf(polHoras.getPorcentaje()));
                                             horasSuplementariasPersonalRepository.save(horaPersonal);
                                          //   System.out.println("horas arrastradas i:"+i+"   "+  horasPaso+"_____________Porcentaje:"+polHoras.getPorcentaje());
                                         }else{
                                             horaArrastrada=utily.horasMilisegundosGeneral(polHoras.getRangoHoraInicial())-horaArrastrada;
 
                                             horaPersonal.setHoras(horaPersonal.getHoras()+horaArrastrada);
-                                            horaPersonal.setPorcentaje(polHoras.getPorcentaje());
+                                            horaPersonal.setPorcentaje(BigDecimal.valueOf(polHoras.getPorcentaje()));
                                             horasSuplementariasPersonalRepository.save(horaPersonal);
                                            // System.out.println("horas arrastradas i:"+i+"   "+  horaArrastrada+"_____________Porcentaje:"+polHoras.getPorcentaje());
                                             break;
@@ -707,7 +713,7 @@ public class DataBaseServices {
                                             horaArrastrada=horaArrastrada-dif;
 
                                             horaPersonal.setHoras(horaPersonal.getHoras()+horaArrastrada);
-                                            horaPersonal.setPorcentaje(polHoras.getPorcentaje());
+                                            horaPersonal.setPorcentaje(BigDecimal.valueOf(polHoras.getPorcentaje()));
                                             horasSuplementariasPersonalRepository.save(horaPersonal);
                                            // System.out.println("horas arrastradas i:"+i+"   "+  horaArrastrada+"_____________Porcentaje:"+polHoras.getPorcentaje());
                                         }
@@ -715,7 +721,7 @@ public class DataBaseServices {
                                             horaArrastrada= (utily.horasMilisegundosGeneral(polHoras.getRangoHoraFinal())-horaArrastrada)-utily.horasMilisegundosGeneral(polHoras.getRangoHoraInicial());
 
                                             horaPersonal.setHoras(horaPersonal.getHoras()+horaArrastrada);
-                                            horaPersonal.setPorcentaje(polHoras.getPorcentaje());
+                                            horaPersonal.setPorcentaje(BigDecimal.valueOf(polHoras.getPorcentaje()));
                                             horasSuplementariasPersonalRepository.save(horaPersonal);
                                            // System.out.println("horas arrastradas i:"+i+"   "+  horaArrastrada+"_____________Porcentaje:"+polHoras.getPorcentaje());
                                             break;
@@ -797,7 +803,7 @@ public class DataBaseServices {
                           Integer horasPaso=utily.horasMilisegundosGeneral("8:00:00");
 
                           horaPersonal.setHoras(horaPersonal.getHoras()+horasPaso);
-                          horaPersonal.setPorcentaje(lsPoliticasFilter25.get(0).getPorcentaje());
+                          horaPersonal.setPorcentaje(BigDecimal.valueOf(lsPoliticasFilter25.get(0).getPorcentaje()));
                           horasSuplementariasPersonalRepository.save(horaPersonal);
                          // System.out.println("horas arrastradas "+  horasPaso+"_____________Porcentaje:"+lsPoliticasFilter25.get(0).getPorcentaje());
                       }
@@ -837,7 +843,7 @@ public class DataBaseServices {
                             Integer horasPaso=utily.horasMilisegundosGeneral(horasGeneral100);
 
                             horaPersonal.setHoras(horaPersonal.getHoras()+horasPaso);
-                            horaPersonal.setPorcentaje(lsPoliticasFilter100.get(0).getPorcentaje());
+                            horaPersonal.setPorcentaje(BigDecimal.valueOf(lsPoliticasFilter100.get(0).getPorcentaje()));
                             horasSuplementariasPersonalRepository.save(horaPersonal);
                             //System.out.println("horas arrastradas "+  horasPaso+"_____________Porcentaje:"+lsPoliticasFilter100.get(0).getPorcentaje());
 
@@ -867,7 +873,7 @@ public class DataBaseServices {
                             Integer horasPaso=utily.horasMilisegundosGeneral(horasGeneral50);
 
                             horaPersonal.setHoras(horaPersonal.getHoras()+horasPaso);
-                            horaPersonal.setPorcentaje(lsPoliticasFilter50.get(0).getPorcentaje());
+                            horaPersonal.setPorcentaje(BigDecimal.valueOf(lsPoliticasFilter50.get(0).getPorcentaje()));
                             horasSuplementariasPersonalRepository.save(horaPersonal);
                            // System.out.println("horas arrastradas "+  horasPaso+"_____________Porcentaje:"+lsPoliticasFilter50.get(0).getPorcentaje());
 
@@ -913,6 +919,7 @@ public class DataBaseServices {
             if (!pc2.getContent().isEmpty())
             {
                 List<RegistroMarcacionesDTO>  registroMarcacionesDTOList =utily.conversioRegistroMarcacionesDTO(consultarEntradaSalida.getIpBiometrico(),consultarEntradaSalida.getBiometrico(),pc2.getContent());
+                //List<RegistroMarcacionesDTO>  registroMarcacionesDTOList =utily.conversioRegistroMarcacionesDTO2(consultarEntradaSalida.getFechaInicio(),consultarEntradaSalida.getFechaFin(),consultarEntradaSalida.getIpBiometrico(),consultarEntradaSalida.getBiometrico(),pc2.getContent());
                 response.setLsMarcacionesEntradaSalida(registroMarcacionesDTOList);
                 response.setTotalRegistrosEntradaSalidad((int) pc2.getTotalElements());
                 response.setMensaje("Consulta Existosa");
@@ -1028,6 +1035,7 @@ public class DataBaseServices {
                     registroMarcaciones.setId(asistnowPK);
                     registroMarcaciones.setAsisRes("OK");
                     registroMarcaciones.setAsisHorasSuplementaria(false);
+                    registroMarcaciones.setAsisTipoRegistro("W");
                     AsistNow registroMarcacionesSave = postGresRepository.save(registroMarcaciones);
                     RegistroMarcacionesDTO marcacionesMapperDTO = registroMarcacionesMapper.asistNowToRegistroMarcacionesDTO(registroMarcacionesSave);
                     response.setMessage("GUARDADO CON EXISTO");
@@ -1152,20 +1160,21 @@ public class DataBaseServices {
     }
 
     @Transactional(rollbackFor = {RuntimeException.class})
-    public HorasSuplementariasPersonalResponses calculoHorasSuplementariasProduccionXPersona(String identificacion, String empresa ) throws Exception
+    public HorasSuplementariasPersonalResponses calculoHorasSuplementariasProduccionXPersona(String identificacion, String empresa ,ResponsePeriodoActual periodoActual ) throws Exception
     {
 
         HorasSuplementariasPersonalResponses response = new HorasSuplementariasPersonalResponses();
         try
         {
             List<PoliticasHorasSuple> lsPoliticas=politicasHorasSupleRepository.findByEstadoTrue();
-            ResponsePeriodoActual periodoActual =restServices.consultarPeriodoActual();
+            //ResponsePeriodoActual periodoActual =restServices.consultarPeriodoActual();
             String[] fechaPeriodo= utily.fechaPeriodoSplit(periodoActual.getPeriodoAsistencia());
             PersonResponseS  personResponseS=   restServices.consultarPersonaTipoBiometricoCalculo(identificacion);
             if (personResponseS.isSuccess())
             {
                 List<AsistNow>  listaSinDuplicados =postGresRepository.findAllByIdentificacionEntada(fechaPeriodo[0],fechaPeriodo[1],identificacion,empresa,personResponseS.getTipoBiometricoCalculoDto()==null?"": personResponseS.getTipoBiometricoCalculoDto().getNombreBiometrico(),"INGRESO",false, Sort.by(Sort.Direction.ASC,"id.asisIng"));
                 List<AsistNow>  asistNowListSalida =postGresRepository.findAllByIdentificacionSalida(fechaPeriodo[0],fechaPeriodo[1],identificacion,empresa,personResponseS.getTipoBiometricoCalculoDto()==null?"": personResponseS.getTipoBiometricoCalculoDto().getNombreBiometrico(),"SALIDA",false, Sort.by(Sort.Direction.DESC,"id.asisIng"));
+
                 List<AsistNow> asistNowList = listaSinDuplicados.stream()
                         .collect(Collectors.toMap(
                                 AsistNow::getAsisFecha,  // Clave: asisFecha
@@ -1266,7 +1275,7 @@ public class DataBaseServices {
                     }
                     Integer horasPaso= (int) utily.convertirHorasAMilisegundos("08:00:00");
                     horaPersonal.setHoras(horaPersonal.getHoras()+horasPaso);
-                    horaPersonal.setPorcentaje(lsPoliticasFilter25.get(0).getPorcentaje());
+                    horaPersonal.setPorcentaje(BigDecimal.valueOf(lsPoliticasFilter25.get(0).getPorcentaje()));
                     horasSuplementariasPersonalRepository.save(horaPersonal);
                     String[] hora5 =utily.convertirStringFechaHMS(nuevesHorasMediaTraba);
                     //Utils.console("hora5 --Object", Utils.toJson(hora5));
@@ -1287,7 +1296,7 @@ public class DataBaseServices {
                         }
                         Integer horasPaso100= (int) utily.convertirHorasAMilisegundos(horasMinutosSegundos);
                         horaPersonal100.setHoras(horaPersonal100.getHoras()+horasPaso100);
-                        horaPersonal100.setPorcentaje(lsPoliticasFilter100.get(0).getPorcentaje());
+                        horaPersonal100.setPorcentaje(BigDecimal.valueOf(lsPoliticasFilter100.get(0).getPorcentaje()));
                         horasSuplementariasPersonalRepository.save(horaPersonal100);
                     }
                    String sumarHoras6= utily.sumarHoras(nuevesHorasMediaTraba,horasMinutosSegundos);
@@ -1308,7 +1317,7 @@ public class DataBaseServices {
                         }
                         Integer horasPaso50= (int) utily.convertirHorasAMilisegundos(horasMinutosSegundos6);
                         horaPersonal50.setHoras(horaPersonal50.getHoras()+horasPaso50);
-                        horaPersonal50.setPorcentaje(lsPoliticasFilter50.get(0).getPorcentaje());
+                        horaPersonal50.setPorcentaje(BigDecimal.valueOf(lsPoliticasFilter50.get(0).getPorcentaje()));
                         horasSuplementariasPersonalRepository.save(horaPersonal50);
                     }
 
@@ -1384,7 +1393,7 @@ public class DataBaseServices {
                     }
                     Integer horasPaso= (int) utily.convertirHorasAMilisegundos("08:00:00");
                     horaPersonal.setHoras(horaPersonal.getHoras()+horasPaso);
-                    horaPersonal.setPorcentaje(lsPoliticasFilter25.get(0).getPorcentaje());
+                    horaPersonal.setPorcentaje(BigDecimal.valueOf(lsPoliticasFilter25.get(0).getPorcentaje()));
                     horasSuplementariasPersonalRepository.save(horaPersonal);
                     String[] hora5 =utily.convertirStringFechaHMS(nuevesHorasMediaTraba);
                    // Utils.console("hora5 --Object", Utils.toJson(hora5));
@@ -1405,7 +1414,7 @@ public class DataBaseServices {
                         }
                         Integer horasPaso100= (int) utily.convertirHorasAMilisegundos(horasMinutosSegundos);
                         horaPersonal100.setHoras(horaPersonal100.getHoras()+horasPaso100);
-                        horaPersonal100.setPorcentaje(lsPoliticasFilter100.get(0).getPorcentaje());
+                        horaPersonal100.setPorcentaje(BigDecimal.valueOf(lsPoliticasFilter100.get(0).getPorcentaje()));
                         horasSuplementariasPersonalRepository.save(horaPersonal100);
                     }
                     String sumarHoras6= utily.sumarHoras(nuevesHorasMediaTraba,horasMinutosSegundos);
@@ -1426,7 +1435,7 @@ public class DataBaseServices {
                         }
                         Integer horasPaso100= (int) utily.convertirHorasAMilisegundos(horasMinutosSegundos6);
                         horaPersonal50.setHoras(horaPersonal50.getHoras()+horasPaso100);
-                        horaPersonal50.setPorcentaje(lsPoliticasFilter50.get(0).getPorcentaje());
+                        horaPersonal50.setPorcentaje(BigDecimal.valueOf(lsPoliticasFilter50.get(0).getPorcentaje()));
                         horasSuplementariasPersonalRepository.save(horaPersonal50);
                     }
 
@@ -1487,21 +1496,23 @@ public class DataBaseServices {
         try
         {
             ResponsePersonaProduccionFija responsePersonaProduccionFija =restServices.consultarPersonaProduccionFijaCalculo("PRODUCCIÓN FIJA");
+            //  Utils.console("responsePersonaProduccionFija",Utils.toJson(responsePersonaProduccionFija));
             if (responsePersonaProduccionFija.isSuccess())
             {
                 responsePersonaProduccionFija.getPersonaProduccionFijaDtoList().forEach(x ->
-                {
+               {
                     try
                     {
-                        calculoHorasSuplementariasProduccionXPersona(x.getIdentificacion(), x.getEmpCodigo());
                         ResponsePeriodoActual periodoActual =restServices.consultarPeriodoActual();
-                        calculoNominaProduccionFija.calculoNominaProduccionFija(x.getIdentificacion(),x.getSueldo(),periodoActual.getPeriodoAsistencia());
+                        calculoHorasSuplementariasProduccionXPersona(x.getIdentificacion(), x.getEmpNombre(),periodoActual);
+                        //calculoHorasSuplementariasProduccionXPersona("0917425266", "PROCAMARONEX",periodoActual);
+                       calculoNominaProduccionFija.calculoNominaProduccionFija(x.getIdentificacion(),x.getSueldo(),periodoActual.getPeriodoAsistencia());
+                        //calculoNominaProduccionFija.calculoNominaProduccionFija("0917425266", (float) 458.64,periodoActual.getPeriodoAsistencia());
                     } catch (Exception e)
                     {
                         throw new GenericExceptionUtils(e);
                     }
                 });
-              //  Utils.console("responsePersonaProduccionFija",Utils.toJson(responsePersonaProduccionFija));
                 System.out.println("***********************AQUI-----"+utily.convertirDateString(new Date()));
             }
         }
@@ -1561,7 +1572,13 @@ public class DataBaseServices {
                             postGresRepository.delete(asistNowEliminado);
 
                         }
+                        registroMarcaciones.setAsisTipoRegistro("W");
                         AsistNow registroMarcacionesSave = postGresRepository.save(registroMarcaciones);
+                        if (registroMarcacionesSave.getBiometrico().getIpBiometrico().equalsIgnoreCase("192.168.9.100"))
+                        {
+                            ResponsePeriodoActual periodoActual =restServices.consultarPeriodoActual();
+                            restServices.modificacionAsistenciasEntradaSalida(registroMarcacionesSave.getIdentificacion(),periodoActual.getPeriodoAsistencia(),utily.convertirDateStringAnosMesDias(registroMarcacionesSave.getAsisFecha()));
+                        }
                         //RegistroMarcacionesDTO marcacionesMapperDTO = registroMarcacionesMapper.asistNowToRegistroMarcacionesDTO(registroMarcacionesSave);
                         response.setMessage("GUARDADO CON EXISTO");
                         response.setSuccess(true);
@@ -1594,14 +1611,7 @@ public class DataBaseServices {
         ConsultarEntradaSalidaMarcacionResponses response = new ConsultarEntradaSalidaMarcacionResponses();
         try
         {
-           /* if (consultarEntradaSalida.getIpBiometrico().equalsIgnoreCase(""))
-            {
-               return response=  consultarEntradaSalidaMarcacionFahdi(consultarEntradaSalida);
-            }else
-            {*/
                 return response=  consultarEntradaSalidaMarcacionGDS(consultarEntradaSalida);
-         //  }
-
         }
         catch (Exception ex)
         {
