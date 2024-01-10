@@ -880,6 +880,8 @@ public class Utily {
             Biometrico biometricoEntrada = biometricoRepository.findByIpBiometrico(registroMarcaciones == null ? "":registroMarcaciones.getId().getAsisZona());
             registroMarcacionesDTO.setBiometricoEntrada( (biometricoEntrada==null?null:biometricoMapper.biometricoDTOToBiometrico(biometricoEntrada)) );
             String[] horas = horasMinutosSegundosSplit(registroMarcaciones == null?null :registroMarcaciones.getAsisHora());
+
+
             if (biometrico.equalsIgnoreCase("GARITA"))
             {
                 if (Integer.parseInt(horas[0]) >= 16)
