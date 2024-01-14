@@ -114,11 +114,11 @@ public class MarcacionesIngresoSalidaServices
         try
         {
             ResponsePersonaProduccionFija responsePersonaProduccionFija =restServices.findAllByPersonalHorasExtras(true);
-           Utils.console("responsePersonaProduccionFija",Utils.toJson(responsePersonaProduccionFija));
+           //Utils.console("responsePersonaProduccionFija",Utils.toJson(responsePersonaProduccionFija));
             String[] fechaPeriodo= utily.fechaPeriodoSplit(periodoActual.getPeriodoAsistencia());
            marcacionesIngresoSalidaRepository.findAllByIngresoSalidaHorasExtras(fechaPeriodo[0],fechaPeriodo[1],false).ifPresentOrElse(  marcacionesIngresoSalidaList ->
             {
-                Utils.console("marcacionesIngresoSalidaList",Utils.toJson(marcacionesIngresoSalidaList));
+                //Utils.console("marcacionesIngresoSalidaList",Utils.toJson(marcacionesIngresoSalidaList));
                 if (responsePersonaProduccionFija.isSuccess())
                 {
                    responsePersonaProduccionFija.getPersonaProduccionFijaDtoList().forEach(x ->
@@ -128,7 +128,7 @@ public class MarcacionesIngresoSalidaServices
                         List<MarcacionesIngresoSalida> marcacionesIngresoSalidaListFilter=marcacionesIngresoSalidaList==null? new ArrayList<>() :marcacionesIngresoSalidaList.stream().filter(p->(p.getId().getIdentificacion().equalsIgnoreCase(x.getIdentificacion()))).collect(Collectors.toList());
                         if(!marcacionesIngresoSalidaListFilter.isEmpty())
                         {
-                            Utils.console("marcacionesIngresoSalidaListFilter",Utils.toJson(marcacionesIngresoSalidaListFilter));
+                            //Utils.console("marcacionesIngresoSalidaListFilter",Utils.toJson(marcacionesIngresoSalidaListFilter));
                             calculoNominaProduccionFijaService.acumularHorasExtrasPersonal(periodoActual.getPeriodoAsistencia(),x.getIdentificacion(),marcacionesIngresoSalidaListFilter);
                             calculoNominaProduccionFijaService.calculoHorasExtrasNominaProduccionFija(x.getIdentificacion(),x.getSueldo(),periodoActual.getPeriodoAsistencia());
                         }
@@ -160,7 +160,7 @@ public class MarcacionesIngresoSalidaServices
     {
         try
         {
-            ///findAllMarcacionesIngresoSalidaCalculoHorasSuplementariasPersonal();
+            findAllMarcacionesIngresoSalidaCalculoHorasSuplementariasPersonal();
             findAllMarcacionesIngresoSalidaCalculoHorasExtras();
 
         }catch (Exception ex)
