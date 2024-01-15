@@ -111,7 +111,7 @@ public class DataBaseServices {
                         AsistNow regActual = asisRegistroMapper.asistNowRegistroToAsistNow(x);
                         Biometrico biometricoGuarado = biometricoRepository.findByIpBiometrico(regActual.getId().getAsisZona());
                         regActual.setBiometrico(biometricoGuarado);
-                        //regActual.setAsisTipoRegistro("B");
+                        regActual.setAsisTipoRegistro("B");
                         //  postGresRepository.save(regActual);
                         postGresRepository.findById_AsisIdAndId_AsisIngAndId_AsisZona(regActual.getId().getAsisId(), regActual.getId().getAsisIng(), regActual.getId().getAsisZona()).ifPresentOrElse(asistNow ->
                         {
@@ -1036,7 +1036,7 @@ public class DataBaseServices {
                     registroMarcaciones.setId(asistnowPK);
                     registroMarcaciones.setAsisRes("OK");
                     registroMarcaciones.setAsisHorasSuplementaria(false);
-                   //registroMarcaciones.setAsisTipoRegistro("W");
+                    registroMarcaciones.setAsisTipoRegistro("W");
                     AsistNow registroMarcacionesSave = postGresRepository.save(registroMarcaciones);
                     RegistroMarcacionesDTO marcacionesMapperDTO = registroMarcacionesMapper.asistNowToRegistroMarcacionesDTO(registroMarcacionesSave);
                     response.setMessage("GUARDADO CON EXISTO");
@@ -1572,7 +1572,7 @@ public class DataBaseServices {
                             postGresRepository.delete(asistNowEliminado);
 
                         }
-                       // registroMarcaciones.setAsisTipoRegistro("W");
+                       registroMarcaciones.setAsisTipoRegistro("W");
                         AsistNow registroMarcacionesSave = postGresRepository.save(registroMarcaciones);
                         if (registroMarcacionesSave.getBiometrico().getIpBiometrico().equalsIgnoreCase("192.168.9.100"))
                         {
