@@ -1514,7 +1514,6 @@ public class DataBaseServices {
                         throw new GenericExceptionUtils(e);
                     }
                 });
-                System.out.println("***********************AQUI-----"+utily.convertirDateString(new Date()));
             }
         }
         catch (Exception ex)
