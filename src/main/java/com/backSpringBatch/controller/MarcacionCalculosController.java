@@ -15,12 +15,11 @@ public class MarcacionCalculosController
     @Autowired
     MarcacionesIngresoSalidaServices marcacionesIngresoSalidaServices;
 
-    @Scheduled(cron = "0 0 */4 * * *")
+    @Scheduled(cron = "0 0 */2 * * *")
     @GetMapping("findAllMarcacionesIngresoSalida/")
     public void findAllMarcacionesIngresoSalida()
     {
         marcacionesIngresoSalidaServices.calculoHorasExtrasCalculoHorasSuplementarias();
-       // marcacionesIngresoSalidaServices.findAllMarcacionesIngresoSalida();
     }
 
 

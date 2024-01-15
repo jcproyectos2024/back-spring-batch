@@ -167,11 +167,10 @@ public class CalculoNominaProduccionFijaService
                 {
                     if (marcacionesIngresoSalida.getId().getFechaEntrada()!=null && marcacionesIngresoSalida.getFecheSalida()!=null )
                     {
-                        Utils.console("ENTRO",Utils.toJson(""));
+
                         //Acumulacion de 25% para guardarlo en la table de HorasSuplementariasPersonal
                         if (marcacionesIngresoSalida.getSuplementarias25()!=null)
                         {
-                            Utils.console("getSuplementarias25",Utils.toJson(marcacionesIngresoSalida.getSuplementarias25()));
                             //int horas25=0;
                             HorasSuplementariasPersonal horaPersonal=horasSuplementariasPersonalRepository.findByIdentificacionAndEstadoTrueAndTipoAndPeriodo(identificacion,"horas suplementarias 25",periodoActual);
                             if(horaPersonal==null)
@@ -184,14 +183,14 @@ public class CalculoNominaProduccionFijaService
                             horaPersonal.setTipo("horas suplementarias 25");
                             horaPersonal.setHoras(horaPersonal.getHoras()+marcacionesIngresoSalida.getSuplementarias25());
                             //horaPersonal.setHoras(horaPersonal.getHoras()+horas25);
-                            Utils.console("horaPersonal",Utils.toJson(horaPersonal));
-                            horasSuplementariasPersonalRepository.save(horaPersonal);
+                            //Utils.console("horaPersonal-----",Utils.toJson(horaPersonal));
+                            HorasSuplementariasPersonal personal = horasSuplementariasPersonalRepository.save(horaPersonal);
+                           // Utils.console("horaPersonal----guardado",Utils.toJson(personal));
                         }
 
                         //Acumulacion de 100% para guardarlo en la table de HorasSuplementariasPersonal
                         if (marcacionesIngresoSalida.getSuplementarias100()!=null)
                         {
-                            Utils.console("getSuplementarias100",Utils.toJson(marcacionesIngresoSalida.getSuplementarias100()));
                             //int horas25=0;
                             HorasSuplementariasPersonal horaPersonal=horasSuplementariasPersonalRepository.findByIdentificacionAndEstadoTrueAndTipoAndPeriodo(identificacion,"horas suplementarias 100",periodoActual);
                             if(horaPersonal==null)
@@ -211,7 +210,6 @@ public class CalculoNominaProduccionFijaService
                         //Acumulacion de 50% para guardarlo en la table de HorasSuplementariasPersonal
                         if (marcacionesIngresoSalida.getSuplementarias50()!=null)
                         {
-                            Utils.console("getSuplementarias50",Utils.toJson(marcacionesIngresoSalida.getSuplementarias50()));
                             //int horas25=0;
                             HorasSuplementariasPersonal horaPersonal=horasSuplementariasPersonalRepository.findByIdentificacionAndEstadoTrueAndTipoAndPeriodo(identificacion,"horas suplementarias 50",periodoActual);
                             if(horaPersonal==null)
@@ -249,17 +247,16 @@ public class CalculoNominaProduccionFijaService
     {
         try
         {
+
             if (marcacionesIngresoSalidaListFilter != null)
             {
                 for (MarcacionesIngresoSalida marcacionesIngresoSalida :marcacionesIngresoSalidaListFilter)
                 {
                     if (marcacionesIngresoSalida.getId().getFechaEntrada()!=null && marcacionesIngresoSalida.getFecheSalida()!=null )
                     {
-                        Utils.console("ENTRO");
                         //Acumulacion horas extras 50 % para guardarlo en la table de HorasSuplementariasPersonal
                         if (marcacionesIngresoSalida.getHorasExtras()!=null)
                         {
-                            Utils.console("horas extras 50",Utils.toJson(marcacionesIngresoSalida.getHorasExtras()));
                             HorasSuplementariasPersonal horaPersonal=horasSuplementariasPersonalRepository.findByIdentificacionAndEstadoTrueAndTipoAndPeriodo(identificacion,"horas extras 50",periodoActual);
                             if(horaPersonal==null)
                             {

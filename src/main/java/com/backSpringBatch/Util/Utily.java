@@ -4,6 +4,7 @@ import com.backSpringBatch.dto.RegistroMarcacionesDTO;
 import com.backSpringBatch.dto.RegistroMarcacionesEntraSalida;
 import com.backSpringBatch.postgres.entity.AsistNow;
 import com.backSpringBatch.postgres.entity.Biometrico;
+import com.backSpringBatch.postgres.entity.MarcacionesIngresoSalida;
 import com.backSpringBatch.postgres.mapper.BiometricoMapper;
 import com.backSpringBatch.postgres.models.MarcacionIdentificacionDto;
 import com.backSpringBatch.postgres.repository.BiometricoRepository;
@@ -549,7 +550,8 @@ public class Utily {
                     }
                     else
                     {
-                        asistNowNoche = postGresRepository.consultarMarcacioneSalida(registroMarcaciones.getIdentificacion(), fechaTurnoNche, fechaTurnoNche, registroMarcaciones.getBiometrico().getNombreBiometrico(), registroMarcaciones.getEmpresa(), "SALIDA");
+                        List<AsistNow>  asistNowNocheEntrda = postGresRepository.consultarMarcacioneSalida(registroMarcaciones.getIdentificacion(), fechaTurnoNche, fechaTurnoNche, registroMarcaciones.getBiometrico().getNombreBiometrico(), registroMarcaciones.getEmpresa(), "SALIDA");
+                        asistNowNoche=asistNowNocheEntrda==null? new ArrayList<>() :asistNowNocheEntrda.stream().filter(p->( splitHoraInterger(p.getAsisHora())<=9)).collect(Collectors.toList());
                         Biometrico biometricoSalida = biometricoRepository.findByIpBiometrico(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getId().getAsisZona());
                         registroMarcacionesDTO.setBiometricoSalida( (biometricoEntrada==null?null:biometricoMapper.biometricoDTOToBiometrico(biometricoSalida)));
                     }
@@ -880,6 +882,8 @@ public class Utily {
             Biometrico biometricoEntrada = biometricoRepository.findByIpBiometrico(registroMarcaciones == null ? "":registroMarcaciones.getId().getAsisZona());
             registroMarcacionesDTO.setBiometricoEntrada( (biometricoEntrada==null?null:biometricoMapper.biometricoDTOToBiometrico(biometricoEntrada)) );
             String[] horas = horasMinutosSegundosSplit(registroMarcaciones == null?null :registroMarcaciones.getAsisHora());
+
+
             if (biometrico.equalsIgnoreCase("GARITA"))
             {
                 if (Integer.parseInt(horas[0]) >= 16)
@@ -960,6 +964,20 @@ public class Utily {
 
 
         return registroMarcacionesDTOList;
+    }
+
+    public  Integer splitHoraInterger(String horasMinutosSegundosEntradaNocturno)
+    {
+        try
+        {
+            String[] horasMinutosSegundosSplit = horasMinutosSegundosEntradaNocturno.split(":");
+            Integer.parseInt(horasMinutosSegundosSplit[0]);
+            return  Integer.parseInt(horasMinutosSegundosSplit[0]);
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
     }
 
 }

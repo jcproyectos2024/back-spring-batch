@@ -263,6 +263,7 @@ public class DataBaseServices {
 
         }catch (Exception ex)
         {
+            ex.printStackTrace();
             throw new GenericExceptionUtils(ex);
         }
     }
@@ -1513,7 +1514,6 @@ public class DataBaseServices {
                         throw new GenericExceptionUtils(e);
                     }
                 });
-                System.out.println("***********************AQUI-----"+utily.convertirDateString(new Date()));
             }
         }
         catch (Exception ex)
@@ -1572,7 +1572,7 @@ public class DataBaseServices {
                             postGresRepository.delete(asistNowEliminado);
 
                         }
-                        registroMarcaciones.setAsisTipoRegistro("W");
+                       registroMarcaciones.setAsisTipoRegistro("W");
                         AsistNow registroMarcacionesSave = postGresRepository.save(registroMarcaciones);
                         if (registroMarcacionesSave.getBiometrico().getIpBiometrico().equalsIgnoreCase("192.168.9.100"))
                         {

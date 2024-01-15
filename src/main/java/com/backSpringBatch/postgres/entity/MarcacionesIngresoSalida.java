@@ -61,9 +61,9 @@ public class MarcacionesIngresoSalida
     private Long horasExtras;
 
     @Column(name = "procesado")
-    private  boolean procesado;
+    private  Boolean procesado;
     @Column(name = "horas_extras_procesada")
-    private  boolean horasExtrasProcesada;
+    private  Boolean horasExtrasProcesada;
 
     public MarcacionesIngresoSalida() {
     }
