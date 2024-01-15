@@ -266,7 +266,6 @@ public class RESTServices {
                     .contentType("application/json;charset=utf-8").when()
                     .get(ruta)
                     .then().extract().response();
-            rootc = response.getBody().as(String.class);
         } catch (Exception ex)
         {
             // TODO: handle exception

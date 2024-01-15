@@ -80,7 +80,7 @@ public class MarcacionesIngresoSalidaServices
                  {
                         try
                         {
-                            List<MarcacionesIngresoSalida> marcacionesIngresoSalidaListFilter=marcacionesIngresoSalidaList==null? new ArrayList<>() :marcacionesIngresoSalidaList.stream().filter(p->(p.getId().getIdentificacion().equalsIgnoreCase(/*x.getIdentificacion()*/"1725733529"))).collect(Collectors.toList());
+                            List<MarcacionesIngresoSalida> marcacionesIngresoSalidaListFilter=marcacionesIngresoSalidaList==null? new ArrayList<>() :marcacionesIngresoSalidaList.stream().filter(p->(p.getId().getIdentificacion().equalsIgnoreCase(x.getIdentificacion()))).collect(Collectors.toList());
                             if(!marcacionesIngresoSalidaListFilter.isEmpty())
                             {
                                // Utils.console("marcacionesIngresoSalidaListFilter",Utils.toJson(marcacionesIngresoSalidaListFilter));
@@ -130,7 +130,7 @@ public class MarcacionesIngresoSalidaServices
                     {
                     try
                     {
-                        List<MarcacionesIngresoSalida> marcacionesIngresoSalidaListFilter=marcacionesIngresoSalidaList==null? new ArrayList<>() :marcacionesIngresoSalidaList.stream().filter(p->(p.getId().getIdentificacion().equalsIgnoreCase(/*x.getIdentificacion()*/"1725733529"))).collect(Collectors.toList());
+                        List<MarcacionesIngresoSalida> marcacionesIngresoSalidaListFilter=marcacionesIngresoSalidaList==null? new ArrayList<>() :marcacionesIngresoSalidaList.stream().filter(p->(p.getId().getIdentificacion().equalsIgnoreCase(x.getIdentificacion()))).collect(Collectors.toList());
                         if(!marcacionesIngresoSalidaListFilter.isEmpty())
                         {
                             //tils.console("marcacionesIngresoSalidaListFilter",Utils.toJson(marcacionesIngresoSalidaListFilter));
