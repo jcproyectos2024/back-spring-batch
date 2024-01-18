@@ -1,4 +1,6 @@
 package com.backSpringBatch.postgres.entity;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -13,12 +15,14 @@ public class MarcacionesIngresoSalida
     @EmbeddedId
     private IngresoSalidaPK id;
 
+    @JsonFormat(pattern="yyyy-MM-dd")
     @Column(name = "fecha_salida")
     private Date fecheSalida;
 
+    @JsonFormat(pattern="yyyy-MM-dd")
     @Column(name = "asis_fecha_entrada")
     private Date asisFechaEntrada;
-
+    @JsonFormat(pattern="yyyy-MM-dd")
     @Column(name = "asis_fecha_salida")
     private Date asisFechaSalida;
 

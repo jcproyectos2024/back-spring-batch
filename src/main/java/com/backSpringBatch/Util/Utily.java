@@ -538,7 +538,7 @@ public class Utily {
                     List<AsistNow> asistNowNoche;
                     String asisFecha = convertirDateStringAnosMesDias(registroMarcaciones.getAsisFecha());
                     String fechaTurnoNche = sumarUnDia(asisFecha);
-                    if (ipBiometrico.equalsIgnoreCase("192.168.54.242"))
+                    if (ipBiometrico.equalsIgnoreCase(restServices.parametrizacionRecursosHumanos("ipBiometricoFahdi")))
                     {
                          asistNowNoche = postGresRepository.consultarMarcacioneSalidaFahdi(registroMarcaciones.getIdentificacion(), fechaTurnoNche, fechaTurnoNche,ipBiometrico, registroMarcaciones.getEmpresa(), "SALIDA");
                         Biometrico biometricoSalida = biometricoRepository.findByIpBiometrico(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getId().getAsisZona());
@@ -565,7 +565,7 @@ public class Utily {
                 {
                     List<AsistNow> asistNowNoche = null;
                     String asisFecha = convertirDateStringAnosMesDias(registroMarcaciones.getAsisFecha());
-                    if (ipBiometrico.equalsIgnoreCase("192.168.54.242"))
+                    if (ipBiometrico.equalsIgnoreCase(restServices.parametrizacionRecursosHumanos("ipBiometricoFahdi")))
                     {
                         asistNowNoche = postGresRepository.consultarMarcacioneSalidaFahdi(registroMarcaciones.getIdentificacion(), asisFecha, asisFecha,ipBiometrico, registroMarcaciones.getEmpresa(), "SALIDA");
                         Biometrico biometricoSalida = biometricoRepository.findByIpBiometrico(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getId().getAsisZona());
@@ -891,7 +891,7 @@ public class Utily {
                     List<AsistNow> asistNowNoche;
                     String asisFecha = convertirDateStringAnosMesDias(registroMarcaciones.getAsisFecha());
                     String fechaTurnoNche = sumarUnDia(asisFecha);
-                    if (ipBiometrico.equalsIgnoreCase("192.168.54.242"))
+                    if (ipBiometrico.equalsIgnoreCase(restServices.parametrizacionRecursosHumanos("ipBiometricoFahdi")))
                     {
                         asistNowNoche = postGresRepository.consultarMarcacioneSalidaFahdi(registroMarcaciones.getIdentificacion(), fechaTurnoNche, fechaTurnoNche,ipBiometrico, registroMarcaciones.getEmpresa(), "SALIDA");
                         Biometrico biometricoSalida = biometricoRepository.findByIpBiometrico(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getId().getAsisZona());
@@ -917,7 +917,7 @@ public class Utily {
                 {
                     List<AsistNow> asistNowNoche = null;
                     String asisFecha = convertirDateStringAnosMesDias(registroMarcaciones.getAsisFecha());
-                    if (ipBiometrico.equalsIgnoreCase("192.168.54.242"))
+                    if (ipBiometrico.equalsIgnoreCase(restServices.parametrizacionRecursosHumanos("ipBiometricoFahdi")))
                     {
                         asistNowNoche = postGresRepository.consultarMarcacioneSalidaFahdi(registroMarcaciones.getIdentificacion(), asisFecha, asisFecha,ipBiometrico, registroMarcaciones.getEmpresa(), "SALIDA");
                         Biometrico biometricoSalida = biometricoRepository.findByIpBiometrico(asistNowNoche.isEmpty() || asistNowNoche == null ? null : asistNowNoche.get(0).getId().getAsisZona());
@@ -979,5 +979,19 @@ public class Utily {
             return null;
         }
     }
+
+    public Date formatoDate(Date fechaEntrada) {
+
+        Date miFecha = null;
+        try {
+            SimpleDateFormat formato =new  SimpleDateFormat("yyyy-MM-dd");
+            String fechaComoCadena = formato.format(fechaEntrada);
+            miFecha = formato.parse(fechaComoCadena);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+        return miFecha;
+    }
+
 
 }

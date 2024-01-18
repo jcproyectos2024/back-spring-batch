@@ -17,6 +17,8 @@ public class BiometricoServices
     BiometricoRepository biometricoRepository;
     @Autowired
     BiometricoMapper biometricoMapper;
+    @Autowired
+    RESTServices restServices;
 
     public BiometricoResponse findAllByBiometrico()
     {
@@ -27,7 +29,7 @@ public class BiometricoServices
             {
                 BiometricoDto  biometricoDtoIngreso= new BiometricoDto();
                 biometricoDtoIngreso.setId(8L);
-                biometricoDtoIngreso.setIpBiometrico("192.168.54.242");
+                biometricoDtoIngreso.setIpBiometrico(restServices.parametrizacionRecursosHumanos("ipBiometricoFahdi"));
                 biometricoDtoIngreso.setTipoBiometrinco("INGRESO");
                 biometricoDtoIngreso.setNombreBiometrico("GARITA");
                 biometricoDtoIngreso.setEmpresa("GD08");
@@ -35,7 +37,7 @@ public class BiometricoServices
 
                 BiometricoDto  biometricoDtoSalida= new BiometricoDto();
                 biometricoDtoSalida.setId(9L);
-                biometricoDtoSalida.setIpBiometrico("192.168.54.242");
+                biometricoDtoSalida.setIpBiometrico(restServices.parametrizacionRecursosHumanos("ipBiometricoFahdi"));
                 biometricoDtoSalida.setTipoBiometrinco("SALIDA");
                 biometricoDtoSalida.setNombreBiometrico("GARITA");
                 biometricoDtoSalida.setEmpresa("GD08");

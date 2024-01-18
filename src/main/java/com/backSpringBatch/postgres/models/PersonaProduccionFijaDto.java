@@ -2,6 +2,8 @@ package com.backSpringBatch.postgres.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.math.BigDecimal;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PersonaProduccionFijaDto
 {
@@ -14,6 +16,8 @@ public class PersonaProduccionFijaDto
     private String empCodigo;
 
     private String empNombre;
+
+    private Float sueldoAntiguo;
     public PersonaProduccionFijaDto() {
     }
 
@@ -71,5 +75,13 @@ public class PersonaProduccionFijaDto
 
     public void setEmpNombre(String empNombre) {
         this.empNombre = empNombre;
+    }
+
+    public Float getSueldoAntiguo() {
+        return sueldoAntiguo;
+    }
+
+    public void setSueldoAntiguo(Float sueldoAntiguo) {
+        this.sueldoAntiguo = sueldoAntiguo;
     }
 }
