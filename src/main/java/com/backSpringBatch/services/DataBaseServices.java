@@ -1503,7 +1503,7 @@ public class DataBaseServices {
                         ResponsePeriodoActual periodoActual =restServices.consultarPeriodoActual();
                         calculoHorasSuplementariasProduccionXPersona(x.getIdentificacion(), x.getEmpNombre(),periodoActual);
                         //calculoHorasSuplementariasProduccionXPersona("0917425266", "PROCAMARONEX",periodoActual);
-                       calculoNominaProduccionFija.calculoNominaProduccionFija(x.getIdentificacion(),x.getSueldo(),periodoActual.getPeriodoAsistencia());
+                       calculoNominaProduccionFija.calculoNominaProduccionFija(false,x.getIdentificacion(),x.getSueldo(),periodoActual.getPeriodoAsistencia());
                         //calculoNominaProduccionFija.calculoNominaProduccionFija("0917425266", (float) 458.64,periodoActual.getPeriodoAsistencia());
                     } catch (Exception e)
                     {

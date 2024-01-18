@@ -1,4 +1,5 @@
 package com.backSpringBatch.dto;
+import javax.persistence.Column;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import static java.math.BigDecimal.ZERO;
@@ -12,6 +13,9 @@ public class HorasSuplementariasPersonalDto implements Serializable {
     private  Double porcentaje;
 
     private BigDecimal saldoHorasExtras = ZERO;
+    private  Long horasSueldoAnterior=0L;
+    private BigDecimal saldoHorasExtrasSueldoAnterior = ZERO;
+
 
     public HorasSuplementariasPersonalDto() {
     }
@@ -71,5 +75,21 @@ public class HorasSuplementariasPersonalDto implements Serializable {
 
     public void setSaldoHorasExtras(BigDecimal saldoHorasExtras) {
         this.saldoHorasExtras = saldoHorasExtras;
+    }
+
+    public Long getHorasSueldoAnterior() {
+        return horasSueldoAnterior;
+    }
+
+    public void setHorasSueldoAnterior(Long horasSueldoAnterior) {
+        this.horasSueldoAnterior = horasSueldoAnterior;
+    }
+
+    public BigDecimal getSaldoHorasExtrasSueldoAnterior() {
+        return saldoHorasExtrasSueldoAnterior;
+    }
+
+    public void setSaldoHorasExtrasSueldoAnterior(BigDecimal saldoHorasExtrasSueldoAnterior) {
+        this.saldoHorasExtrasSueldoAnterior = saldoHorasExtrasSueldoAnterior;
     }
 }
