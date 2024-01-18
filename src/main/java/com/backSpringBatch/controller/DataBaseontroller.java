@@ -65,31 +65,10 @@ public class DataBaseontroller {
 		return  dataBaseServices.justificacion(justDTO);
 	}
 
-	
-
-	
-	
 	@GetMapping("procesarDataGuardada/")
 	public String procesarDataGuardada() {
 		return dataBaseServices.procesarDataGuardada();
 	}
-	
-	
-//	@GetMapping("sumarHoras")
-//	public Date sumaHoras (@RequestParam Date dateInicio, Date dateFinal){
-//		return utily.getSumBetwenDates(dateInicio, dateFinal);
-//
-//	}
-
-//	@GetMapping("simulatorMarcaciones/")
-//	public void simulatorMarcaciones (Boolean inicio ) throws InterruptedException {
-//		dataBaseServices.simulatorMarcaciones(inicio);
-//	}
-
-//	@GetMapping("calcularHora")
-//	public String calcularHora(@RequestParam String identificaicion, @RequestParam String hora){
-//		return dataBaseServices.calcularHora(identificaicion, hora);
-//	}
 
 
 	@PostMapping("findAllByHorasSuplementariasPersonal/")
@@ -144,17 +123,6 @@ public class DataBaseontroller {
 		return dataBaseServices.consultarMarcacionIdentificacion(identificacion,apellidos,empresa);
 	}
 
-		//@Scheduled (cron = "0/3 * * ? * *")
-	//cada dos horas
-		//@Scheduled (cron = "0 0 */2 * * ?")
-		//@Scheduled (cron = "0/15 0 * * * ?")
-		//@Scheduled(cron = "0 0 */6 * * *")//cada 6 hora
-		//@Scheduled(cron = "0 0 */12 * * *")//12 horas
-		//@Scheduled(cron = "0 0 */8 * * *")8 horas
-		//@Scheduled(cron = "0 * * * * *")//cada un minutos
-		//@Scheduled(cron = "0 0 */6 * * *")//cada 6 hora
-		//@Scheduled(cron = "0 * * * * *")//cada un minutos
-	//	@Scheduled(cron = "0 0 */4 * * *")//cada 4 hora
 		@GetMapping("calculoHorasSuplementariasProduccionFija/")
 	 public void calculoHorasSuplementariasProduccionFija()
 		{

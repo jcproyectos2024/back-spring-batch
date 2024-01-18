@@ -908,9 +908,7 @@ public class DataBaseServices {
             String apellidos=(consultarEntradaSalida.getApellidos()!=null && !consultarEntradaSalida.getApellidos().equals("")?"%"+consultarEntradaSalida.getApellidos().toUpperCase()+"%":null);
             EmpresaResponse empresaResponse =restServices.findByEstadoEmpCodigoEmpresa(consultarEntradaSalida.getEmpresa());
             consultarEntradaSalida.setEmpresa(empresaResponse.getSuccess()?empresaResponse.getEmpresaDTO().getEmpNombre():"");
-            //Biometrico biometrico= biometricoRepository.findByIpBiometrico(consultarEntradaSalida.getIpBiometrico());
-            //String  tipoBiometrinco=(consultarEntradaSalida.getIpBiometrico().equalsIgnoreCase("192.168.54.242")?"INGRESO-SALIDA":"INGRESO");
-           if ( (consultarEntradaSalida.getIpBiometrico()==null?"":consultarEntradaSalida.getIpBiometrico()).equalsIgnoreCase("192.168.54.242") )
+           if ( (consultarEntradaSalida.getIpBiometrico()==null?"":consultarEntradaSalida.getIpBiometrico()).equalsIgnoreCase(restServices.parametrizacionRecursosHumanos("ipBiometricoFahdi")) )
            {
                pc2= postGresRepository.consultarMarcacioneEntradaFahdiPagineo(identificacion,apellidos,consultarEntradaSalida.getFechaInicio(),consultarEntradaSalida.getFechaFin(),consultarEntradaSalida.getIpBiometrico() ,consultarEntradaSalida.getEmpresa(),"INGRESO",pageable);
            }else
@@ -1008,7 +1006,7 @@ public class DataBaseServices {
                 if (!asistNowExiste.isEmpty()) {
                     AsistnowPK asistnowPK = new AsistnowPK();
                     Biometrico biometrico;
-                   if (marcacionesDTO.getBiometrico().getIpBiometrico().equalsIgnoreCase("192.168.54.242"))
+                   if (marcacionesDTO.getBiometrico().getIpBiometrico().equalsIgnoreCase(restServices.parametrizacionRecursosHumanos("ipBiometricoFahdi")))
                    {
                         biometrico = biometricoRepository.findByIpBiometrico(marcacionesDTO.getBiometrico().getIpBiometrico());
                    }else
@@ -1128,12 +1126,10 @@ public class DataBaseServices {
             String identificacion=(consultarAsistenciasDias.getIdentificacion()!=null && !consultarAsistenciasDias.getIdentificacion().equals("")?"%"+consultarAsistenciasDias.getIdentificacion()+"%":null);
             EmpresaResponse empresaResponse =restServices.findByEstadoEmpCodigoEmpresa(consultarAsistenciasDias.getEmpresa());
             consultarAsistenciasDias.setEmpresa(empresaResponse.getSuccess()?empresaResponse.getEmpresaDTO().getEmpNombre():"");
-           Utils.console("consultarAsistenciasDias",Utils.toJson(consultarAsistenciasDias));
            if (consultarAsistenciasDias.getTipoBiometrincoGDSFahdi().equalsIgnoreCase("LOGISTICA GENERAL"))
            {
-               Utils.console("LOGISTICA GENERAL");
-            lsMarcacionesEntrada=postGresRepository.listaDiaAsistenciasBiometricoFahdi(consultarAsistenciasDias.getFechaInicio(),consultarAsistenciasDias.getFechaFin(),identificacion,"192.168.54.242","INGRESO", consultarAsistenciasDias.getEmpresa());
-            lsMarcacionesSalida=postGresRepository.listaDiaAsistenciasBiometricoFahdi(consultarAsistenciasDias.getFechaInicio(),consultarAsistenciasDias.getFechaFin(),identificacion,"192.168.54.242","SALIDA", consultarAsistenciasDias.getEmpresa());
+            lsMarcacionesEntrada=postGresRepository.listaDiaAsistenciasBiometricoFahdi(consultarAsistenciasDias.getFechaInicio(),consultarAsistenciasDias.getFechaFin(),identificacion,restServices.parametrizacionRecursosHumanos("ipBiometricoFahdi"),"INGRESO", consultarAsistenciasDias.getEmpresa());
+            lsMarcacionesSalida=postGresRepository.listaDiaAsistenciasBiometricoFahdi(consultarAsistenciasDias.getFechaInicio(),consultarAsistenciasDias.getFechaFin(),identificacion,restServices.parametrizacionRecursosHumanos("ipBiometricoFahdi"),"SALIDA", consultarAsistenciasDias.getEmpresa());
            }else
            {
               lsMarcacionesEntrada=postGresRepository.listaDiaAsistenciasBiometrico(consultarAsistenciasDias.getFechaInicio(),consultarAsistenciasDias.getFechaFin(),identificacion,"GARITA","INGRESO", consultarAsistenciasDias.getEmpresa());
@@ -1496,7 +1492,7 @@ public class DataBaseServices {
     {
         try
         {
-            ResponsePersonaProduccionFija responsePersonaProduccionFija =restServices.consultarPersonaProduccionFijaCalculo("PRODUCCIÓN FIJA");
+            ResponsePersonaProduccionFija responsePersonaProduccionFija =restServices.consultarPersonaProduccionFijaCalculo(restServices.parametrizacionRecursosHumanos("produccionFija"));
             //  Utils.console("responsePersonaProduccionFija",Utils.toJson(responsePersonaProduccionFija));
             if (responsePersonaProduccionFija.isSuccess())
             {

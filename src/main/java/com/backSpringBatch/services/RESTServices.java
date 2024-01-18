@@ -1,5 +1,6 @@
 package com.backSpringBatch.services;
 
+import com.backSpringBatch.Util.UtilsJSON;
 import com.backSpringBatch.postgres.models.*;
 import com.backSpringBatch.sqlserver.models.MarcacionesMongo;
 import com.backSpringBatch.sqlserver.models.ResponseMarcacionesMongo;
@@ -15,6 +16,9 @@ import io.restassured.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class RESTServices {
@@ -235,7 +239,8 @@ public class RESTServices {
     {
         String ruta = env.getProperty("urlParametrizacionRecursosHumanos");
         ruta+="?nombreParametro="+nombreParametro;
-        String rootc=null;
+        Map<String, Object> rootc=null;
+        String valorParametro;
         try {
             Response response = RestAssured.given()
                     .headers(
@@ -243,14 +248,15 @@ public class RESTServices {
                     .contentType("application/json;charset=utf-8").when()
                     .get(ruta)
                     .then().extract().response();
-            rootc = response.getBody().as(String.class);
+               rootc = response.getBody().as(HashMap.class);
+             valorParametro = UtilsJSON.jsonToObjeto(String.class, rootc.get("valorParametro"));
         } catch (Exception ex)
         {
             // TODO: handle exception
             ex.printStackTrace();
             throw new GenericExceptionUtils(ex);
         }
-        return rootc;
+        return valorParametro;
 
     }
 
