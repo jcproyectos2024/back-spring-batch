@@ -1,5 +1,7 @@
 package com.backSpringBatch.postgres.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
@@ -11,6 +13,7 @@ public class IngresoSalidaPK implements Serializable
     @Column(name = "asis_id", nullable = false, updatable = false)
     private String asisId;
 
+    @JsonFormat(pattern="yyyy-MM-dd")
     @Column(name = "fecha_entrada")
     private Date fechaEntrada;
 
