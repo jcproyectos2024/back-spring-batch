@@ -42,6 +42,13 @@ public class HorasSuplementariasPersonal {
 	@Column(name = "saldo_horas")
 	private BigDecimal saldoHorasExtras = ZERO;
 
+	@Column(name = "horas_sueldo_anterior")
+	private  Long horasSueldoAnterior=0L;
+
+	@Column(name = "saldo_horas_sueldo_anterior")
+	private BigDecimal saldoHorasExtrasSueldoAnterior = ZERO;
+
+
 	public Long getId() {
 		return id;
 	}
@@ -112,5 +119,21 @@ public class HorasSuplementariasPersonal {
 
 	public void setSaldoHorasExtras(BigDecimal saldoHorasExtras) {
 		this.saldoHorasExtras = saldoHorasExtras;
+	}
+
+	public Long getHorasSueldoAnterior() {
+		return horasSueldoAnterior;
+	}
+
+	public void setHorasSueldoAnterior(Long horasSueldoAnterior) {
+		this.horasSueldoAnterior = horasSueldoAnterior;
+	}
+
+	public BigDecimal getSaldoHorasExtrasSueldoAnterior() {
+		return saldoHorasExtrasSueldoAnterior;
+	}
+
+	public void setSaldoHorasExtrasSueldoAnterior(BigDecimal saldoHorasExtrasSueldoAnterior) {
+		this.saldoHorasExtrasSueldoAnterior = saldoHorasExtrasSueldoAnterior;
 	}
 }
