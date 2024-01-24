@@ -993,5 +993,27 @@ public class Utily {
         return miFecha;
     }
 
+    public BigDecimal calculoSalarioPorSegundos(BigDecimal sueldo)
+    {ffff
+        BigDecimal salarioPorHora= BigDecimal.valueOf(0);
+        BigDecimal salarioMinutos= BigDecimal.valueOf(0);
+        BigDecimal horaTrabajada= BigDecimal.valueOf(Integer.valueOf(restServices.parametrizacionRecursosHumanos("horaTrabajada")));
+        BigDecimal diaTrabajado= BigDecimal.valueOf(Integer.valueOf(restServices.parametrizacionRecursosHumanos("diaTrabajado")));
+        BigDecimal minutosTrabajado= BigDecimal.valueOf(Integer.valueOf(restServices.parametrizacionRecursosHumanos("minutosTrabajado")));
+        try
+        {
+
+            BigDecimal  sueldoDiaTrabajado= sueldo.divide(diaTrabajado,MathContext.DECIMAL128);
+            salarioPorHora= sueldoDiaTrabajado.divide(horaTrabajada,MathContext.DECIMAL128);
+            salarioMinutos=salarioPorHora.divide(minutosTrabajado,MathContext.DECIMAL128);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            throw new GenericExceptionUtils(ex);
+
+        }
+        return salarioMinutos;
+    }
 
 }

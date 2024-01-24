@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,7 +41,7 @@ public class MarcacionesIngresoSalidaServices
            // String[] fechaPeriodo= utily.fechaPeriodoSplit(periodoActual.getPeriodoAsistencia());
                 if (responsePersonaProduccionFija.isSuccess())
                 {
-                    Utils.console("responsePersonaProduccionFija",Utils.toJson(responsePersonaProduccionFija));
+
                     responsePersonaProduccionFija.getPersonaProduccionFijaDtoList().forEach(x ->
                     {
                         try
@@ -73,32 +74,43 @@ public class MarcacionesIngresoSalidaServices
         {
             ResponsePersonaProduccionFija responsePersonaProduccionFija =restServices.consultarPersonaProduccionFijaCalculo(restServices.parametrizacionRecursosHumanos("produccionFija"));
             String[] fechaPeriodo= utily.fechaPeriodoSplit(periodoActual.getPeriodoAsistencia());
-            marcacionesIngresoSalidaRepository. findAllByIngresoSalida(fechaPeriodo[0],fechaPeriodo[1],false).ifPresentOrElse(  marcacionesIngresoSalidaList ->
+            Optional<List<MarcacionesIngresoSalida>>  marcacionesIngresoSalidaListSueldoAntigOptional=marcacionesIngresoSalidaRepository.findAllByIngresoSalida("2023-12-26","2023-12-31",false);
+            Optional<List<MarcacionesIngresoSalida>>  marcacionesIngresoSalidaListOptional=marcacionesIngresoSalidaRepository.findAllByIngresoSalida("2024-01-01","2024-01-25",false);
+
+            // marcacionesIngresoSalidaRepository. findAllByIngresoSalida(fechaPeriodo[0],fechaPeriodo[1],false).ifPresentOrElse(  marcacionesIngresoSalidaList -
+            if(marcacionesIngresoSalidaListSueldoAntigOptional.isPresent() || marcacionesIngresoSalidaListOptional.isPresent())
             {
+                List<MarcacionesIngresoSalida> marcacionesIngresoSalidaListSueldoAntig=marcacionesIngresoSalidaListSueldoAntigOptional.get();
+                List<MarcacionesIngresoSalida>      marcacionesIngresoSalidaList=marcacionesIngresoSalidaListOptional.get();
+
                 if (responsePersonaProduccionFija.isSuccess())
                 {
-                   //List<PersonaProduccionFijaDto> personaProduccionFijaDtoListListFilter=responsePersonaProduccionFija.getPersonaProduccionFijaDtoList()==null? new ArrayList<>() :responsePersonaProduccionFija.getPersonaProduccionFijaDtoList().stream().filter(s->(s.getIdentificacion().equalsIgnoreCase( /*x.getIdentificacion()*/"0923988315" ))).collect(Collectors.toList());
-                    //personaProduccionFijaDtoListListFilter.forEach(x ->
+                  // List<PersonaProduccionFijaDto> personaProduccionFijaDtoListListFilter=responsePersonaProduccionFija.getPersonaProduccionFijaDtoList()==null? new ArrayList<>() :responsePersonaProduccionFija.getPersonaProduccionFijaDtoList().stream().filter(s->(s.getIdentificacion().equalsIgnoreCase( /*x.getIdentificacion()*/"0953839032" ))).collect(Collectors.toList());
+                  //  personaProduccionFijaDtoListListFilter.forEach(x ->
                    responsePersonaProduccionFija.getPersonaProduccionFijaDtoList().forEach(x ->
                 {
                         try
                         {
-                            List<MarcacionesIngresoSalida> marcacionesIngresoSalidaListFilter=marcacionesIngresoSalidaList==null? new ArrayList<>() :marcacionesIngresoSalidaList.stream().filter(p->(p.getId().getIdentificacion().equalsIgnoreCase(x.getIdentificacion()))).collect(Collectors.toList());
-                            if(!marcacionesIngresoSalidaListFilter.isEmpty())
+                            List<MarcacionesIngresoSalida> marcacionesIngresoSalidaListFilter=marcacionesIngresoSalidaList==null? new ArrayList<>() :marcacionesIngresoSalidaList.stream().filter(ls->(ls.getId().getIdentificacion().equalsIgnoreCase(x.getIdentificacion()))).collect(Collectors.toList());
+                            List<MarcacionesIngresoSalida> marcacionesIngresoSalidaListSueldoAntigFilter=marcacionesIngresoSalidaListSueldoAntig==null? new ArrayList<>() :marcacionesIngresoSalidaListSueldoAntig.stream().filter(ow->(ow.getId().getIdentificacion().equalsIgnoreCase(x.getIdentificacion()))).collect(Collectors.toList());
+
+                            if(!marcacionesIngresoSalidaListSueldoAntigFilter.isEmpty())
                             {
-                              if (x.getSueldoAntiguo()!=null)
+
+                                if ((x.getSueldoAntiguo()==null?0F:x.getSueldoAntiguo())==458.64F)
                                 {
                                     //Filtro del 26 Diciembre Hasta el 31 Diciembre para Calcular con el Sueldo Antiguo
-                                    periodoActual.setPeriodoAsistencia("2023-12-26_2023-12-31");
-                                    String[] fechaPeriodoFilter= utily.fechaPeriodoSplit(periodoActual.getPeriodoAsistencia());
-                                    List<MarcacionesIngresoSalida> marcacionesIngresoSalidaListFilterSueldoAntig=marcacionesIngresoSalidaListFilter==null? new ArrayList<>() :marcacionesIngresoSalidaListFilter.stream().filter(b->(utily.formatoDate(b.getAsisFechaEntrada()).after(utily.convertirStringDate(fechaPeriodoFilter[0]))  &&  utily.formatoDate(b.getAsisFechaEntrada()).before(utily.convertirStringDate(fechaPeriodoFilter[1])) )).collect(Collectors.toList());
-                                    calculoNominaProduccionFijaService.acumularHorasSuplementariasPersonal(true,periodoOriginal,x.getIdentificacion(),marcacionesIngresoSalidaListFilterSueldoAntig);
+                                    calculoNominaProduccionFijaService.acumularHorasSuplementariasPersonal(true,periodoOriginal,x.getIdentificacion(),marcacionesIngresoSalidaListSueldoAntigFilter);
                                    calculoNominaProduccionFijaService.calculoNominaProduccionFija(true,x.getIdentificacion(),x.getSueldoAntiguo(),periodoOriginal);
+                                }else
+                                {
+                                    calculoNominaProduccionFijaService.acumularHorasSuplementariasPersonal(false,periodoOriginal,x.getIdentificacion(),marcacionesIngresoSalidaListSueldoAntigFilter);
+                                    calculoNominaProduccionFijaService.calculoNominaProduccionFija(false,x.getIdentificacion(),x.getSueldo(),periodoOriginal);
                                 }
-                                periodoActual.setPeriodoAsistencia("2024-01-01_2024-01-25");
-                                String[] fechaPeriodoFilter= utily.fechaPeriodoSplit(periodoActual.getPeriodoAsistencia());
-                                List<MarcacionesIngresoSalida> marcacionesIngresoSalidaListFilterSueldoAntig=marcacionesIngresoSalidaListFilter==null? new ArrayList<>() :marcacionesIngresoSalidaListFilter.stream().filter(b->(utily.formatoDate(b.getAsisFechaEntrada()).after(utily.convertirStringDate(fechaPeriodoFilter[0]))  &&  utily.formatoDate(b.getAsisFechaEntrada()).before(utily.convertirStringDate(fechaPeriodoFilter[1])) )).collect(Collectors.toList());
-                                calculoNominaProduccionFijaService.acumularHorasSuplementariasPersonal(false,periodoOriginal,x.getIdentificacion(),marcacionesIngresoSalidaListFilterSueldoAntig);
+                            }
+                            if(!marcacionesIngresoSalidaListFilter.isEmpty())
+                            {
+                                calculoNominaProduccionFijaService.acumularHorasSuplementariasPersonal(false,periodoOriginal,x.getIdentificacion(),marcacionesIngresoSalidaListFilter);
                                 calculoNominaProduccionFijaService.calculoNominaProduccionFija(false,x.getIdentificacion(),x.getSueldo(),periodoOriginal);
                             }
 
@@ -110,10 +122,7 @@ public class MarcacionesIngresoSalidaServices
                    });
                 }
 
-            }, () -> {
-
-            });
-
+            }
         }catch (Exception ex)
         {
             ex.printStackTrace();
@@ -130,34 +139,49 @@ public class MarcacionesIngresoSalidaServices
         try
         {
             ResponsePersonaProduccionFija responsePersonaProduccionFija =restServices.findAllByPersonalHorasExtras(true);
+          //  Utils.console("responsePersonaProduccionFija",Utils.toJson(responsePersonaProduccionFija.getPersonaProduccionFijaDtoList()));
             String[] fechaPeriodo= utily.fechaPeriodoSplit(periodoActual.getPeriodoAsistencia());
-           marcacionesIngresoSalidaRepository.findAllByIngresoSalidaHorasExtras(fechaPeriodo[0],fechaPeriodo[1],false).ifPresentOrElse(  marcacionesIngresoSalidaList ->
+            Optional<List<MarcacionesIngresoSalida>>  marcacionesIngresoSalidaListSueldoAntigOptional=marcacionesIngresoSalidaRepository.findAllByIngresoSalidaHorasExtras("2023-12-26","2023-12-31",false);
+            Optional<List<MarcacionesIngresoSalida>>  marcacionesIngresoSalidaListOptional=marcacionesIngresoSalidaRepository.findAllByIngresoSalidaHorasExtras("2024-01-01","2024-01-25",false);
+           //marcacionesIngresoSalidaRepository.findAllByIngresoSalidaHorasExtras(fechaPeriodo[0],fechaPeriodo[1],false).ifPresentOrElse(  marcacionesIngresoSalidaList ->
+            if(marcacionesIngresoSalidaListSueldoAntigOptional.isPresent() || marcacionesIngresoSalidaListOptional.isPresent())
             {
+                List<MarcacionesIngresoSalida> marcacionesIngresoSalidaListSueldoAntig=marcacionesIngresoSalidaListSueldoAntigOptional.get();
+                List<MarcacionesIngresoSalida>      marcacionesIngresoSalidaList=marcacionesIngresoSalidaListOptional.get();
+                Utils.console("marcacionesIngresoSalidaListSueldoAntig",Utils.toJson(marcacionesIngresoSalidaListSueldoAntig));
                 if (responsePersonaProduccionFija.isSuccess())
                 {
-                   // List<PersonaProduccionFijaDto> personaProduccionFijaDtoListListFilter=responsePersonaProduccionFija.getPersonaProduccionFijaDtoList()==null? new ArrayList<>() :responsePersonaProduccionFija.getPersonaProduccionFijaDtoList().stream().filter(s->(s.getIdentificacion().equalsIgnoreCase( /*x.getIdentificacion()*/"0923988315" ))).collect(Collectors.toList());
-                    //personaProduccionFijaDtoListListFilter.forEach(x ->
-                             responsePersonaProduccionFija.getPersonaProduccionFijaDtoList().forEach(x ->
+                      // List<PersonaProduccionFijaDto> personaProduccionFijaDtoListListFilter=responsePersonaProduccionFija.getPersonaProduccionFijaDtoList()==null? new ArrayList<>() :responsePersonaProduccionFija.getPersonaProduccionFijaDtoList().stream().filter(s->(s.getIdentificacion().equalsIgnoreCase( /*x.getIdentificacion()*/"1310952690" ))).collect(Collectors.toList());
+                     //personaProduccionFijaDtoListListFilter.forEach(persona ->
+                               responsePersonaProduccionFija.getPersonaProduccionFijaDtoList().forEach(persona ->
                     {
                     try
                     {
-                        List<MarcacionesIngresoSalida> marcacionesIngresoSalidaListFilter=marcacionesIngresoSalidaList==null? new ArrayList<>() :marcacionesIngresoSalidaList.stream().filter(p->(p.getId().getIdentificacion().equalsIgnoreCase(x.getIdentificacion()))).collect(Collectors.toList());
+                        List<MarcacionesIngresoSalida> marcacionesIngresoSalidaListFilter=marcacionesIngresoSalidaList==null? new ArrayList<>() :marcacionesIngresoSalidaList.stream().filter(j->(j.getId().getIdentificacion().equalsIgnoreCase(persona.getIdentificacion()))).collect(Collectors.toList());
+                        Utils.console("persona.getIdentificacion()",Utils.toJson(persona.getIdentificacion()));
+                        List<MarcacionesIngresoSalida> marcacionesIngresoSalidaListSueldoAntigFilter=marcacionesIngresoSalidaListSueldoAntig==null? new ArrayList<>() :marcacionesIngresoSalidaListSueldoAntig.stream().filter(t->(t.getId().getIdentificacion().equalsIgnoreCase(persona.getIdentificacion()))).collect(Collectors.toList());
+                        Utils.console("marcacionesIngresoSalidaListSueldoAntigFilter",Utils.toJson(marcacionesIngresoSalidaListSueldoAntigFilter));
+                        if(!marcacionesIngresoSalidaListSueldoAntigFilter.isEmpty())
+                        {
+                            Utils.console("x.getSueldoAntiguo()",Utils.toJson(persona.getSueldoAntiguo()));
+                            System.out.println("entro***********");
+                            if ((persona.getSueldoAntiguo()==null?0F:persona.getSueldoAntiguo())==458.64F)
+                            {
+                                System.out.println("entro***********--2222---------");
+                                Utils.console("x.getSueldoAntiguo()",Utils.toJson(persona.getSueldoAntiguo()));
+                                Utils.console("marcacionesIngresoSalidaListSueldoAntigFilter",Utils.toJson(marcacionesIngresoSalidaListSueldoAntigFilter));
+                                calculoNominaProduccionFijaService.acumularHorasExtrasPersonal(true,periodoOriginal,persona.getIdentificacion(),marcacionesIngresoSalidaListSueldoAntigFilter);
+                                calculoNominaProduccionFijaService.calculoHorasExtrasNominaProduccionFija(true,persona.getIdentificacion(),persona.getSueldoAntiguo(),periodoOriginal);
+                            }else
+                            {
+                                calculoNominaProduccionFijaService.acumularHorasExtrasPersonal(false,periodoOriginal,persona.getIdentificacion(),marcacionesIngresoSalidaListSueldoAntigFilter);
+                                calculoNominaProduccionFijaService.calculoHorasExtrasNominaProduccionFija(false,persona.getIdentificacion(),persona.getSueldo(),periodoOriginal);
+                            }
+                        }
                         if(!marcacionesIngresoSalidaListFilter.isEmpty())
                         {
-                            if (x.getSueldoAntiguo()!=null)
-                            {
-                                //Filtro del 26 Diciembre Hasta el 31 Diciembre para Calcular con el Sueldo Antiguo
-                                periodoActual.setPeriodoAsistencia("2023-12-26_2023-12-31");
-                                String[] fechaPeriodoFilter= utily.fechaPeriodoSplit(periodoActual.getPeriodoAsistencia());
-                                List<MarcacionesIngresoSalida> marcacionesIngresoSalidaListFilterSueldoAntig=marcacionesIngresoSalidaListFilter==null? new ArrayList<>() :marcacionesIngresoSalidaListFilter.stream().filter(b->(utily.formatoDate(b.getAsisFechaEntrada()).after(utily.convertirStringDate(fechaPeriodoFilter[0]))  &&  utily.formatoDate(b.getAsisFechaEntrada()).before(utily.convertirStringDate(fechaPeriodoFilter[1])) )).collect(Collectors.toList());
-                                calculoNominaProduccionFijaService.acumularHorasExtrasPersonal(true,periodoOriginal,x.getIdentificacion(),marcacionesIngresoSalidaListFilterSueldoAntig);
-                                calculoNominaProduccionFijaService.calculoHorasExtrasNominaProduccionFija(true,x.getIdentificacion(),x.getSueldo(),periodoOriginal);
-                            }
-                            periodoActual.setPeriodoAsistencia("2024-01-01_2024-01-25");
-                            String[] fechaPeriodoFilter= utily.fechaPeriodoSplit(periodoActual.getPeriodoAsistencia());
-                            List<MarcacionesIngresoSalida> marcacionesIngresoSalidaListFilterSueldoAntig=marcacionesIngresoSalidaListFilter==null? new ArrayList<>() :marcacionesIngresoSalidaListFilter.stream().filter(b->(utily.formatoDate(b.getAsisFechaEntrada()).after(utily.convertirStringDate(fechaPeriodoFilter[0]))  &&  utily.formatoDate(b.getAsisFechaEntrada()).before(utily.convertirStringDate(fechaPeriodoFilter[1])) )).collect(Collectors.toList());
-                            calculoNominaProduccionFijaService.acumularHorasExtrasPersonal(false,periodoOriginal,x.getIdentificacion(),marcacionesIngresoSalidaListFilterSueldoAntig);
-                            calculoNominaProduccionFijaService.calculoHorasExtrasNominaProduccionFija(false,x.getIdentificacion(),x.getSueldo(),periodoOriginal);
+                            calculoNominaProduccionFijaService.acumularHorasExtrasPersonal(false,periodoOriginal,persona.getIdentificacion(),marcacionesIngresoSalidaListFilter);
+                            calculoNominaProduccionFijaService.calculoHorasExtrasNominaProduccionFija(false,persona.getIdentificacion(),persona.getSueldo(),periodoOriginal);
                         }
 
                     } catch (Exception e)
@@ -168,12 +192,7 @@ public class MarcacionesIngresoSalidaServices
                     });
                 }
 
-            }, () -> {
-              /*  response.setMensaje("No se encotraron Datos");
-                response.setSuccess(false);*/
-
-            });
-
+            }
         }catch (Exception ex)
         {
             ex.printStackTrace();
