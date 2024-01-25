@@ -148,7 +148,6 @@ public class MarcacionesIngresoSalidaServices
             {
                 List<MarcacionesIngresoSalida> marcacionesIngresoSalidaListSueldoAntig=marcacionesIngresoSalidaListSueldoAntigOptional.get();
                 List<MarcacionesIngresoSalida>      marcacionesIngresoSalidaList=marcacionesIngresoSalidaListOptional.get();
-                Utils.console("marcacionesIngresoSalidaListSueldoAntig",Utils.toJson(marcacionesIngresoSalidaListSueldoAntig));
                 if (responsePersonaProduccionFija.isSuccess())
                 {
                       // List<PersonaProduccionFijaDto> personaProduccionFijaDtoListListFilter=responsePersonaProduccionFija.getPersonaProduccionFijaDtoList()==null? new ArrayList<>() :responsePersonaProduccionFija.getPersonaProduccionFijaDtoList().stream().filter(s->(s.getIdentificacion().equalsIgnoreCase( /*x.getIdentificacion()*/"1310952690" ))).collect(Collectors.toList());
@@ -158,18 +157,11 @@ public class MarcacionesIngresoSalidaServices
                     try
                     {
                         List<MarcacionesIngresoSalida> marcacionesIngresoSalidaListFilter=marcacionesIngresoSalidaList==null? new ArrayList<>() :marcacionesIngresoSalidaList.stream().filter(j->(j.getId().getIdentificacion().equalsIgnoreCase(persona.getIdentificacion()))).collect(Collectors.toList());
-                        Utils.console("persona.getIdentificacion()",Utils.toJson(persona.getIdentificacion()));
                         List<MarcacionesIngresoSalida> marcacionesIngresoSalidaListSueldoAntigFilter=marcacionesIngresoSalidaListSueldoAntig==null? new ArrayList<>() :marcacionesIngresoSalidaListSueldoAntig.stream().filter(t->(t.getId().getIdentificacion().equalsIgnoreCase(persona.getIdentificacion()))).collect(Collectors.toList());
-                        Utils.console("marcacionesIngresoSalidaListSueldoAntigFilter",Utils.toJson(marcacionesIngresoSalidaListSueldoAntigFilter));
                         if(!marcacionesIngresoSalidaListSueldoAntigFilter.isEmpty())
                         {
-                            Utils.console("x.getSueldoAntiguo()",Utils.toJson(persona.getSueldoAntiguo()));
-                            System.out.println("entro***********");
                             if ((persona.getSueldoAntiguo()==null?0F:persona.getSueldoAntiguo())==458.64F)
                             {
-                                System.out.println("entro***********--2222---------");
-                                Utils.console("x.getSueldoAntiguo()",Utils.toJson(persona.getSueldoAntiguo()));
-                                Utils.console("marcacionesIngresoSalidaListSueldoAntigFilter",Utils.toJson(marcacionesIngresoSalidaListSueldoAntigFilter));
                                 calculoNominaProduccionFijaService.acumularHorasExtrasPersonal(true,periodoOriginal,persona.getIdentificacion(),marcacionesIngresoSalidaListSueldoAntigFilter);
                                 calculoNominaProduccionFijaService.calculoHorasExtrasNominaProduccionFija(true,persona.getIdentificacion(),persona.getSueldoAntiguo(),periodoOriginal);
                             }else
