@@ -44,7 +44,7 @@ public class CalculoNominaProduccionFijaService
                     String horasSplit = horasMinutosSegundosSplit[0];
                     String minutosSplit = horasMinutosSegundosSplit[1];
                     String segundosSplit = horasMinutosSegundosSplit[2];
-                    //calculos por horas
+                    //calculos por horas 25
                     if (Integer.parseInt(horasSplit) > 0 && z.getTipo().equalsIgnoreCase("horas suplementarias 25")) {
                         BigDecimal calcularPorcentaje = utility.calcularPorcentaje(z.getPorcentaje(), salarioPorHora);
                         if (sueldoAnterior)
@@ -55,6 +55,7 @@ public class CalculoNominaProduccionFijaService
                             z.setSaldoHorasExtras(BigDecimal.valueOf(Integer.parseInt(horasSplit)).multiply(calcularPorcentaje));
                         }
                     }
+                    //calculos por horas 100
                     if (Integer.parseInt(horasSplit) > 0 && z.getTipo().equalsIgnoreCase("horas suplementarias 100")) {
                         // Se multiplica por 2 cuando es al 100% salario por horas es doble
                         BigDecimal calcularPorcentaje = salarioPorHora.multiply(new BigDecimal(2));
@@ -67,7 +68,7 @@ public class CalculoNominaProduccionFijaService
                         }
                     }
 
-                    //calculos por minutos
+                    //calculos por minutos  25
                     if (Integer.parseInt(minutosSplit) > 0 && z.getTipo().equalsIgnoreCase("horas suplementarias 25")){
                         BigDecimal calcularPorcentaje = utility.calcularPorcentaje(z.getPorcentaje(), salarioPorMinutos);
                         BigDecimal minutosTotal= (BigDecimal.valueOf(Integer.parseInt(minutosSplit)).multiply(calcularPorcentaje));
@@ -79,6 +80,7 @@ public class CalculoNominaProduccionFijaService
                             z.setSaldoHorasExtras(z.getSaldoHorasExtras().add(minutosTotal));
                         }
                     }
+                    //calculos por minutos  100
                     if (Integer.parseInt(minutosSplit) >0 && z.getTipo().equalsIgnoreCase("horas suplementarias 100")) {
                         BigDecimal calcularPorcentaje = salarioPorMinutos.multiply(new BigDecimal(2));
                         BigDecimal minutosTotal= (BigDecimal.valueOf(Integer.parseInt(minutosSplit)).multiply(calcularPorcentaje));
@@ -91,7 +93,7 @@ public class CalculoNominaProduccionFijaService
                         }
                     }
 
-                    //calculos por segundos
+                    //calculos por segundos 25
                     if (Integer.parseInt(segundosSplit) > 0 && z.getTipo().equalsIgnoreCase("horas suplementarias 25")){
                         BigDecimal calcularPorcentaje = utility.calcularPorcentaje(z.getPorcentaje(), salarioPorSegundos);
                         BigDecimal segundosTotal= (BigDecimal.valueOf(Integer.parseInt(segundosSplit)).multiply(calcularPorcentaje));
@@ -103,6 +105,7 @@ public class CalculoNominaProduccionFijaService
                             z.setSaldoHorasExtras(z.getSaldoHorasExtras().add(segundosTotal));
                         }
                     }
+                    //calculos por segundos 100
                     if (Integer.parseInt(segundosSplit) >0 && z.getTipo().equalsIgnoreCase("horas suplementarias 100")) {
                         BigDecimal calcularPorcentaje = salarioPorSegundos.multiply(new BigDecimal(2));
                         BigDecimal segundosTotal= (BigDecimal.valueOf(Integer.parseInt(segundosSplit)).multiply(calcularPorcentaje));
@@ -121,7 +124,7 @@ public class CalculoNominaProduccionFijaService
                     {
                        horasSuplementariasPersonalRepository.save(z);
                     }
-                    if ((Integer.parseInt(horasSplit) > 0 || Integer.parseInt(minutosSplit) >0 || Integer.parseInt(segundosSplit) >0  ) && (z.getTipo().equalsIgnoreCase("horas suplementarias 100")))
+                    if ( (Integer.parseInt(horasSplit) > 0 || Integer.parseInt(minutosSplit) >0 || Integer.parseInt(segundosSplit) >0  ) && (z.getTipo().equalsIgnoreCase("horas suplementarias 100")) )
                     {
                         horasSuplementariasPersonalRepository.save(z);
                     }

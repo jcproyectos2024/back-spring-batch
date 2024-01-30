@@ -97,7 +97,8 @@ public class MarcacionesIngresoSalidaServices
                             if(!marcacionesIngresoSalidaListSueldoAntigFilter.isEmpty())
                             {
 
-                                if ((x.getSueldoAntiguo()==null?0F:x.getSueldoAntiguo())==458.64F)
+                              //  if ((x.getSueldoAntiguo()==null?0F:x.getSueldoAntiguo())==458.64F)
+                                    if (x.getSueldoAntiguo()!=null)
                                 {
                                     //Filtro del 26 Diciembre Hasta el 31 Diciembre para Calcular con el Sueldo Antiguo
                                     calculoNominaProduccionFijaService.acumularHorasSuplementariasPersonal(true,periodoOriginal,x.getIdentificacion(),marcacionesIngresoSalidaListSueldoAntigFilter);
@@ -160,7 +161,8 @@ public class MarcacionesIngresoSalidaServices
                         List<MarcacionesIngresoSalida> marcacionesIngresoSalidaListSueldoAntigFilter=marcacionesIngresoSalidaListSueldoAntig==null? new ArrayList<>() :marcacionesIngresoSalidaListSueldoAntig.stream().filter(t->(t.getId().getIdentificacion().equalsIgnoreCase(persona.getIdentificacion()))).collect(Collectors.toList());
                         if(!marcacionesIngresoSalidaListSueldoAntigFilter.isEmpty())
                         {
-                            if ((persona.getSueldoAntiguo()==null?0F:persona.getSueldoAntiguo())==458.64F)
+                           // if ((persona.getSueldoAntiguo()==null?0F:persona.getSueldoAntiguo())==458.64F)
+                                if (persona.getSueldoAntiguo()!=null)
                             {
                                 calculoNominaProduccionFijaService.acumularHorasExtrasPersonal(true,periodoOriginal,persona.getIdentificacion(),marcacionesIngresoSalidaListSueldoAntigFilter);
                                 calculoNominaProduccionFijaService.calculoHorasExtrasNominaProduccionFija(true,persona.getIdentificacion(),persona.getSueldoAntiguo(),periodoOriginal);
