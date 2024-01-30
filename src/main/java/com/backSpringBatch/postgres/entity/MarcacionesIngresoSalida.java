@@ -56,9 +56,9 @@ public class MarcacionesIngresoSalida
 
     @Column(name = "suplementarias_100")
     private Long suplementarias100;
-
+/*
     @Column(name = "suplementarias_50")
-    private Long suplementarias50;
+    private Long suplementarias50;*/
 
 
     @Column(name = "horas_extras")
@@ -183,14 +183,14 @@ public class MarcacionesIngresoSalida
     public void setSuplementarias100(Long suplementarias100) {
         this.suplementarias100 = suplementarias100;
     }
-
+/*
     public Long getSuplementarias50() {
         return suplementarias50;
     }
 
     public void setSuplementarias50(Long suplementarias50) {
         this.suplementarias50 = suplementarias50;
-    }
+    }*/
 
     public Long getHorasExtras() {
         return horasExtras;
