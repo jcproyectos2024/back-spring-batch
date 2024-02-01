@@ -16,6 +16,7 @@ import io.restassured.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import org.zalando.problem.Status;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +36,6 @@ public class RESTServices {
     public ShedulePersonDto getSchedulePerson(String identificacion)
     {
 
-        //System.out.println("getSchedulePerson"+identificacion);
         String ruta = env.getProperty("url_get_schedule");
         ShedulePersonDto rootc = null;
         String rutahistory=ruta;
@@ -53,14 +53,17 @@ public class RESTServices {
 
             String json = response.getBody().asString();
             Gson gson = new Gson();
-         //   System.out.println("json"+response.getStatusLine());
-          //  System.out.println("json"+response.getStatusCode());
             rootc = gson.fromJson(json, new TypeToken<ShedulePersonDto>() {
             }.getType());
         } catch (Exception ex) {
-            // TODO: handle exception
-            ex.printStackTrace();
-            throw new GenericExceptionUtils(ex);
+            if(ex.getMessage().toLowerCase().contains("connection refused")) {
+                throw new GenericExceptionUtils(
+                        Utils.replaceText("{} --> metodo: '{}' - url: '{}' - body: '{}'", ex.getMessage(), "GET", ruta)
+                        , Status.BAD_REQUEST
+                );
+            }else{
+                throw new GenericExceptionUtils(ex.getMessage(), Status.BAD_REQUEST);
+            }
         }
         return rootc;
     }
@@ -68,7 +71,6 @@ public class RESTServices {
     public PersonResponseS consultarPersonaTipoBiometricoCalculo(String identificacion)
     {
 
-        //System.out.println("consultarPersonaTipoBiometricoCalculo"+identificacion);
         String ruta = env.getProperty("urlConsultarPersonaTipoBiometricoCalculo");
         PersonResponseS rootc = null;
         String rutahistory=ruta;
@@ -87,9 +89,14 @@ public class RESTServices {
             rootc = gson.fromJson(json, new TypeToken<PersonResponseS>() {
             }.getType());
         } catch (Exception ex) {
-            // TODO: handle exception
-            ex.printStackTrace();
-            throw new GenericExceptionUtils(ex);
+            if(ex.getMessage().toLowerCase().contains("connection refused")) {
+                throw new GenericExceptionUtils(
+                        Utils.replaceText("{} --> metodo: '{}' - url: '{}' - body: '{}'", ex.getMessage(), "GET", ruta)
+                        , Status.BAD_REQUEST
+                );
+            }else{
+                throw new GenericExceptionUtils(ex.getMessage(), Status.BAD_REQUEST);
+            }
         }
         return rootc;
     }
@@ -114,9 +121,14 @@ public class RESTServices {
             ObjectMapper om = new ObjectMapper();
           //  rootc = om.readValue(json, ResponseMarcacionesMongo.class);
         } catch (Exception ex) {
-            // TODO: handle exception
-            ex.printStackTrace();
-            throw new GenericExceptionUtils(ex);
+            if(ex.getMessage().toLowerCase().contains("connection refused")) {
+                throw new GenericExceptionUtils(
+                        Utils.replaceText("{} --> metodo: '{}' - url: '{}' - body: '{}'", ex.getMessage(), "POST", urlRemote, Utils.toJson(marcacionesMongo))
+                        , Status.BAD_REQUEST
+                );
+            }else{
+                throw new GenericExceptionUtils(ex.getMessage(), Status.BAD_REQUEST);
+            }
         }
         return rootc;
     }
@@ -135,9 +147,14 @@ public class RESTServices {
             rootc = response.getBody().as(ResponsePeriodoActual.class);
         } catch (Exception ex)
         {
-            // TODO: handle exception
-            ex.printStackTrace();
-            throw new GenericExceptionUtils(ex);
+            if(ex.getMessage().toLowerCase().contains("connection refused")) {
+                throw new GenericExceptionUtils(
+                        Utils.replaceText("{} --> metodo: '{}' - url: '{}' - body: '{}'", ex.getMessage(), "GET", ruta)
+                        , Status.BAD_REQUEST
+                );
+            }else{
+                throw new GenericExceptionUtils(ex.getMessage(), Status.BAD_REQUEST);
+            }
         }
         return rootc;
 
@@ -158,9 +175,14 @@ public class RESTServices {
             rootc = response.getBody().as(EmpresaResponse.class);
         } catch (Exception ex)
         {
-            // TODO: handle exception
-            ex.printStackTrace();
-            throw new GenericExceptionUtils(ex);
+            if(ex.getMessage().toLowerCase().contains("connection refused")) {
+                throw new GenericExceptionUtils(
+                        Utils.replaceText("{} --> metodo: '{}' - url: '{}' - body: '{}'", ex.getMessage(), "GET", ruta)
+                        , Status.BAD_REQUEST
+                );
+            }else{
+                throw new GenericExceptionUtils(ex.getMessage(), Status.BAD_REQUEST);
+            }
         }
         return rootc;
 
@@ -181,9 +203,14 @@ public class RESTServices {
             rootc = response.getBody().as(ResponsePersonaProduccionFija.class);
         } catch (Exception ex)
         {
-            // TODO: handle exception
-            ex.printStackTrace();
-            throw new GenericExceptionUtils(ex);
+            if(ex.getMessage().toLowerCase().contains("connection refused")) {
+                throw new GenericExceptionUtils(
+                        Utils.replaceText("{} --> metodo: '{}' - url: '{}' - body: '{}'", ex.getMessage(), "GET", ruta)
+                        , Status.BAD_REQUEST
+                );
+            }else{
+                throw new GenericExceptionUtils(ex.getMessage(), Status.BAD_REQUEST);
+            }
         }
         return rootc;
 
@@ -204,9 +231,14 @@ public class RESTServices {
             rootc = response.getBody().as(ResponsePersonaProduccionFija.class);
         } catch (Exception ex)
         {
-            // TODO: handle exception
-            ex.printStackTrace();
-            throw new GenericExceptionUtils(ex);
+            if(ex.getMessage().toLowerCase().contains("connection refused")) {
+                throw new GenericExceptionUtils(
+                        Utils.replaceText("{} --> metodo: '{}' - url: '{}' - body: '{}'", ex.getMessage(), "GET", ruta)
+                        , Status.BAD_REQUEST
+                );
+            }else{
+                throw new GenericExceptionUtils(ex.getMessage(), Status.BAD_REQUEST);
+            }
         }
         return rootc;
 
@@ -252,9 +284,14 @@ public class RESTServices {
              valorParametro = UtilsJSON.jsonToObjeto(String.class, rootc.get("valorParametro"));
         } catch (Exception ex)
         {
-            // TODO: handle exception
-            ex.printStackTrace();
-            throw new GenericExceptionUtils(ex);
+            if(ex.getMessage().toLowerCase().contains("connection refused")) {
+                throw new GenericExceptionUtils(
+                        Utils.replaceText("{} --> metodo: '{}' - url: '{}' - body: '{}'", ex.getMessage(), "GET", ruta)
+                        , Status.BAD_REQUEST
+                );
+            }else{
+                throw new GenericExceptionUtils(ex.getMessage(), Status.BAD_REQUEST);
+            }
         }
         return valorParametro;
 
@@ -275,8 +312,14 @@ public class RESTServices {
         } catch (Exception ex)
         {
             // TODO: handle exception
-            ex.printStackTrace();
-            throw new GenericExceptionUtils(ex);
+            if(ex.getMessage().toLowerCase().contains("connection refused")) {
+                throw new GenericExceptionUtils(
+                        Utils.replaceText("{} --> metodo: '{}' - url: '{}' - body: '{}'", ex.getMessage(), "GET", ruta)
+                        , Status.BAD_REQUEST
+                );
+            }else{
+                throw new GenericExceptionUtils(ex.getMessage(), Status.BAD_REQUEST);
+            }
         }
 
     }
