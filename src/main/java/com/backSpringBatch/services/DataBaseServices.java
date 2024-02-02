@@ -1518,7 +1518,7 @@ public class DataBaseServices {
         }
     }
 
-    @Transactional(rollbackFor = {Exception.class} )
+    @Transactional(rollbackFor = {RuntimeException.class} )
     public RegistroMarcacionesResponses guardadoEntradaSalidaMarcacionDia( List<RegistroMarcacionesGuardadoDTO> marcacionesGuardadoDTOList) throws Exception
     {
         RegistroMarcacionesResponses response = new RegistroMarcacionesResponses();

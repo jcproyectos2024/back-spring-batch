@@ -1,4 +1,6 @@
 package com.backSpringBatch.services;
+import com.backSpringBatch.Util.UtilsJSON;
+import com.backSpringBatch.dto.RegistroMarcacionesDTO;
 import com.backSpringBatch.postgres.entity.MantenimientoFeriado;
 import com.backSpringBatch.postgres.mapper.MantenimientoFeriadoMapper;
 import com.backSpringBatch.postgres.models.MantenimientoFeriadoDto;
@@ -6,11 +8,16 @@ import com.backSpringBatch.postgres.repository.MantenimientoFeriadoRepository;
 import com.diosmar.GenericExceptionUtils;
 import com.diosmar.GenericResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.zalando.problem.Status;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 @Service
 public class MantenimientoFeriadoServices
@@ -29,7 +36,6 @@ public class MantenimientoFeriadoServices
                 mantenimientoFeriadoRepository.findAllByEstadoTrue().ifPresentOrElse(mantenimientoFeriadoList ->
                 {
                     List<MantenimientoFeriadoDto> mantenimientoFeriadoDtoList = mantenimientoFeriadoMapper.toMantenimientoFeriadoDtoList(mantenimientoFeriadoList);
-
                     genericResponse.data(mantenimientoFeriadoDtoList)
                             .success(true)
                             .message("Consulta Existosa");
@@ -41,119 +47,103 @@ public class MantenimientoFeriadoServices
             return genericResponse;
         }
 
-/*
 
-        public MantenimientoFeriadoResponse findByIdMantenimientoFeriado(long id)
+
+        public GenericResponse findByIdMantenimientoFeriado(long id)
         {
             GenericResponse genericResponse  =new GenericResponse();
-
-            try
-            {
-
                 mantenimientoFeriadoRepository.findByEstadoTrueAndIdMantenimientoFeriado(id).ifPresentOrElse(mantenimientoFeriado ->
                 {
                     MantenimientoFeriadoDto mantenimientoFeriadoDto = mantenimientoFeriadoMapper.mantenimientoFeriadoToMantenimientoFeriadoDto(mantenimientoFeriado);
-                    response.setMantenimientoFeriadoDto(mantenimientoFeriadoDto);
-                    response.setMensaje("Consulta Existosa");
-                    response.setSuccess(true);
+                    genericResponse.data(mantenimientoFeriadoDto)
+                            .success(true)
+                            .message("Consulta Existosa");
 
                 }, () -> {
-                    response.setMensaje("No se encotraron Datos");
-                    response.setSuccess(false);
+                    throw new GenericExceptionUtils("No se encotraron Datos", Status.OK);
                 });
 
-
-            }catch (Exception ex)
-            {
-                ex.printStackTrace();
-                response.setMensaje("Error de Servidor");
-                response.setSuccess(false);
-                //return response;
-                throw new GenericExceptionUtils(ex);
-
-            }
-
-
-            return response;
+            return genericResponse;
         }
 
-        @Transactional(rollbackFor = {Exception.class} )
-        public MantenimientoFeriadoResponse saveUpdateMantenimientoFeriado(MantenimientoFeriadoDto mantenimientoFeriadoDto)
+        @Transactional(rollbackFor = {RuntimeException.class} )
+        public GenericResponse saveUpdateMantenimientoFeriado(List<MantenimientoFeriadoDto> mantenimientoFeriadoDtoList)
         {
-            MantenimientoFeriadoResponse response = new MantenimientoFeriadoResponse();
+            GenericResponse genericResponse  =new GenericResponse();
 
-            try
+            for (MantenimientoFeriadoDto mantenimientoFeriadoDto :mantenimientoFeriadoDtoList)
             {
-
                 mantenimientoFeriadoRepository.
                         findByEstadoTrueAndIdMantenimientoFeriado(Objects.requireNonNullElse(mantenimientoFeriadoDto.getIdMantenimientoFeriado(), 0L))
                         .ifPresentOrElse(mantenimientoFeriado ->
                         {
 
                             MantenimientoFeriado mantenimientoFeriadoMap = mantenimientoFeriadoMapper.mantenimientoFeriadoDtoToMantenimientoFeriado(mantenimientoFeriadoDto);
+                            mantenimientoFeriadoMap.setEstado(true);
                             mantenimientoFeriadoMap.setFechaModifica(Instant.now());
                             mantenimientoFeriadoMap.setEstado(Objects.requireNonNullElse(mantenimientoFeriadoDto.getEstado(), mantenimientoFeriado.getEstado()));
-                            response.setMantenimientoFeriadoDto(mantenimientoFeriadoMapper.mantenimientoFeriadoToMantenimientoFeriadoDto(mantenimientoFeriadoRepository.save(mantenimientoFeriadoMap)));
-                            response.setMensaje("Modificación Existosa");
-                            response.setSuccess(true);
+                            genericResponse.data(mantenimientoFeriadoMapper.mantenimientoFeriadoToMantenimientoFeriadoDto(mantenimientoFeriadoRepository.save(mantenimientoFeriadoMap)))
+                                    .success(true)
+                                    .message("Modificación Existosa");
+
                         }, () ->
                         {
-                            //mantenimientoFeriadoDto.setEstado(true);
+                            mantenimientoFeriadoDto.setEstado(true);
+                            mantenimientoFeriadoDto.setFechaCreacion(Instant.now());
                             MantenimientoFeriado mantenimientoFeriadoSave= mantenimientoFeriadoRepository.save(mantenimientoFeriadoMapper.mantenimientoFeriadoDtoToMantenimientoFeriado(mantenimientoFeriadoDto));
-                            response.setMantenimientoFeriadoDto(mantenimientoFeriadoMapper.mantenimientoFeriadoToMantenimientoFeriadoDto(mantenimientoFeriadoSave));
-                            response.setMensaje("Guardado Existoso");
-                            response.setSuccess(true);
+                            genericResponse.data(mantenimientoFeriadoMapper.mantenimientoFeriadoToMantenimientoFeriadoDto(mantenimientoFeriadoSave))
+                                    .success(true)
+                                    .message("Guardado Existosa");
                         });
-
-
-            }catch (Exception ex)
-            {
-                ex.printStackTrace();
-                response.setMensaje("Error de Servidor :"+ex.getMessage());
-                response.setSuccess(false);
-                //  return response;
-                throw new GenericExceptionUtils(ex);
-
             }
-            return response;
+            return genericResponse;
         }
 
 
-        public MantenimientoFeriadoResponse deleteMantenimientoFeriado(Long id)
+        public GenericResponse deleteMantenimientoFeriado(Long id)
         {
-            MantenimientoFeriadoResponse response = new MantenimientoFeriadoResponse();
-
-            try
-            {
+            GenericResponse genericResponse  =new GenericResponse();
 
                 mantenimientoFeriadoRepository.findByEstadoTrueAndIdMantenimientoFeriado(id).ifPresentOrElse(mantenimientoFeriado ->
                 {
                     mantenimientoFeriado.setFechaModifica(Instant.now());
                     mantenimientoFeriado.setEstado(false);
                     MantenimientoFeriado mantenimientoFeriadoSave= mantenimientoFeriadoRepository.save(mantenimientoFeriado);
-                    response.setMantenimientoFeriadoDto(mantenimientoFeriadoMapper.mantenimientoFeriadoToMantenimientoFeriadoDto(mantenimientoFeriadoSave));
-                    response.setMensaje("Elimino Existosamente");
-                    response.setSuccess(true);
+                    genericResponse.data(mantenimientoFeriadoMapper.mantenimientoFeriadoToMantenimientoFeriadoDto(mantenimientoFeriadoSave))
+                            .success(true)
+                            .message("Elimino Existosamente");
 
                 }, () ->
                 {
-
-                    response.setMensaje("No se Elimino");
-                    response.setSuccess(false);
+                    genericResponse.success(true)
+                            .message("No se Elimino");
                 });
 
-            }catch (Exception ex)
-            {
-                ex.printStackTrace();
-                response.setMensaje("Error de Servidor");
-                response.setSuccess(false);
-                // return response;
-                throw new GenericExceptionUtils(ex);
-
-            }
-            return response;
+            return genericResponse;
         }
-*/
+
+    public GenericResponse consultarMantenimientoFeriadoPagineo(Map<String, Object> body)
+    {
+        GenericResponse genericResponse  =new GenericResponse();
+        String feriado = UtilsJSON.jsonToObjeto(String.class, body.get("feriado"));
+        int numeroPagina = UtilsJSON.jsonToObjeto(Integer.class, body.get("numeroPagina"));
+        int numeroRegistros = UtilsJSON.jsonToObjeto(Integer.class, body.get("numeroRegistros"));
+        Pageable pageable = PageRequest.of(numeroPagina-1,numeroRegistros);
+        String feriadoConsulta=(feriado!=null && !feriado.equals("")?"%"+feriado+"%":null);
+        Page<MantenimientoFeriado> pc2= mantenimientoFeriadoRepository.consultarMantenimientoFeriadoPagineo(feriadoConsulta,pageable);
+        if (!pc2.getContent().isEmpty())
+        {
+            List<MantenimientoFeriadoDto> mantenimientoFeriadoDtoList = mantenimientoFeriadoMapper.toMantenimientoFeriadoDtoList(pc2.getContent());
+            genericResponse.data(mantenimientoFeriadoDtoList)
+                    .success(true)
+                    .message("Consulta Existosa");
+        }
+        else {
+            throw new GenericExceptionUtils("No se encotraron Datos", Status.OK);
+        }
+        return genericResponse;
+    }
+
 
 }
 
